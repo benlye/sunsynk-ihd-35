@@ -23,7 +23,7 @@ static lv_color_t buf[ screenWidth * screenHeight / 10 ];
 
 // Variables for looping
 long lastUpdateTime = 0;
-int loopDelaySec = 60;
+int loopDelaySec = 30;
 
 const char compileDate[] = __DATE__ " " __TIME__;
 
@@ -50,7 +50,7 @@ void connectWifI() {
 
 // Use NTP to set the clock
 void setClock() {
-  configTime(0, 0, "pool.ntp.org");
+  configTzTime("GMTGMT-1,M3.4.0/01,M10.4.0/02", "pool.ntp.org");
 
   Serial.print(F(" - Waiting for NTP time sync ..."));
   time_t nowSecs = time(nullptr);
@@ -81,10 +81,15 @@ String getDateTimeString(unsigned long val) {
   return String(timeString);
 }
 
-// Converts an epoch time to a 24hr clock time string
-String getTimeString(unsigned long val) {
+// Gets a 24hr clock time string
+String getTimeString() {
+  struct tm timeinfo;
   char timeString[20];
-  sprintf(timeString, "%02d:%02d", hour(val), minute(val));
+  if (!getLocalTime(&timeinfo)){
+    Serial.println("Failed to obtain time");
+    return "00:00";
+  }
+  sprintf(timeString, "%02d:%02d", timeinfo.tm_hour, timeinfo.tm_min);
   return String(timeString);
 }
 
@@ -276,7 +281,7 @@ void loop()
   }
 
     // Update the time
-    String timeNow = getTimeString(getTime());
+    String timeNow = getTimeString();
     lv_label_set_text(ui_time, timeNow.c_str());
 
     lv_timer_handler(); /* let the GUI do its work */
