@@ -136,8 +136,6 @@ void my_disp_flush( lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *colo
 void my_touchpad_read( lv_indev_drv_t * indev_driver, lv_indev_data_t * data )
 {
     uint16_t touchX = 0, touchY = 0;
-
-    //bool touched = false;
     bool touched = tft.getTouch( &touchX, &touchY, 600 );
 
     if( !touched )
@@ -147,17 +145,8 @@ void my_touchpad_read( lv_indev_drv_t * indev_driver, lv_indev_data_t * data )
     else
     {
         data->state = LV_INDEV_STATE_PR;
-
-        /*Set the coordinates*/
         data->point.x = touchX;
         data->point.y = touchY;
-
-        Serial.print( "Data x " );
-        Serial.println( touchX );
-
-        Serial.print( "Data y " );
-        Serial.println( touchY );
-
     }
 }
 
