@@ -1,2 +1,6 @@
 # Secrets file
 **/Secrets.h
+
+# VS Code Arduino files
+.vscode/build/
+.vscode/c_cpp_properties.json
