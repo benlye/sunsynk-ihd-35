@@ -191,7 +191,7 @@ void ui_home_screen_init(void)
     lv_obj_set_width(ui_battChargeIcon, LV_SIZE_CONTENT);   /// 30
     lv_obj_set_height(ui_battChargeIcon, LV_SIZE_CONTENT);    /// 30
     lv_obj_set_x(ui_battChargeIcon, -221);
-    lv_obj_set_y(ui_battChargeIcon, 90);
+    lv_obj_set_y(ui_battChargeIcon, 91);
     lv_obj_set_align(ui_battChargeIcon, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_battChargeIcon, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
     lv_obj_clear_flag(ui_battChargeIcon, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
@@ -282,12 +282,12 @@ void ui_home_screen_init(void)
     lv_obj_set_width(ui_gridExportArrow, LV_SIZE_CONTENT);   /// 30
     lv_obj_set_height(ui_gridExportArrow, LV_SIZE_CONTENT);    /// 30
     lv_obj_set_x(ui_gridExportArrow, 229);
-    lv_obj_set_y(ui_gridExportArrow, -83);
+    lv_obj_set_y(ui_gridExportArrow, -84);
     lv_obj_set_align(ui_gridExportArrow, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_gridExportArrow, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
     lv_obj_clear_flag(ui_gridExportArrow, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_img_set_angle(ui_gridExportArrow, -900);
-    lv_img_set_zoom(ui_gridExportArrow, 170);
+    lv_img_set_zoom(ui_gridExportArrow, 200);
     lv_obj_set_style_img_recolor(ui_gridExportArrow, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_img_recolor_opa(ui_gridExportArrow, 100, LV_PART_MAIN | LV_STATE_DEFAULT);
 
@@ -296,12 +296,12 @@ void ui_home_screen_init(void)
     lv_obj_set_width(ui_gridImportArrow, LV_SIZE_CONTENT);   /// 30
     lv_obj_set_height(ui_gridImportArrow, LV_SIZE_CONTENT);    /// 30
     lv_obj_set_x(ui_gridImportArrow, 228);
-    lv_obj_set_y(ui_gridImportArrow, -56);
+    lv_obj_set_y(ui_gridImportArrow, -54);
     lv_obj_set_align(ui_gridImportArrow, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_gridImportArrow, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
     lv_obj_clear_flag(ui_gridImportArrow, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_img_set_angle(ui_gridImportArrow, 900);
-    lv_img_set_zoom(ui_gridImportArrow, 170);
+    lv_img_set_zoom(ui_gridImportArrow, 200);
     lv_obj_set_style_img_recolor(ui_gridImportArrow, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_img_recolor_opa(ui_gridImportArrow, 100, LV_PART_MAIN | LV_STATE_DEFAULT);
 

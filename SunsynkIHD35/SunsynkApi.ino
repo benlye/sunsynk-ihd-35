@@ -1,6 +1,10 @@
 #include <ArduinoJson.h>
 #include <Preferences.h>
 
+#include "Secrets.h"
+#include "SunsynkApi.h"
+#include "ui.h"
+
 void GetSunsynkAuthToken() {
   Serial.println("Fetching new Sunsynk auth token ...");
   WiFiClientSecure *client = new WiFiClientSecure;
@@ -41,7 +45,7 @@ void GetSunsynkAuthToken() {
             const char* refreshToken = authResponseJson["data"]["refresh_token"];
             unsigned long expiresIn = authResponseJson["data"]["expires_in"];
             unsigned long expiresAt = getTime() + expiresIn;
-            Serial.printf("New Token Expires: %s\n\n", getTimeString(expiresAt).c_str());
+            Serial.printf("New Token Expires: %s\n\n", getDateTimeString(expiresAt).c_str());
 
             prefs.begin("sunsynk", false);
             prefs.putString("access-token", accessToken);
@@ -165,46 +169,78 @@ void GetPlantFlow() {
   //Serial.println();
 
   if (responseJson["code"] == 0 && responseJson["msg"] == "Success") {
-    int pvPower = responseJson["data"]["pvPower"];
-    int battPower = responseJson["data"]["battPower"];
-    int gridOrMeterPower = responseJson["data"]["gridOrMeterPower"];
-    int loadOrEpsPower = responseJson["data"]["loadOrEpsPower"];
-    int battSoc = responseJson["data"]["soc"];
+    int pvPower = responseJson["data"]["pvPower"];                    // Energy from solar generation
+    int battPower = responseJson["data"]["battPower"];                // Energy flowing in or out of the battery
+    int gridOrMeterPower = responseJson["data"]["gridOrMeterPower"];  // Energy flowing in or out of the grid
+    int loadOrEpsPower = responseJson["data"]["loadOrEpsPower"];      // Energy flowing to the load
+    int battSoc = responseJson["data"]["soc"];                        // Battery state of charge percentage
+    bool toBatt = responseJson["data"]["toBat"];                      // True if battery is charging; false if discharging
+    bool toGrid = responseJson["data"]["toGrid"];                     // True if exporting; false if importing
 
+    // Update the PV energy
     lv_label_set_text_fmt(ui_pvWatts, "%dW", pvPower);
     if (pvPower == 0) {
-      lv_obj_set_style_text_color(ui_pvWatts, lv_color_hex(0xA2A2A2), LV_PART_MAIN | LV_STATE_DEFAULT);
+      lv_obj_set_style_text_color(ui_pvWatts, lv_color_hex(UI_GREY), LV_PART_MAIN | LV_STATE_DEFAULT);
     } else {
-      lv_obj_set_style_text_color(ui_pvWatts, lv_color_hex(0x00E05A), LV_PART_MAIN | LV_STATE_DEFAULT);
+      lv_obj_set_style_text_color(ui_pvWatts, lv_color_hex(UI_GREEN), LV_PART_MAIN | LV_STATE_DEFAULT);
     }
     
+    // Update the grid energy
+    int gridWattsColor = UI_GREY;
+    int gridExportColor = UI_WHITE;
+    int gridImportColor = UI_WHITE;
+    int gridExportAlpha = 100;
+    int gridImportAlpha = 100;
+    
+    if (gridOrMeterPower > 0) {
+      if (toGrid) { // Exporting
+        gridWattsColor = UI_GREEN;
+        gridExportColor = UI_GREEN;
+        gridExportAlpha = 255;
+      } else { // Importing
+        gridWattsColor = UI_RED;
+        gridImportColor = UI_RED;
+        gridImportAlpha = 255;
+      }
+    }
+
+    // Grid watts colour
+    lv_obj_set_style_text_color(ui_gridWatts, lv_color_hex(gridWattsColor), LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // Grid Export arrow colour
+    lv_obj_set_style_img_recolor(ui_gridExportArrow, lv_color_hex(gridExportColor), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_img_recolor_opa(ui_gridExportArrow, gridExportAlpha, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // Grid import arrow colour
+    lv_obj_set_style_img_recolor(ui_gridImportArrow, lv_color_hex(gridImportColor), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_img_recolor_opa(ui_gridImportArrow, gridImportAlpha, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // Grid watts value
     lv_label_set_text_fmt(ui_gridWatts, "%dW", gridOrMeterPower);
-    if (gridOrMeterPower == 0) {
-      lv_obj_set_style_text_color(ui_gridWatts, lv_color_hex(0xA2A2A2), LV_PART_MAIN | LV_STATE_DEFAULT);
-    } else if (gridOrMeterPower > 0) {
-      lv_obj_set_style_text_color(ui_gridWatts, lv_color_hex(0x00E05A), LV_PART_MAIN | LV_STATE_DEFAULT);
+    
+    // Update the battery energy
+    if (battPower == 0) { // Neither charging nor discharging
+      lv_obj_set_style_text_color(ui_battWatts, lv_color_hex(UI_GREY), LV_PART_MAIN | LV_STATE_DEFAULT);
     } else {
-      lv_obj_set_style_text_color(ui_gridWatts, lv_color_hex(0xE00000), LV_PART_MAIN | LV_STATE_DEFAULT);
+      if (toBatt) { // Charging
+        lv_obj_set_style_text_color(ui_battWatts, lv_color_hex(UI_GREEN), LV_PART_MAIN | LV_STATE_DEFAULT);
+        battPower = battPower * -1;        
+      } else { // Discharging
+        lv_obj_set_style_text_color(ui_battWatts, lv_color_hex(UI_RED), LV_PART_MAIN | LV_STATE_DEFAULT);
+      }
     }
-
     lv_label_set_text_fmt(ui_battWatts, "%dW", battPower);
-    if (battPower == 0) {
-      lv_obj_set_style_text_color(ui_battWatts, lv_color_hex(0xA2A2A2), LV_PART_MAIN | LV_STATE_DEFAULT);
-    } else if (battPower > 0) {
-      lv_obj_set_style_text_color(ui_battWatts, lv_color_hex(0xE00000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    } else {
-      lv_obj_set_style_text_color(ui_battWatts, lv_color_hex(0x00E05A), LV_PART_MAIN | LV_STATE_DEFAULT);
-    }
 
+    // Update the load energy
+    if (loadOrEpsPower == 0) {
+      lv_obj_set_style_text_color(ui_loadWatts, lv_color_hex(UI_GREY), LV_PART_MAIN | LV_STATE_DEFAULT);
+    } else {
+      lv_obj_set_style_text_color(ui_loadWatts, lv_color_hex(UI_RED), LV_PART_MAIN | LV_STATE_DEFAULT);
+    }
     lv_label_set_text_fmt(ui_loadWatts, "%dW", loadOrEpsPower);
-        if (loadOrEpsPower == 0) {
-      lv_obj_set_style_text_color(ui_loadWatts, lv_color_hex(0xA2A2A2), LV_PART_MAIN | LV_STATE_DEFAULT);
-    } else {
-      lv_obj_set_style_text_color(ui_loadWatts, lv_color_hex(0xE00000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    }
 
+    // Update the battery SOC
     lv_label_set_text_fmt(ui_battSoc, "%d%%", battSoc);
-
 
     Serial.println();
     Serial.printf("PV:      %6d W\n", pvPower);

@@ -50,7 +50,7 @@ void connectWifI() {
 
 // Use NTP to set the clock
 void setClock() {
-  configTzTime("GMTGMT-1,M3.4.0/01,M10.4.0/02", "pool.ntp.org");
+  configTzTime(TZ_INFO, "pool.ntp.org");
 
   Serial.print(F(" - Waiting for NTP time sync ..."));
   time_t nowSecs = time(nullptr);
