@@ -10,7 +10,7 @@
 #include <Time.h>
 #include <TimeLib.h>
 
-#include "Secrets.h"
+#include "Config.h"
 #include "SunsynkApi.h"
 #include "ui.h"
 

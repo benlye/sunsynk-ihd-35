@@ -1,5 +1,5 @@
-# Secrets file
-**/Secrets.h
+# User configuration file
+**/Config.h
 
 # VS Code Arduino files
 .vscode/build/

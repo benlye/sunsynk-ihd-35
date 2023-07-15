@@ -2,7 +2,7 @@
 #define __CONFIG_H
 
 /* 
- * Secrets.h - Stores sensitive configuration data. 
+ * Config.h - Stores sensitive configuration data. 
  * Changes to this file will be excluded from Git.
  */
 
