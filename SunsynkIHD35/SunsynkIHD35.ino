@@ -75,9 +75,16 @@ unsigned long getTime() {
 }
 
 // Converts an epoch time to a datetime string
-String getTimeString(unsigned long val) {
+String getDateTimeString(unsigned long val) {
   char timeString[20];
   sprintf(timeString, "%4d-%02d-%02d %02d:%02d:%02d", year(val), month(val), day(val), hour(val), minute(val), second(val));
+  return String(timeString);
+}
+
+// Converts an epoch time to a 24hr clock time string
+String getTimeString(unsigned long val) {
+  char timeString[20];
+  sprintf(timeString, "%02d:%02d", hour(val), minute(val));
   return String(timeString);
 }
 
@@ -207,7 +214,7 @@ void setup()
 
     Serial.printf("\nNetwork SSID: %s\n", WIFI_SSID);
     Serial.printf("IP Address:   %s\n", WiFi.localIP().toString().c_str());
-    Serial.printf("\nUTC Time:     %s\n", getTimeString(getTime()).c_str());
+    Serial.printf("\nUTC Time:     %s\n", getDateTimeString(getTime()).c_str());
     Serial.println("\nReady.\n");
 
     Serial.println( "Setup done" );
@@ -226,7 +233,7 @@ void loop()
     char* tokenState = "Unknown";
     bool tokenValid = false;
     if (accessToken != "" && tokenExpiry > 0){
-      Serial.printf("Stored Token Expiry: %s\n", getTimeString(tokenExpiry).c_str());
+      Serial.printf("Stored Token Expiry: %s\n", getDateTimeString(tokenExpiry).c_str());
       if (tokenExpiry > getTime()) {
         tokenState = "Valid";
         tokenValid = true;
@@ -267,6 +274,10 @@ void loop()
     // Wait for a bit
     Serial.printf("Waiting %d seconds before next API poll ...\n\n", loopDelaySec);
   }
+
+    // Update the time
+    String timeNow = getTimeString(getTime());
+    lv_label_set_text(ui_time, timeNow.c_str());
 
     lv_timer_handler(); /* let the GUI do its work */
     delay(5);

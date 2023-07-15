@@ -43,38 +43,16 @@ lv_obj_t * ui_loadTotalUnits;
 lv_obj_t * ui_inverterIcon;
 lv_obj_t * ui_Inverter;
 lv_obj_t * ui_SunsynkLogo;
-void ui_event_Image10(lv_event_t * e);
-lv_obj_t * ui_Image10;
-
-// SCREEN: ui_config
-void ui_config_screen_init(void);
-lv_obj_t * ui_config;
-lv_obj_t * ui_settingsTabs;
-lv_obj_t * ui_WiFi;
-lv_obj_t * ui_ssidLabel;
-lv_obj_t * ui_networkSSID;
-lv_obj_t * ui_networkPasswordLabel;
-lv_obj_t * ui_networkPassword;
-lv_obj_t * ui_Sunsynk;
-lv_obj_t * ui_usernameLabel;
-lv_obj_t * ui_username;
-lv_obj_t * ui_apiPasswordLabel;
-lv_obj_t * ui_apiPassword;
-lv_obj_t * ui_inverterId;
-lv_obj_t * ui_inverterIdLabel;
-lv_obj_t * ui_btnSaveSettings;
-lv_obj_t * ui_btnSaveSettingsLabel;
-void ui_event_btnCancelSettings(lv_event_t * e);
-lv_obj_t * ui_btnCancelSettings;
-lv_obj_t * ui_btnCancelSettingsLabel;
+lv_obj_t * ui_configIcon;
+lv_obj_t * ui_time;
 lv_obj_t * ui____initial_actions0;
+const lv_img_dsc_t * ui_imgset_867608463[1] = {&ui_img_705529016};
 const lv_img_dsc_t * ui_imgset_1070557679[1] = {&ui_img_670870020};
 const lv_img_dsc_t * ui_imgset_1885365100[1] = {&ui_img_1076282785};
+const lv_img_dsc_t * ui_imgset_1703005419[1] = {&ui_img_540100334};
 const lv_img_dsc_t * ui_imgset_1375169470[1] = {&ui_img_1549501229};
 const lv_img_dsc_t * ui_imgset_1399112042[1] = {&ui_img_264836261};
 const lv_img_dsc_t * ui_imgset_1178831554[1] = {&ui_img_1933564998};
-const lv_img_dsc_t * ui_imgset_867608463[1] = {&ui_img_705529016};
-const lv_img_dsc_t * ui_imgset_1703005419[1] = {&ui_img_540100334};
 
 ///////////////////// TEST LVGL SETTINGS ////////////////////
 #if LV_COLOR_DEPTH != 16
@@ -87,22 +65,6 @@ const lv_img_dsc_t * ui_imgset_1703005419[1] = {&ui_img_540100334};
 ///////////////////// ANIMATIONS ////////////////////
 
 ///////////////////// FUNCTIONS ////////////////////
-void ui_event_Image10(lv_event_t * e)
-{
-    lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t * target = lv_event_get_target(e);
-    if(event_code == LV_EVENT_CLICKED) {
-        _ui_screen_change(&ui_config, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_config_screen_init);
-    }
-}
-void ui_event_btnCancelSettings(lv_event_t * e)
-{
-    lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t * target = lv_event_get_target(e);
-    if(event_code == LV_EVENT_CLICKED) {
-        _ui_screen_change(&ui_home, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_home_screen_init);
-    }
-}
 
 ///////////////////// SCREENS ////////////////////
 
@@ -113,7 +75,6 @@ void ui_init(void)
                                                false, LV_FONT_DEFAULT);
     lv_disp_set_theme(dispp, theme);
     ui_home_screen_init();
-    ui_config_screen_init();
     ui____initial_actions0 = lv_obj_create(NULL);
     lv_disp_load_scr(ui_home);
 }

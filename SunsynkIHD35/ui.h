@@ -59,29 +59,8 @@ extern lv_obj_t * ui_loadTotalUnits;
 extern lv_obj_t * ui_inverterIcon;
 extern lv_obj_t * ui_Inverter;
 extern lv_obj_t * ui_SunsynkLogo;
-void ui_event_Image10(lv_event_t * e);
-extern lv_obj_t * ui_Image10;
-// SCREEN: ui_config
-void ui_config_screen_init(void);
-extern lv_obj_t * ui_config;
-extern lv_obj_t * ui_settingsTabs;
-extern lv_obj_t * ui_WiFi;
-extern lv_obj_t * ui_ssidLabel;
-extern lv_obj_t * ui_networkSSID;
-extern lv_obj_t * ui_networkPasswordLabel;
-extern lv_obj_t * ui_networkPassword;
-extern lv_obj_t * ui_Sunsynk;
-extern lv_obj_t * ui_usernameLabel;
-extern lv_obj_t * ui_username;
-extern lv_obj_t * ui_apiPasswordLabel;
-extern lv_obj_t * ui_apiPassword;
-extern lv_obj_t * ui_inverterId;
-extern lv_obj_t * ui_inverterIdLabel;
-extern lv_obj_t * ui_btnSaveSettings;
-extern lv_obj_t * ui_btnSaveSettingsLabel;
-void ui_event_btnCancelSettings(lv_event_t * e);
-extern lv_obj_t * ui_btnCancelSettings;
-extern lv_obj_t * ui_btnCancelSettingsLabel;
+extern lv_obj_t * ui_configIcon;
+extern lv_obj_t * ui_time;
 extern lv_obj_t * ui____initial_actions0;
 
 LV_IMG_DECLARE(ui_img_1549501229);    // assets\icons8-solar-panel-100.png
