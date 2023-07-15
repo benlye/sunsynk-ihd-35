@@ -51,4 +51,8 @@ At a high level:
 In the fullness of time I will add more information to make it easier. I plan to to do that after I receive the new display hardware and have figured out what a 'final' version will look like.
 
 ## Disclaimer
-I have no association or affiliation with Sunsynk, I'm just a system owner who likes to tinker. I offer this to the community with no warranty whatsoever.
+I have no association or affiliation with Sunsynk, I'm just a system owner who likes to tinker.
+
+This is very much a work in progress, and the code should be considered pre-beta. I'm quite sure that it can be significantly improved, and over time it will be.
+
+I offer this project to the community with no warranty whatsoever.
