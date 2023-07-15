@@ -195,12 +195,12 @@ void GetPlantFlow() {
     if (gridOrMeterPower > 0) {
       if (toGrid) { // Exporting
         gridWattsColor = UI_GREEN;
-        gridExportColor = UI_GREEN;
-        gridExportAlpha = 255;
+        //gridExportColor = UI_GREEN;
+        //gridExportAlpha = 255;
       } else { // Importing
         gridWattsColor = UI_RED;
-        gridImportColor = UI_RED;
-        gridImportAlpha = 255;
+        //gridImportColor = UI_RED;
+        //gridImportAlpha = 255;
       }
     }
 

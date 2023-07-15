@@ -1,3 +1,5 @@
+#ifndef __CONFIG_H
+#define __CONFIG_H
 
 /* 
  * Secrets.h - Stores sensitive configuration data. 
@@ -24,3 +26,5 @@ const char* SUNSYNK_INVERTER_ID = "<INVERTER ID>";
 
 // Timezone string - see https://www.gnu.org/software/libc/manual/html_node/TZ-Variable.html for more information
 const char* TZ_INFO             = "GMTGMT-1,M3.4.0/01,M10.4.0/02";
+
+#endif // __CONFIG_H
