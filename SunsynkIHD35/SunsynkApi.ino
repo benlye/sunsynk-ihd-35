@@ -1,23 +1,20 @@
 #include <ArduinoJson.h>
-#include <Preferences.h>
 #include <WiFiClientSecure.h>
 
 #include "Config.h"
 #include "SunsynkApi.h"
 #include "ui.h"
 
-boolean CheckSunsynkAuthToken() {
+ApiToken apiToken;
 
-    // Get access token and token expiry from store
-    String accessToken = GetPrefString("access-token");
-    unsigned long tokenExpiry = GetPrefULong("expires-at");
+boolean CheckSunsynkAuthToken() {
 
     // Check if the access token is valid
     char* tokenState = "Unknown";
     bool tokenValid = false;
-    if (accessToken != "" && tokenExpiry > 0){
-    Serial.printf("Stored Token Expiry: %s\n", getDateTimeString(tokenExpiry).c_str());
-    if (tokenExpiry > getTime()) {
+    if (apiToken.accessToken != "" && apiToken.expiresIn > 0){
+    Serial.printf("Stored Token Expiry: %s\n", getDateTimeString(apiToken.expiresAt).c_str());
+    if (apiToken.expiresAt > getTime()) {
         tokenState = "Valid";
         tokenValid = true;
     } else {
@@ -37,6 +34,7 @@ boolean CheckSunsynkAuthToken() {
 void GetSunsynkAuthToken() {
   Serial.println("Fetching new Sunsynk auth token ...");
   WiFiClientSecure *client = new WiFiClientSecure;
+
   if(client) {
     client -> setCACert(SUNSYNK_API_CERT);
     {
@@ -76,12 +74,11 @@ void GetSunsynkAuthToken() {
             unsigned long expiresAt = getTime() + expiresIn;
             Serial.printf("New Token Expires: %s\n\n", getDateTimeString(expiresAt).c_str());
 
-            prefs.begin("sunsynk", false);
-            prefs.putString("access-token", accessToken);
-            prefs.putString("refresh-token", refreshToken);
-            prefs.putULong("expires-in", expiresIn);
-            prefs.putULong("expires-at", expiresAt);
-            prefs.end();
+            apiToken.accessToken = String(accessToken);
+            apiToken.refreshToken = String(refreshToken);
+            apiToken.expiresIn = expiresIn;
+            apiToken.expiresAt = expiresAt;
+
           }
         } else {
           Serial.printf("[HTTPS] POST... failed, error: %s\n", https.errorToString(httpCode).c_str());
@@ -116,7 +113,7 @@ String CallSunsynkApi(String uri) {
       if (https.begin(*client, uri)) {  // HTTPS
 
         // start connection and send HTTP header
-        https.addHeader("Authorization", "Bearer " + GetPrefString("access-token"));
+        https.addHeader("Authorization", "Bearer " + apiToken.accessToken);
         https.addHeader("Content-Type", "application/json");
         https.addHeader("Accept", "application/json");
 
@@ -355,7 +352,7 @@ void GetBatteryTotals() {
   }
 }
 
-void GetLoadTotals() {
+void GetLoadTotal() {
   Serial.println("Getting load daily total data ...");
   char apiUri[128];
   sprintf(apiUri, "%s/inverter/load/%s/realtime?sn=%s", SUNSYNK_API_URL, SUNSYNK_INVERTER_ID, SUNSYNK_INVERTER_ID);
