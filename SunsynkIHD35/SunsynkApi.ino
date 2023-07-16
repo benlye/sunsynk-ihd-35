@@ -39,7 +39,7 @@ void GetSunsynkAuthToken() {
   if(client) {
     client -> setCACert(SUNSYNK_API_CERT);
     {
-      // Add a scoping block for HTTPClient https to make sure it is destroyed before WiFiClientSecure *client is 
+      // Add a scoping block for HTTPClient https to make sure it is destroyed before WiFiClientSecure *client is
       HTTPClient https;
       if (https.begin(*client, SUNSYNK_LOGIN_URL)) {  // HTTPS
 
@@ -51,11 +51,11 @@ void GetSunsynkAuthToken() {
         sprintf(authPayload, "{\"username\": \"%s\", \"password\": \"%s\", \"grant_type\": \"password\", \"client_id\":\"csp_web\"}", SUNSYNK_USERNAME, SUNSYNK_PASSWORD);
 
         int httpCode = https.POST(authPayload);
-  
+
         if (httpCode > 0) {
           // HTTP header has been send and Server response header has been handled
           Serial.printf("Response: %d\n", httpCode);
-  
+
           // file found at server
           if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
             String authReponse = https.getString();
@@ -84,7 +84,7 @@ void GetSunsynkAuthToken() {
         } else {
           Serial.printf("[HTTPS] POST... failed, error: %s\n", https.errorToString(httpCode).c_str());
         }
-  
+
         https.end();
       } else {
         Serial.printf("[HTTPS] Unable to connect\n");
@@ -92,7 +92,7 @@ void GetSunsynkAuthToken() {
 
       // End extra scoping block
     }
-  
+
     client -> stop();
     delete client;
   } else {
@@ -102,15 +102,15 @@ void GetSunsynkAuthToken() {
 
 String CallSunsynkApi(String uri) {
   //Serial.println(uri);
-  
+
   String payload;
   WiFiClientSecure *client = new WiFiClientSecure;
 
   if(client) {
     client -> setCACert(SUNSYNK_API_CERT);
     {
-      // Add a scoping block for HTTPClient https to make sure it is destroyed before WiFiClientSecure *client is 
-      HTTPClient https;  
+      // Add a scoping block for HTTPClient https to make sure it is destroyed before WiFiClientSecure *client is
+      HTTPClient https;
       if (https.begin(*client, uri)) {  // HTTPS
 
         // start connection and send HTTP header
@@ -119,7 +119,7 @@ String CallSunsynkApi(String uri) {
         https.addHeader("Accept", "application/json");
 
         int httpCode = https.GET();
-  
+
         if (httpCode > 0) {
           Serial.printf("Response: %d\n", httpCode);
           if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
@@ -128,7 +128,7 @@ String CallSunsynkApi(String uri) {
         } else {
           Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());
         }
-  
+
         https.end();
       } else {
         Serial.printf("[HTTPS] Unable to connect\n");
@@ -226,7 +226,7 @@ void GetPlantFlow() {
     }
     lv_obj_set_style_text_color(ui_pvWatts, lv_color_hex(pvWattsColor), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_label_set_text_fmt(ui_pvWatts, "%dW", pvPower);
-    
+
     // Update the grid energy
     int gridWattsColor = UI_GREY;
     if (gridOrMeterPower > 0) {
@@ -238,13 +238,13 @@ void GetPlantFlow() {
     }
     lv_obj_set_style_text_color(ui_gridWatts, lv_color_hex(gridWattsColor), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_label_set_text_fmt(ui_gridWatts, "%dW", gridOrMeterPower);
-    
+
     // Update the battery energy
     int battWattsColor = UI_GREY;
     if (battPower != 0) { // Neither charging nor discharging
       if (toBatt) { // Charging
         battWattsColor = UI_GREEN;
-        battPower = battPower * -1;        
+        battPower = battPower * -1;
       } else { // Discharging
         battWattsColor = UI_RED;
       }
