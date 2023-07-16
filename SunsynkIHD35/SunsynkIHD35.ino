@@ -19,11 +19,11 @@
 #endif
 
 /* Screen resolution */
-static const uint16_t screenWidth  = 480;
+static const uint16_t screenWidth = 480;
 static const uint16_t screenHeight = 320;
 
 static lv_disp_draw_buf_t draw_buf;
-static lv_color_t buf[ screenWidth * screenHeight / 10 ];
+static lv_color_t buf[screenWidth * screenHeight / 10];
 
 // Variables for looping
 long lastUpdateTime = 0;
@@ -39,95 +39,106 @@ TFT_eSPI tft = TFT_eSPI(screenWidth, screenHeight);
 WiFiMulti WiFiMulti;
 
 // Connect to WiFi
-void connectWifI() {
-  WiFi.mode(WIFI_STA);
-  WiFiMulti.addAP(WIFI_SSID, WIFI_PASSWORD);
+void connectWifI()
+{
+    WiFi.mode(WIFI_STA);
+    WiFiMulti.addAP(WIFI_SSID, WIFI_PASSWORD);
 
-  Serial.print(" - Waiting for WiFi to connect ...");
-  while ((WiFiMulti.run() != WL_CONNECTED)) {
-    //Serial.print(".");
-  }
-  Serial.println(" connected");
+    Serial.print(" - Waiting for WiFi to connect ...");
+    while ((WiFiMulti.run() != WL_CONNECTED))
+    {
+        // Serial.print(".");
+    }
+    Serial.println(" connected");
 }
 
 // Use NTP to set the clock
-void setClock() {
-  configTzTime(TZ_INFO, "pool.ntp.org");
+void setClock()
+{
+    configTzTime(TZ_INFO, "pool.ntp.org");
 
-  Serial.print(F(" - Waiting for NTP time sync ..."));
-  time_t nowSecs = time(nullptr);
-  while (nowSecs < 8 * 3600 * 2) {
-    delay(500);
-    Serial.print(F("."));
-    yield();
-    nowSecs = time(nullptr);
-  }
-  Serial.println(" synced");
+    Serial.print(F(" - Waiting for NTP time sync ..."));
+    time_t nowSecs = time(nullptr);
+    while (nowSecs < 8 * 3600 * 2)
+    {
+        delay(500);
+        Serial.print(F("."));
+        yield();
+        nowSecs = time(nullptr);
+    }
+    Serial.println(" synced");
 }
 
 // Get current epoch time
-unsigned long getTime() {
-  time_t now;
-  struct tm timeinfo;
-  if (!getLocalTime(&timeinfo)) {
-    return(0);
-  }
-  time(&now);
-  return now;
+unsigned long getTime()
+{
+    time_t now;
+    struct tm timeinfo;
+    if (!getLocalTime(&timeinfo))
+    {
+        return (0);
+    }
+    time(&now);
+    return now;
 }
 
 // Return a datetime string of the current localized time
-String getDateTimeString() {
-  struct tm timeinfo;
-  char timeString[32];
-  if (!getLocalTime(&timeinfo)){
-    Serial.println("Failed to obtain time");
-    return "1970-01-01 00:00:00";
-  }
-  sprintf(timeString, "%04d-%02d-%02d %02d:%02d:%02d", timeinfo.tm_year + 1900, timeinfo.tm_mon + 1, timeinfo.tm_mday, timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
-  return String(timeString);
+String getDateTimeString()
+{
+    struct tm timeinfo;
+    char timeString[32];
+    if (!getLocalTime(&timeinfo))
+    {
+        Serial.println("Failed to obtain time");
+        return "1970-01-01 00:00:00";
+    }
+    sprintf(timeString, "%04d-%02d-%02d %02d:%02d:%02d", timeinfo.tm_year + 1900, timeinfo.tm_mon + 1, timeinfo.tm_mday, timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
+    return String(timeString);
 }
 
 // Converts an epoch time to a datetime string
-String getDateTimeString(unsigned long val) {
-  char timeString[20];
-  sprintf(timeString, "%4d-%02d-%02d %02d:%02d:%02d", year(val), month(val), day(val), hour(val), minute(val), second(val));
-  return String(timeString);
+String getDateTimeString(unsigned long val)
+{
+    char timeString[20];
+    sprintf(timeString, "%4d-%02d-%02d %02d:%02d:%02d", year(val), month(val), day(val), hour(val), minute(val), second(val));
+    return String(timeString);
 }
 
 // Gets a 24hr clock time string
-String getTimeString() {
-  struct tm timeinfo;
-  char timeString[20];
-  if (!getLocalTime(&timeinfo)){
-    Serial.println("Failed to obtain time");
-    return "00:00";
-  }
-  sprintf(timeString, "%02d:%02d", timeinfo.tm_hour, timeinfo.tm_min);
-  return String(timeString);
+String getTimeString()
+{
+    struct tm timeinfo;
+    char timeString[20];
+    if (!getLocalTime(&timeinfo))
+    {
+        Serial.println("Failed to obtain time");
+        return "00:00";
+    }
+    sprintf(timeString, "%02d:%02d", timeinfo.tm_hour, timeinfo.tm_min);
+    return String(timeString);
 }
 
 /* Display flushing */
-void my_disp_flush( lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p )
+void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p)
 {
-    uint32_t w = ( area->x2 - area->x1 + 1 );
-    uint32_t h = ( area->y2 - area->y1 + 1 );
+    uint32_t w = (area->x2 - area->x1 + 1);
+    uint32_t h = (area->y2 - area->y1 + 1);
 
     tft.startWrite();
-    tft.setAddrWindow( area->x1, area->y1, w, h );
-    tft.pushColors( ( uint16_t * )&color_p->full, w * h, true );
+    tft.setAddrWindow(area->x1, area->y1, w, h);
+    tft.pushColors((uint16_t *)&color_p->full, w * h, true);
     tft.endWrite();
 
-    lv_disp_flush_ready( disp );
+    lv_disp_flush_ready(disp);
 }
 
 /*Read the touchpad*/
-void my_touchpad_read( lv_indev_drv_t * indev_driver, lv_indev_data_t * data )
+void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
 {
     uint16_t touchX = 0, touchY = 0;
-    bool touched = tft.getTouch( &touchX, &touchY, 600 );
+    bool touched = tft.getTouch(&touchX, &touchY, 600);
 
-    if( !touched )
+    if (!touched)
     {
         data->state = LV_INDEV_STATE_REL;
     }
@@ -139,11 +150,12 @@ void my_touchpad_read( lv_indev_drv_t * indev_driver, lv_indev_data_t * data )
     }
 }
 
-void getVersion(char const *date, char const *time, char *buff) { 
+void getVersion(char const *date, char const *time, char *buff)
+{
     int month, day, year, hour, min, sec;
     static const char month_names[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
     sscanf(date, "%s %d %d", buff, &day, &year);
-    month = (strstr(month_names, buff)-month_names)/3+1;
+    month = (strstr(month_names, buff) - month_names) / 3 + 1;
     year = year % 100U;
     sscanf(time, "%d:%d:%d", &hour, &min, &sec);
     sprintf(buff, "v%d.%02d%02d-%02d%02d", year, month, day, hour, min);
@@ -155,7 +167,7 @@ void setup()
     getVersion(__DATE__, __TIME__, version);
 
     // Initialize the serial port
-    Serial.begin( 115200 );
+    Serial.begin(115200);
     Serial.printf("\n%s\n", version);
     Serial.println("\nBooting ...");
 
@@ -166,29 +178,29 @@ void setup()
     tft.begin();
     tft.setRotation(TFT_ROTATION);
 
-    // Apply the screen calibration data
-    #ifdef USE_TOUCH_CAL
+// Apply the screen calibration data
+#ifdef USE_TOUCH_CAL
     tft.setTouch(calData);
-    #endif
+#endif
 
     // Initialize the display buffer
-    lv_disp_draw_buf_init( &draw_buf, buf, NULL, screenWidth * screenHeight / 10 );
+    lv_disp_draw_buf_init(&draw_buf, buf, NULL, screenWidth * screenHeight / 10);
 
     // Initialize the display
     static lv_disp_drv_t disp_drv;
-    lv_disp_drv_init( &disp_drv );
+    lv_disp_drv_init(&disp_drv);
     disp_drv.hor_res = screenWidth;
     disp_drv.ver_res = screenHeight;
     disp_drv.flush_cb = my_disp_flush;
     disp_drv.draw_buf = &draw_buf;
-    lv_disp_drv_register( &disp_drv );
+    lv_disp_drv_register(&disp_drv);
 
     // Initialize the (dummy) input device driver
     static lv_indev_drv_t indev_drv;
-    lv_indev_drv_init( &indev_drv );
+    lv_indev_drv_init(&indev_drv);
     indev_drv.type = LV_INDEV_TYPE_POINTER;
     indev_drv.read_cb = my_touchpad_read;
-    lv_indev_drv_register( &indev_drv );
+    lv_indev_drv_register(&indev_drv);
 
     // Initialize the TFT
     ui_init();
@@ -241,7 +253,8 @@ void setup()
 void loop()
 {
     // Update the clock at startup or after the interval has elapsed
-    if ((lastClockUpdateTime == 0) || (millis() - lastClockUpdateTime >= 1000L)) {
+    if ((lastClockUpdateTime == 0) || (millis() - lastClockUpdateTime >= 1000L))
+    {
         String timeNow = getTimeString();
         lv_label_set_text(ui_time, timeNow.c_str());
         lastClockUpdateTime = millis();
@@ -251,7 +264,8 @@ void loop()
     if ((lastUpdateTime == 0) || (millis() - lastUpdateTime >= (loopDelaySec * 1000L)))
     {
         // Get a new token if one is needed
-        if (!CheckSunsynkAuthToken()) {
+        if (!CheckSunsynkAuthToken())
+        {
             GetSunsynkAuthToken();
         }
 
@@ -266,7 +280,7 @@ void loop()
 
         // Get the battery charge and discharge totals
         GetBatteryTotals();
-    
+
         // Get the load total
         GetLoadTotal();
 
@@ -276,10 +290,10 @@ void loop()
         // Wait for a bit
         Serial.printf("Waiting %d seconds before next API poll ...\n\n", loopDelaySec);
     }
-  
+
     // Update the GUI
     lv_timer_handler();
-    
+
     // Sleep for a bit
     delay(5);
 }
