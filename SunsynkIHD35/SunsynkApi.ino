@@ -149,8 +149,13 @@ void GetPlantRealtime() {
   sprintf(apiUri, "%s/plant/%s/realtime", SUNSYNK_API_URL, SUNSYNK_PLANT_ID);
   String payload = CallSunsynkApi(apiUri);
 
-  StaticJsonDocument<2048> responseJson;
-  DeserializationError error = deserializeJson(responseJson, payload);
+  StaticJsonDocument<192> responseJson;
+  StaticJsonDocument<200> filter;
+  filter["code"] = true;
+  filter["msg"] = true;
+  filter["data"]["pac"] = true;
+  filter["data"]["etoday"] = true;
+  DeserializationError error = deserializeJson(responseJson, payload, DeserializationOption::Filter(filter));
 
   if (error) {
     Serial.print(F("deserializeJson() failed: "));
@@ -158,8 +163,8 @@ void GetPlantRealtime() {
     return;
   }
 
-  //serializeJsonPretty(responseJson, Serial);
-  //Serial.println();
+  serializeJsonPretty(responseJson, Serial);
+  Serial.println();
 
   if (responseJson["code"] == 0 && responseJson["msg"] == "Success") {
     int pac = responseJson["data"]["pac"];
@@ -183,8 +188,18 @@ void GetPlantFlow() {
   sprintf(apiUri, "%s/plant/energy/%s/flow", SUNSYNK_API_URL, SUNSYNK_PLANT_ID);
   String payload = CallSunsynkApi(apiUri);
 
-  StaticJsonDocument<2048> responseJson;
-  DeserializationError error = deserializeJson(responseJson, payload);
+  StaticJsonDocument<512> responseJson;
+  StaticJsonDocument<200> filter;
+  filter["code"] = true;
+  filter["msg"] = true;
+  filter["data"]["pvPower"] = true;
+  filter["data"]["battPower"] = true;
+  filter["data"]["gridOrMeterPower"] = true;
+  filter["data"]["loadOrEpsPower"] = true;
+  filter["data"]["soc"] = true;
+  filter["data"]["toBat"] = true;
+  filter["data"]["toGrid"] = true;
+  DeserializationError error = deserializeJson(responseJson, payload, DeserializationOption::Filter(filter));
 
   if (error) {
     Serial.print(F("deserializeJson() failed: "));
@@ -192,8 +207,8 @@ void GetPlantFlow() {
     return;
   }
 
-  //serializeJsonPretty(responseJson, Serial);
-  //Serial.println();
+  serializeJsonPretty(responseJson, Serial);
+  Serial.println();
 
   if (responseJson["code"] == 0 && responseJson["msg"] == "Success") {
     int pvPower = responseJson["data"]["pvPower"];                    // Energy from solar generation
@@ -285,8 +300,13 @@ void GetGridTotals() {
   sprintf(apiUri, "%s/inverter/grid/%s/realtime?sn=%s", SUNSYNK_API_URL, SUNSYNK_INVERTER_ID, SUNSYNK_INVERTER_ID);
   String payload = CallSunsynkApi(apiUri);
 
-  StaticJsonDocument<768> responseJson;
-  DeserializationError error = deserializeJson(responseJson, payload);
+  StaticJsonDocument<192> responseJson;
+  StaticJsonDocument<200> filter;
+  filter["code"] = true;
+  filter["msg"] = true;
+  filter["data"]["etodayTo"] = true;
+  filter["data"]["etodayFrom"] = true;
+  DeserializationError error = deserializeJson(responseJson, payload, DeserializationOption::Filter(filter));
 
   if (error) {
     Serial.print(F("deserializeJson() failed: "));
@@ -294,8 +314,8 @@ void GetGridTotals() {
     return;
   }
 
-  //serializeJsonPretty(responseJson, Serial);
-  //Serial.println();
+  serializeJsonPretty(responseJson, Serial);
+  Serial.println();
 
   if (responseJson["code"] == 0 && responseJson["msg"] == "Success") {
 
@@ -322,8 +342,13 @@ void GetBatteryTotals() {
   sprintf(apiUri, "%s/inverter/battery/%s/realtime?sn=%s&lan=en", SUNSYNK_API_URL, SUNSYNK_INVERTER_ID, SUNSYNK_INVERTER_ID);
   String payload = CallSunsynkApi(apiUri);
 
-  StaticJsonDocument<2048> responseJson;
-  DeserializationError error = deserializeJson(responseJson, payload);
+  StaticJsonDocument<192> responseJson;
+  StaticJsonDocument<200> filter;
+  filter["code"] = true;
+  filter["msg"] = true;
+  filter["data"]["etodayChg"] = true;
+  filter["data"]["etodayDischg"] = true;
+  DeserializationError error = deserializeJson(responseJson, payload, DeserializationOption::Filter(filter));
 
   if (error) {
     Serial.print(F("deserializeJson() failed: "));
@@ -331,8 +356,8 @@ void GetBatteryTotals() {
     return;
   }
 
-  //serializeJsonPretty(responseJson, Serial);
-  //Serial.println();
+  serializeJsonPretty(responseJson, Serial);
+  Serial.println();
 
   if (responseJson["code"] == 0 && responseJson["msg"] == "Success") {
 
@@ -359,8 +384,12 @@ void GetLoadTotal() {
   sprintf(apiUri, "%s/inverter/load/%s/realtime?sn=%s", SUNSYNK_API_URL, SUNSYNK_INVERTER_ID, SUNSYNK_INVERTER_ID);
   String payload = CallSunsynkApi(apiUri);
 
-  StaticJsonDocument<512> responseJson;
-  DeserializationError error = deserializeJson(responseJson, payload);
+  StaticJsonDocument<128> responseJson;
+  StaticJsonDocument<200> filter;
+  filter["code"] = true;
+  filter["msg"] = true;
+  filter["data"]["dailyUsed"] = true;
+  DeserializationError error = deserializeJson(responseJson, payload, DeserializationOption::Filter(filter));
 
   if (error) {
     Serial.print(F("deserializeJson() failed: "));
@@ -368,8 +397,8 @@ void GetLoadTotal() {
     return;
   }
 
-  //serializeJsonPretty(responseJson, Serial);
-  //Serial.println();
+  serializeJsonPretty(responseJson, Serial);
+  Serial.println();
 
   if (responseJson["code"] == 0 && responseJson["msg"] == "Success") {
     double loadTotalDbl = responseJson["data"]["dailyUsed"];
