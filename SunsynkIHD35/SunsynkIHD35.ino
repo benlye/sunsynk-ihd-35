@@ -14,6 +14,10 @@
 #include "SunsynkApi.h"
 #include "ui.h"
 
+#ifndef __CONFIG_H
+#error Configuration file is missing!
+#endif
+
 /* Screen resolution */
 static const uint16_t screenWidth  = 480;
 static const uint16_t screenHeight = 320;
