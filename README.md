@@ -15,6 +15,12 @@ My prototype hardware is an ESP-WROOM-32 'Dev Kit C' board and a cheap 3.5" TFT 
 
 <p align="center"><img src="img/prototype_2.jpg" alt="IHD Interface" width="400"/><br><i>IHD on 3.5" TFT LCD</i></p>
 
+### Board Wiring
+
+I used the `Setup204_ESP32_TouchDown.h` template from the TFT_eSPI library with one change - I moved `TFT_DC` from `GPIO 2` to `GPIO 0` to prevent the built-in LED (which is on GPIO2) being constantly on.
+
+<p align="center"><img src="img/wiring.png" alt="Prototype Wiring" width="800"/><br><i>ESP32 and 3.5" TFT LCD Wiring</i></p>
+
 ## Future Hardware
 I've ordered a couple of different ESP32 display devices from [elecrow.com](https://www.elecrow.com/)
 * [3.5" ESP32 480x320 TFT with ILI9488](https://www.elecrow.com/esp-terminal-with-esp32-3-5-inch-parallel-480x320-tft-capacitive-touch-display-rgb-by-chip-ili9488.html)
