@@ -11,7 +11,7 @@ const char* SUNSYNK_LOGIN_URL = "https://pv.inteless.com/oauth/token";
  */
 const char* SUNSYNK_API_URL = "https://pv.inteless.com/api/v1";
 
-// Stores a Sunsynk API authentication token
+// Stores a Sunsynk API authentication token.
 struct ApiToken {
      String accessToken = "";
      String refreshToken = "";

@@ -220,65 +220,44 @@ void GetPlantFlow() {
     bool toGrid = responseJson["data"]["toGrid"];                     // True if exporting; false if importing
 
     // Update the PV energy
-    lv_label_set_text_fmt(ui_pvWatts, "%dW", pvPower);
-    if (pvPower == 0) {
-      lv_obj_set_style_text_color(ui_pvWatts, lv_color_hex(UI_GREY), LV_PART_MAIN | LV_STATE_DEFAULT);
-    } else {
-      lv_obj_set_style_text_color(ui_pvWatts, lv_color_hex(UI_GREEN), LV_PART_MAIN | LV_STATE_DEFAULT);
+    int pvWattsColor = UI_GREY;
+    if (pvPower > 0) { // Generating
+      pvWattsColor = UI_GREEN;
     }
+    lv_obj_set_style_text_color(ui_pvWatts, lv_color_hex(pvWattsColor), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_label_set_text_fmt(ui_pvWatts, "%dW", pvPower);
     
     // Update the grid energy
     int gridWattsColor = UI_GREY;
-    int gridExportColor = UI_WHITE;
-    int gridImportColor = UI_WHITE;
-    int gridExportAlpha = 100;
-    int gridImportAlpha = 100;
-    
     if (gridOrMeterPower > 0) {
       if (toGrid) { // Exporting
         gridWattsColor = UI_GREEN;
-        //gridExportColor = UI_GREEN;
-        //gridExportAlpha = 255;
       } else { // Importing
         gridWattsColor = UI_RED;
-        //gridImportColor = UI_RED;
-        //gridImportAlpha = 255;
       }
     }
-
-    // Grid watts colour
     lv_obj_set_style_text_color(ui_gridWatts, lv_color_hex(gridWattsColor), LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    // Grid Export arrow colour
-    lv_obj_set_style_img_recolor(ui_gridExportArrow, lv_color_hex(gridExportColor), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_img_recolor_opa(ui_gridExportArrow, gridExportAlpha, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    // Grid import arrow colour
-    lv_obj_set_style_img_recolor(ui_gridImportArrow, lv_color_hex(gridImportColor), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_img_recolor_opa(ui_gridImportArrow, gridImportAlpha, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    // Grid watts value
     lv_label_set_text_fmt(ui_gridWatts, "%dW", gridOrMeterPower);
     
     // Update the battery energy
-    if (battPower == 0) { // Neither charging nor discharging
-      lv_obj_set_style_text_color(ui_battWatts, lv_color_hex(UI_GREY), LV_PART_MAIN | LV_STATE_DEFAULT);
-    } else {
+    int battWattsColor = UI_GREY;
+    if (battPower != 0) { // Neither charging nor discharging
       if (toBatt) { // Charging
-        lv_obj_set_style_text_color(ui_battWatts, lv_color_hex(UI_GREEN), LV_PART_MAIN | LV_STATE_DEFAULT);
+        battWattsColor = UI_GREEN;
         battPower = battPower * -1;        
       } else { // Discharging
-        lv_obj_set_style_text_color(ui_battWatts, lv_color_hex(UI_RED), LV_PART_MAIN | LV_STATE_DEFAULT);
+        battWattsColor = UI_RED;
       }
     }
+    lv_obj_set_style_text_color(ui_battWatts, lv_color_hex(battWattsColor), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_label_set_text_fmt(ui_battWatts, "%dW", battPower);
 
     // Update the load energy
-    if (loadOrEpsPower == 0) {
-      lv_obj_set_style_text_color(ui_loadWatts, lv_color_hex(UI_GREY), LV_PART_MAIN | LV_STATE_DEFAULT);
-    } else {
-      lv_obj_set_style_text_color(ui_loadWatts, lv_color_hex(UI_RED), LV_PART_MAIN | LV_STATE_DEFAULT);
+    int loadWattsColor = UI_GREY;
+    if (loadOrEpsPower > 0) {  // Consuming
+      loadWattsColor = UI_RED;
     }
+    lv_obj_set_style_text_color(ui_loadWatts, lv_color_hex(loadWattsColor), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_label_set_text_fmt(ui_loadWatts, "%dW", loadOrEpsPower);
 
     // Update the battery SOC

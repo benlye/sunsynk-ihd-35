@@ -135,11 +135,24 @@ void my_touchpad_read( lv_indev_drv_t * indev_driver, lv_indev_data_t * data )
     }
 }
 
+void getVersion(char const *date, char const *time, char *buff) { 
+    int month, day, year, hour, min, sec;
+    static const char month_names[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
+    sscanf(date, "%s %d %d", buff, &day, &year);
+    month = (strstr(month_names, buff)-month_names)/3+1;
+    year = year % 100U;
+    sscanf(time, "%d:%d:%d", &hour, &min, &sec);
+    sprintf(buff, "v%d.%02d%02d-%2d%2d", year, month, day, hour, min);
+}
+
 void setup()
 {
+    char version[24];
+    getVersion(__DATE__, __TIME__, version);
+
     // Initialize the serial port
     Serial.begin( 115200 );
-    Serial.printf("\nFirmware Date: %s\n", compileDate);
+    Serial.printf("\n%s\n", version);
     Serial.println("\nBooting ...");
 
     // Initialize LVGL
@@ -182,6 +195,8 @@ void setup()
     tft.drawString("3.5\" IHD for Sunsynk", tft.width() / 2, 30, 4);
     tft.setTextColor(TFT_LIGHTGREY);
     tft.drawString("https://github.com/benlye/sunsynk-ihd-35", tft.width() / 2, 50, 2);
+    tft.setTextDatum(BC_DATUM);
+    tft.drawString(version, tft.width() / 2, tft.height() - 10, 2);
 
     // Connect to WiFi
     tft.setTextDatum(MC_DATUM);
@@ -201,22 +216,23 @@ void setup()
     tft.setTextColor(TFT_GREEN);
     tft.drawString(getDateTimeString().c_str(), 10, tft.height() - 10, 2);
 
+    // Get an API access token
     tft.setTextDatum(MC_DATUM);
     tft.setTextColor(TFT_YELLOW, true);
     tft.drawString("Authenticating with Sunsynk ...", tft.width() / 2, tft.height() / 2, 2);
     GetSunsynkAuthToken();
 
+    // Last status update
     tft.setTextDatum(MC_DATUM);
     tft.setTextColor(TFT_YELLOW, true);
     tft.drawString("Getting data from Sunsynk ...", tft.width() / 2, tft.height() / 2, 2);
 
+    // Send status update to serial
     Serial.printf("\nNetwork SSID: %s\n", WIFI_SSID);
     Serial.printf("IP Address:   %s\n", WiFi.localIP().toString().c_str());
     Serial.printf("\nUTC Time:     %s\n", getDateTimeString(getTime()).c_str());
     Serial.println("\nReady.\n");
 }
-
-
 
 void loop()
 {
