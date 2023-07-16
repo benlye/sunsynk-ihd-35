@@ -142,7 +142,7 @@ void getVersion(char const *date, char const *time, char *buff) {
     month = (strstr(month_names, buff)-month_names)/3+1;
     year = year % 100U;
     sscanf(time, "%d:%d:%d", &hour, &min, &sec);
-    sprintf(buff, "v%d.%02d%02d-%2d%2d", year, month, day, hour, min);
+    sprintf(buff, "v%d.%02d%02d-%02d%02d", year, month, day, hour, min);
 }
 
 void setup()
@@ -190,11 +190,11 @@ void setup()
     ui_init();
     tft.fillScreen(TFT_BLACK);
     tft.setTextPadding(300);
-    tft.setTextDatum(MC_DATUM);
+    tft.setTextDatum(TC_DATUM);
     tft.setTextColor(TFT_CYAN, true);
-    tft.drawString("3.5\" IHD for Sunsynk", tft.width() / 2, 30, 4);
+    tft.drawString("3.5\" IHD for Sunsynk", tft.width() / 2, 10, 4);
     tft.setTextColor(TFT_LIGHTGREY);
-    tft.drawString("https://github.com/benlye/sunsynk-ihd-35", tft.width() / 2, 50, 2);
+    tft.drawString("https://github.com/benlye/sunsynk-ihd-35", tft.width() / 2, 40, 2);
     tft.setTextDatum(BC_DATUM);
     tft.drawString(version, tft.width() / 2, tft.height() - 10, 2);
 
