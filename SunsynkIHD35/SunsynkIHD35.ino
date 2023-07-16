@@ -4,6 +4,7 @@
 #include <WiFi.h>
 #include <WiFiMulti.h>
 #include <HTTPClient.h>
+#include <WiFiMulti.h>
 #include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
 #include <Preferences.h>
@@ -23,6 +24,7 @@ static lv_color_t buf[ screenWidth * screenHeight / 10 ];
 
 // Variables for looping
 long lastUpdateTime = 0;
+long lastClockUpdateTime = 0;
 int loopDelaySec = 30;
 
 const char compileDate[] = __DATE__ " " __TIME__;
@@ -43,7 +45,7 @@ void connectWifI() {
 
   Serial.print(" - Waiting for WiFi to connect ...");
   while ((WiFiMulti.run() != WL_CONNECTED)) {
-    Serial.print(".");
+    //Serial.print(".");
   }
   Serial.println(" connected");
 }
@@ -72,6 +74,18 @@ unsigned long getTime() {
   }
   time(&now);
   return now;
+}
+
+// Return a datetime string of the current localized time
+String getDateTimeString() {
+  struct tm timeinfo;
+  char timeString[32];
+  if (!getLocalTime(&timeinfo)){
+    Serial.println("Failed to obtain time");
+    return "1970-01-01 00:00:00";
+  }
+  sprintf(timeString, "%04d-%02d-%02d %02d:%02d:%02d", timeinfo.tm_year + 1900, timeinfo.tm_mon + 1, timeinfo.tm_mday, timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
+  return String(timeString);
 }
 
 // Converts an epoch time to a datetime string
@@ -109,15 +123,6 @@ unsigned long GetPrefULong(char* prefName) {
   return prefValue;
 }
 
-#if LV_USE_LOG != 0
-/* Serial debugging */
-void my_print(const char * buf)
-{
-    Serial.printf(buf);
-    Serial.flush();
-}
-#endif
-
 /* Display flushing */
 void my_disp_flush( lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p )
 {
@@ -152,33 +157,27 @@ void my_touchpad_read( lv_indev_drv_t * indev_driver, lv_indev_data_t * data )
 
 void setup()
 {
+    // Initialize the serial port
     Serial.begin( 115200 );
+    Serial.printf("\nFirmware Date: %s\n", compileDate);
+    Serial.println("\nBooting ...");
 
-    String LVGL_Arduino = "Hello Arduino! ";
-    LVGL_Arduino += String('V') + lv_version_major() + "." + lv_version_minor() + "." + lv_version_patch();
-
-    Serial.println( LVGL_Arduino );
-    Serial.println( "I am LVGL_Arduino" );
-
+    // Initialize LVGL
     lv_init();
 
-  Serial.printf("\nFirmware Date: %s\n", compileDate);
-  Serial.println("\nBooting ...");
+    // Initialize the screen and set the rotation
+    tft.begin();
+    tft.setRotation(TFT_ROTATION);
 
-
-#if LV_USE_LOG != 0
-    lv_log_register_print_cb( my_print ); /* register print function for debugging */
-#endif
-
-    tft.begin();          /* TFT init */
-    tft.setRotation( 3 ); /* Landscape orientation, flipped */
-
-    uint16_t calData[5] = { 178, 3745, 80, 3693, 1 };
+    // Apply the screen calibration data
+    #ifdef USE_TOUCH_CAL
     tft.setTouch(calData);
+    #endif
 
+    // Initialize the display buffer
     lv_disp_draw_buf_init( &draw_buf, buf, NULL, screenWidth * screenHeight / 10 );
 
-    /*Initialize the display*/
+    // Initialize the display
     static lv_disp_drv_t disp_drv;
     lv_disp_drv_init( &disp_drv );
     disp_drv.hor_res = screenWidth;
@@ -187,92 +186,93 @@ void setup()
     disp_drv.draw_buf = &draw_buf;
     lv_disp_drv_register( &disp_drv );
 
-    /*Initialize the (dummy) input device driver*/
+    // Initialize the (dummy) input device driver
     static lv_indev_drv_t indev_drv;
     lv_indev_drv_init( &indev_drv );
     indev_drv.type = LV_INDEV_TYPE_POINTER;
     indev_drv.read_cb = my_touchpad_read;
     lv_indev_drv_register( &indev_drv );
 
-    // Initialize the TFT and show a message
+    // Initialize the TFT
     ui_init();
     tft.fillScreen(TFT_BLACK);
-    //tft.setTextSize(2);
-    tft.drawCentreString("Starting up ...", tft.width()/2, tft.height()/2, 2);
+    tft.setTextPadding(300);
+    tft.setTextDatum(MC_DATUM);
+    tft.setTextColor(TFT_CYAN, true);
+    tft.drawString("3.5\" IHD for Sunsynk", tft.width() / 2, 30, 4);
+    tft.setTextColor(TFT_LIGHTGREY);
+    tft.drawString("https://github.com/benlye/sunsynk-ihd-35", tft.width() / 2, 50, 2);
 
     // Connect to WiFi
+    tft.setTextDatum(MC_DATUM);
+    tft.setTextColor(TFT_YELLOW, true);
+    tft.drawString(" Connecting to wireless network ...", tft.width() / 2, tft.height() / 2, 2);
     connectWifI();
+    tft.setTextDatum(BR_DATUM);
+    tft.setTextColor(TFT_GREEN);
+    tft.drawString(WiFi.localIP().toString().c_str(), tft.width() - 10, tft.height() - 10, 2);
 
     // Set the clock
+    tft.setTextDatum(MC_DATUM);
+    tft.setTextColor(TFT_YELLOW, true);
+    tft.drawString("Synchronizing the clock ...", tft.width() / 2, tft.height() / 2, 2);
     setClock();
+    tft.setTextDatum(BL_DATUM);
+    tft.setTextColor(TFT_GREEN);
+    tft.drawString(getDateTimeString().c_str(), 10, tft.height() - 10, 2);
+
+    tft.setTextDatum(MC_DATUM);
+    tft.setTextColor(TFT_YELLOW, true);
+    tft.drawString("Getting data from Sunsynk ...", tft.width() / 2, tft.height() / 2, 2);
 
     Serial.printf("\nNetwork SSID: %s\n", WIFI_SSID);
     Serial.printf("IP Address:   %s\n", WiFi.localIP().toString().c_str());
     Serial.printf("\nUTC Time:     %s\n", getDateTimeString(getTime()).c_str());
     Serial.println("\nReady.\n");
-
-    Serial.println( "Setup done" );
 }
 
 void loop()
 {
-  // Only poll the sensor at startup or after the interval has elapsed
-  if ((lastUpdateTime == 0) || (millis() - lastUpdateTime >= (loopDelaySec * 1000L)))
-  {
-    // Get access token and token expiry from store
-    String accessToken = GetPrefString("access-token");
-    unsigned long tokenExpiry = GetPrefULong("expires-at");
-
-    // Check if the access token is valid
-    char* tokenState = "Unknown";
-    bool tokenValid = false;
-    if (accessToken != "" && tokenExpiry > 0){
-      Serial.printf("Stored Token Expiry: %s\n", getDateTimeString(tokenExpiry).c_str());
-      if (tokenExpiry > getTime()) {
-        tokenState = "Valid";
-        tokenValid = true;
-      } else {
-        tokenState = "Expired";
-      }
-    } else {
-      tokenState = "Missing";
+    // Update the clock at startup or after the interval has elapsed
+    if ((lastClockUpdateTime == 0) || (millis() - lastClockUpdateTime >= 1000L)) {
+        String timeNow = getTimeString();
+        lv_label_set_text(ui_time, timeNow.c_str());
+        lastClockUpdateTime = millis();
     }
 
-    // Report Sunsynk token state
-    Serial.printf("Stored Token State: %s\n", tokenState);
-    Serial.println();
+    // Poll the API at startup or after the interval has elapsed
+    if ((lastUpdateTime == 0) || (millis() - lastUpdateTime >= (loopDelaySec * 1000L)))
+    {
+        // Get a new token if one is needed
+        if (!CheckSunsynkAuthToken()) {
+            GetSunsynkAuthToken();
+        }
 
-    // Get a new token if one is needed
-    if (!tokenValid) {
-      GetSunsynkAuthToken();
+        // Get the plant realtime data
+        GetPlantRealtime();
+
+        // Get the plant flow data
+        GetPlantFlow();
+
+        // Get the grid import and export totals
+        GetGridTotals();
+
+        // Get the battery charge and discharge totals
+        GetBatteryTotals();
+    
+        // Get the load total
+        GetLoadTotals();
+
+        // Store the time
+        lastUpdateTime = millis();
+
+        // Wait for a bit
+        Serial.printf("Waiting %d seconds before next API poll ...\n\n", loopDelaySec);
     }
-
-    // Get the plant realtime data
-    GetPlantRealtime();
-
-    // Get the plant flow data
-    GetPlantFlow();
-
-    // Get the grid import and export totals
-    GetGridTotals();
-
-    // Get the battery charge and discharge totals
-    GetBatteryTotals();
   
-    // Get the load total
-    GetLoadTotals();
-
-    // Store the time
-    lastUpdateTime = millis();
-
-    // Wait for a bit
-    Serial.printf("Waiting %d seconds before next API poll ...\n\n", loopDelaySec);
-  }
-
-    // Update the time
-    String timeNow = getTimeString();
-    lv_label_set_text(ui_time, timeNow.c_str());
-
-    lv_timer_handler(); /* let the GUI do its work */
+    // Update the GUI
+    lv_timer_handler();
+    
+    // Sleep for a bit
     delay(5);
 }

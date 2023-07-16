@@ -27,4 +27,11 @@ const char* SUNSYNK_INVERTER_ID = "<INVERTER ID>";
 // Timezone string - see https://www.gnu.org/software/libc/manual/html_node/TZ-Variable.html for more information
 const char* TZ_INFO             = "GMTGMT-1,M3.4.0/01,M10.4.0/02";
 
+// Touchpad calibration data
+//#define USE_TOUCH_CAL
+uint16_t calData[5]             = {0, 0, 0, 0, 0};
+
+// TFT rotation setting
+const int TFT_ROTATION          = 3;
+
 #endif // __CONFIG_H

@@ -1,9 +1,38 @@
 #include <ArduinoJson.h>
 #include <Preferences.h>
+#include <WiFiClientSecure.h>
 
 #include "Config.h"
 #include "SunsynkApi.h"
 #include "ui.h"
+
+boolean CheckSunsynkAuthToken() {
+
+    // Get access token and token expiry from store
+    String accessToken = GetPrefString("access-token");
+    unsigned long tokenExpiry = GetPrefULong("expires-at");
+
+    // Check if the access token is valid
+    char* tokenState = "Unknown";
+    bool tokenValid = false;
+    if (accessToken != "" && tokenExpiry > 0){
+    Serial.printf("Stored Token Expiry: %s\n", getDateTimeString(tokenExpiry).c_str());
+    if (tokenExpiry > getTime()) {
+        tokenState = "Valid";
+        tokenValid = true;
+    } else {
+        tokenState = "Expired";
+    }
+    } else {
+    tokenState = "Missing";
+    }
+
+    // Report Sunsynk token state
+    Serial.printf("Stored Token State: %s\n", tokenState);
+    Serial.println();
+
+    return tokenValid;
+}
 
 void GetSunsynkAuthToken() {
   Serial.println("Fetching new Sunsynk auth token ...");

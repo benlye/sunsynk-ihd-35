@@ -11,6 +11,17 @@ const char* SUNSYNK_LOGIN_URL = "https://pv.inteless.com/oauth/token";
  */
 const char* SUNSYNK_API_URL = "https://pv.inteless.com/api/v1";
 
+boolean CheckSunsynkAuthToken(void);
+
+// Connects to the Sunsynk authentication endpoint and retrieves and stores an authentication token.
+void GetSunsynkAuthToken(void);
+
+void GetPlantRealtime(void);
+void GetPlantFlow(void);
+void GetGridTotals(void);
+void GetBatteryTotals(void);
+void GetLoadTotals(void);
+
 /* 
  * Root certificate for pv.inteless.com
  * Friendly Name: ISRG Root X1
