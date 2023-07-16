@@ -7,7 +7,6 @@
 #include <WiFiMulti.h>
 #include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
-#include <Preferences.h>
 #include <Time.h>
 #include <TimeLib.h>
 
@@ -31,9 +30,6 @@ const char compileDate[] = __DATE__ " " __TIME__;
 
 // Global TFT instance
 TFT_eSPI tft = TFT_eSPI(screenWidth, screenHeight);
-
-// Global instance of preferences
-Preferences prefs;
 
 // Global instance of Wi-Fi client
 WiFiMulti WiFiMulti;
@@ -105,22 +101,6 @@ String getTimeString() {
   }
   sprintf(timeString, "%02d:%02d", timeinfo.tm_hour, timeinfo.tm_min);
   return String(timeString);
-}
-
-// Get a string preference and return it
-String GetPrefString(char* prefName) {
-  prefs.begin("sunsynk", false);
-  String prefValue = prefs.getString(prefName, "");
-  prefs.end();
-  return prefValue;
-}
-
-// Get a ULong preference and return it
-unsigned long GetPrefULong(char* prefName) {
-  prefs.begin("sunsynk", false);
-  unsigned long prefValue = prefs.getULong(prefName, 0);
-  prefs.end();
-  return prefValue;
 }
 
 /* Display flushing */
@@ -223,6 +203,11 @@ void setup()
 
     tft.setTextDatum(MC_DATUM);
     tft.setTextColor(TFT_YELLOW, true);
+    tft.drawString("Authenticating with Sunsynk ...", tft.width() / 2, tft.height() / 2, 2);
+    GetSunsynkAuthToken();
+
+    tft.setTextDatum(MC_DATUM);
+    tft.setTextColor(TFT_YELLOW, true);
     tft.drawString("Getting data from Sunsynk ...", tft.width() / 2, tft.height() / 2, 2);
 
     Serial.printf("\nNetwork SSID: %s\n", WIFI_SSID);
@@ -230,6 +215,8 @@ void setup()
     Serial.printf("\nUTC Time:     %s\n", getDateTimeString(getTime()).c_str());
     Serial.println("\nReady.\n");
 }
+
+
 
 void loop()
 {
@@ -261,7 +248,7 @@ void loop()
         GetBatteryTotals();
     
         // Get the load total
-        GetLoadTotals();
+        GetLoadTotal();
 
         // Store the time
         lastUpdateTime = millis();

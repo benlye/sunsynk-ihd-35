@@ -11,16 +11,34 @@ const char* SUNSYNK_LOGIN_URL = "https://pv.inteless.com/oauth/token";
  */
 const char* SUNSYNK_API_URL = "https://pv.inteless.com/api/v1";
 
-boolean CheckSunsynkAuthToken(void);
+// Stores a Sunsynk API authentication token
+struct ApiToken {
+     String accessToken = "";
+     String refreshToken = "";
+     unsigned long expiresIn = 0;
+     unsigned long expiresAt = 0;
+};
 
 // Connects to the Sunsynk authentication endpoint and retrieves and stores an authentication token.
 void GetSunsynkAuthToken(void);
 
+// Checks the validity of the stored API token.
+boolean CheckSunsynkAuthToken();
+
+// Gets the realtime data for the plant.
 void GetPlantRealtime(void);
+
+// Gets the realtime energy flow for the plant.
 void GetPlantFlow(void);
+
+// Gets the daily grid import and export totals.
 void GetGridTotals(void);
+
+// Gets the daily batter charge and discharge totals.
 void GetBatteryTotals(void);
-void GetLoadTotals(void);
+
+// Gets the daily load total.
+void GetLoadTotal(void);
 
 /* 
  * Root certificate for pv.inteless.com
