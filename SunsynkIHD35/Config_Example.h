@@ -1,15 +1,15 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
-/* 
- * Config.h - Stores sensitive configuration data. 
+/*
+ * Config.h - Stores sensitive configuration data.
  * Changes to this file will be excluded from Git.
  */
 
 // SSID of the wireless network to connect to
 const char* WIFI_SSID           = "<NETWORK SSID>";
 
-// Wireless network password 
+// Wireless network password
 const char* WIFI_PASSWORD       = "<NETWORK PASSWORD>";
 
 // Username for Sunsynk

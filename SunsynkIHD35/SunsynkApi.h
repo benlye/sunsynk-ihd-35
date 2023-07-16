@@ -40,7 +40,7 @@ void GetBatteryTotals(void);
 // Gets the daily load total.
 void GetLoadTotal(void);
 
-/* 
+/*
  * Root certificate for pv.inteless.com
  * Friendly Name: ISRG Root X1
  * Expires: 04/06/2035
