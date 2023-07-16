@@ -1,8 +1,6 @@
 // User Setup for the ESP32 TouchDown V1.0 and V1.1
 // ILI9488 using 4-wire SPI and using an FT6206 touch controller
 
-#define USER_SETUP_ID 204
-
 #define ILI9488_DRIVER
 
 #define TFT_BL   32
