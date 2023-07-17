@@ -34,6 +34,7 @@ boolean CheckSunsynkAuthToken() {
 
 void GetSunsynkAuthToken() {
   Serial.println("Fetching new Sunsynk auth token ...");
+  DynamicJsonDocument authResponseJson(384);
   WiFiClientSecure *client = new WiFiClientSecure;
 
   if(client) {
@@ -41,6 +42,7 @@ void GetSunsynkAuthToken() {
     {
       // Add a scoping block for HTTPClient https to make sure it is destroyed before WiFiClientSecure *client is
       HTTPClient https;
+      https.useHTTP10(true);
       if (https.begin(*client, SUNSYNK_LOGIN_URL)) {  // HTTPS
 
         // start connection and send HTTP header
@@ -58,28 +60,23 @@ void GetSunsynkAuthToken() {
 
           // file found at server
           if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
-            String authReponse = https.getString();
-
-            StaticJsonDocument<512> authResponseJson;
-            DeserializationError error = deserializeJson(authResponseJson, authReponse);
+            DeserializationError error = deserializeJson(authResponseJson, https.getStream());
 
             if (error) {
               Serial.print(F("deserializeJson() failed: "));
               Serial.println(error.f_str());
-              return;
+            } else {
+              const char* accessToken = authResponseJson["data"]["access_token"];
+              const char* refreshToken = authResponseJson["data"]["refresh_token"];
+              unsigned long expiresIn = authResponseJson["data"]["expires_in"];
+              unsigned long expiresAt = getTime() + expiresIn;
+              Serial.printf("New Token Expires: %s\n\n", getDateTimeString(expiresAt).c_str());
+
+              apiToken.accessToken = String(accessToken);
+              apiToken.refreshToken = String(refreshToken);
+              apiToken.expiresIn = expiresIn;
+              apiToken.expiresAt = expiresAt;
             }
-
-            const char* accessToken = authResponseJson["data"]["access_token"];
-            const char* refreshToken = authResponseJson["data"]["refresh_token"];
-            unsigned long expiresIn = authResponseJson["data"]["expires_in"];
-            unsigned long expiresAt = getTime() + expiresIn;
-            Serial.printf("New Token Expires: %s\n\n", getDateTimeString(expiresAt).c_str());
-
-            apiToken.accessToken = String(accessToken);
-            apiToken.refreshToken = String(refreshToken);
-            apiToken.expiresIn = expiresIn;
-            apiToken.expiresAt = expiresAt;
-
           }
         } else {
           Serial.printf("[HTTPS] POST... failed, error: %s\n", https.errorToString(httpCode).c_str());
@@ -89,7 +86,6 @@ void GetSunsynkAuthToken() {
       } else {
         Serial.printf("[HTTPS] Unable to connect\n");
       }
-
       // End extra scoping block
     }
 
@@ -100,17 +96,16 @@ void GetSunsynkAuthToken() {
   }
 }
 
-String CallSunsynkApi(String uri) {
+DynamicJsonDocument CallSunsynkApi(String uri, int size, DeserializationOption::Filter(filter)) {
   //Serial.println(uri);
-
-  String payload;
+  DynamicJsonDocument doc(size);
   WiFiClientSecure *client = new WiFiClientSecure;
-
   if(client) {
     client -> setCACert(SUNSYNK_API_CERT);
     {
       // Add a scoping block for HTTPClient https to make sure it is destroyed before WiFiClientSecure *client is
       HTTPClient https;
+      https.useHTTP10(true);
       if (https.begin(*client, uri)) {  // HTTPS
 
         // start connection and send HTTP header
@@ -123,7 +118,11 @@ String CallSunsynkApi(String uri) {
         if (httpCode > 0) {
           Serial.printf("Response: %d\n", httpCode);
           if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
-            payload = https.getString();
+            DeserializationError error = deserializeJson(doc, https.getStream(), DeserializationOption::Filter(filter));
+            if (error) {
+              Serial.print(F("deserializeJson() failed: "));
+              Serial.println(error.f_str());
+            }
           }
         } else {
           Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());
@@ -140,31 +139,23 @@ String CallSunsynkApi(String uri) {
   } else {
     Serial.println("Unable to create client");
   }
-  return payload;
+  return doc;
 }
 
 void GetPlantRealtime() {
   Serial.println("Getting plant realtime data ...");
   char apiUri[128];
   sprintf(apiUri, "%s/plant/%s/realtime", SUNSYNK_API_URL, SUNSYNK_PLANT_ID);
-  String payload = CallSunsynkApi(apiUri);
 
-  StaticJsonDocument<192> responseJson;
   StaticJsonDocument<200> filter;
   filter["code"] = true;
   filter["msg"] = true;
   filter["data"]["pac"] = true;
   filter["data"]["etoday"] = true;
-  DeserializationError error = deserializeJson(responseJson, payload, DeserializationOption::Filter(filter));
 
-  if (error) {
-    Serial.print(F("deserializeJson() failed: "));
-    Serial.println(error.f_str());
-    return;
-  }
-
-  serializeJsonPretty(responseJson, Serial);
-  Serial.println();
+  int docSize = 192;
+  DynamicJsonDocument responseJson(docSize);
+  responseJson = CallSunsynkApi(apiUri, docSize, DeserializationOption::Filter(filter));
 
   if (responseJson["code"] == 0 && responseJson["msg"] == "Success") {
     int pac = responseJson["data"]["pac"];
@@ -186,9 +177,7 @@ void GetPlantFlow() {
   Serial.println("Getting plant flow data ...");
   char apiUri[128];
   sprintf(apiUri, "%s/plant/energy/%s/flow", SUNSYNK_API_URL, SUNSYNK_PLANT_ID);
-  String payload = CallSunsynkApi(apiUri);
 
-  StaticJsonDocument<512> responseJson;
   StaticJsonDocument<200> filter;
   filter["code"] = true;
   filter["msg"] = true;
@@ -199,16 +188,10 @@ void GetPlantFlow() {
   filter["data"]["soc"] = true;
   filter["data"]["toBat"] = true;
   filter["data"]["toGrid"] = true;
-  DeserializationError error = deserializeJson(responseJson, payload, DeserializationOption::Filter(filter));
 
-  if (error) {
-    Serial.print(F("deserializeJson() failed: "));
-    Serial.println(error.f_str());
-    return;
-  }
-
-  serializeJsonPretty(responseJson, Serial);
-  Serial.println();
+  int docSize = 512;
+  DynamicJsonDocument responseJson(docSize);
+  responseJson = CallSunsynkApi(apiUri, docSize, DeserializationOption::Filter(filter));
 
   if (responseJson["code"] == 0 && responseJson["msg"] == "Success") {
     int pvPower = responseJson["data"]["pvPower"];                    // Energy from solar generation
@@ -277,24 +260,16 @@ void GetGridTotals() {
   Serial.println("Getting grid daily total data ...");
   char apiUri[128];
   sprintf(apiUri, "%s/inverter/grid/%s/realtime?sn=%s", SUNSYNK_API_URL, SUNSYNK_INVERTER_ID, SUNSYNK_INVERTER_ID);
-  String payload = CallSunsynkApi(apiUri);
 
-  StaticJsonDocument<192> responseJson;
   StaticJsonDocument<200> filter;
   filter["code"] = true;
   filter["msg"] = true;
   filter["data"]["etodayTo"] = true;
   filter["data"]["etodayFrom"] = true;
-  DeserializationError error = deserializeJson(responseJson, payload, DeserializationOption::Filter(filter));
 
-  if (error) {
-    Serial.print(F("deserializeJson() failed: "));
-    Serial.println(error.f_str());
-    return;
-  }
-
-  serializeJsonPretty(responseJson, Serial);
-  Serial.println();
+  int docSize = 192;
+  DynamicJsonDocument responseJson(docSize);
+  responseJson = CallSunsynkApi(apiUri, docSize, DeserializationOption::Filter(filter));
 
   if (responseJson["code"] == 0 && responseJson["msg"] == "Success") {
 
@@ -319,24 +294,16 @@ void GetBatteryTotals() {
   Serial.println("Getting battery daily total data ...");
   char apiUri[128];
   sprintf(apiUri, "%s/inverter/battery/%s/realtime?sn=%s&lan=en", SUNSYNK_API_URL, SUNSYNK_INVERTER_ID, SUNSYNK_INVERTER_ID);
-  String payload = CallSunsynkApi(apiUri);
 
-  StaticJsonDocument<192> responseJson;
   StaticJsonDocument<200> filter;
   filter["code"] = true;
   filter["msg"] = true;
   filter["data"]["etodayChg"] = true;
   filter["data"]["etodayDischg"] = true;
-  DeserializationError error = deserializeJson(responseJson, payload, DeserializationOption::Filter(filter));
 
-  if (error) {
-    Serial.print(F("deserializeJson() failed: "));
-    Serial.println(error.f_str());
-    return;
-  }
-
-  serializeJsonPretty(responseJson, Serial);
-  Serial.println();
+  int docSize = 192;
+  DynamicJsonDocument responseJson(docSize);
+  responseJson = CallSunsynkApi(apiUri, docSize, DeserializationOption::Filter(filter));
 
   if (responseJson["code"] == 0 && responseJson["msg"] == "Success") {
 
@@ -361,23 +328,15 @@ void GetLoadTotal() {
   Serial.println("Getting load daily total data ...");
   char apiUri[128];
   sprintf(apiUri, "%s/inverter/load/%s/realtime?sn=%s", SUNSYNK_API_URL, SUNSYNK_INVERTER_ID, SUNSYNK_INVERTER_ID);
-  String payload = CallSunsynkApi(apiUri);
 
-  StaticJsonDocument<128> responseJson;
   StaticJsonDocument<200> filter;
   filter["code"] = true;
   filter["msg"] = true;
   filter["data"]["dailyUsed"] = true;
-  DeserializationError error = deserializeJson(responseJson, payload, DeserializationOption::Filter(filter));
 
-  if (error) {
-    Serial.print(F("deserializeJson() failed: "));
-    Serial.println(error.f_str());
-    return;
-  }
-
-  serializeJsonPretty(responseJson, Serial);
-  Serial.println();
+  int docSize = 128;
+  DynamicJsonDocument responseJson(docSize);
+  responseJson = CallSunsynkApi(apiUri, docSize, DeserializationOption::Filter(filter));
 
   if (responseJson["code"] == 0 && responseJson["msg"] == "Success") {
     double loadTotalDbl = responseJson["data"]["dailyUsed"];
