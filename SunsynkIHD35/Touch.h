@@ -7,14 +7,14 @@
  ******************************************************************************/
 
 /* uncomment for XPT2046 */
-// #define TOUCH_XPT2046
-// #define TOUCH_XPT2046_SCK 12
-// #define TOUCH_XPT2046_MISO 13
-// #define TOUCH_XPT2046_MOSI 11
-// #define TOUCH_XPT2046_CS 10
-// #define TOUCH_XPT2046_INT 18
-// #define TOUCH_XPT2046_ROTATION 0
-// #define TOUCH_XPT2046_SAMPLES 50
+#define TOUCH_XPT2046
+#define TOUCH_XPT2046_SCK 18
+#define TOUCH_XPT2046_MISO 19
+#define TOUCH_XPT2046_MOSI 23
+#define TOUCH_XPT2046_CS 21
+#define TOUCH_XPT2046_INT 27
+#define TOUCH_XPT2046_ROTATION 0
+#define TOUCH_XPT2046_SAMPLES 50
 
 // uncomment for most capacitive touchscreen
 //#define TOUCH_MODULES_FT5x06 // GT911 / CST_SELF / CST_MUTUAL / ZTW622 / L58 / FT3267 / FT5x06
@@ -25,11 +25,11 @@
 // #define TOUCH_INT -1
 
 // Please fill below values from Arduino_GFX Example - TouchCalibration
-bool touch_swap_xy = false;
-int16_t touch_map_x1 = -1;
-int16_t touch_map_x2 = -1;
-int16_t touch_map_y1 = -1;
-int16_t touch_map_y2 = -1;
+bool touch_swap_xy = true;
+int16_t touch_map_x1 = 173;
+int16_t touch_map_x2 = 3889;
+int16_t touch_map_y1 = 4072;
+int16_t touch_map_y2 = 256;
 
 int16_t touch_max_x = 0, touch_max_y = 0;
 int16_t touch_raw_x = 0, touch_raw_y = 0;
