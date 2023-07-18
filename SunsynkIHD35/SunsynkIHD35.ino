@@ -14,7 +14,7 @@
 #include "FreeSansBold10pt7b.h"
 #include "Graphics.h"
 #include "SunsynkApi.h"
-//#include "Touch.h"
+#include "Touch.h"
 #include "ui.h"
 
 #ifndef __CONFIG_H
@@ -127,19 +127,25 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
 /*Read the touchpad*/
 void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
 {
-    uint16_t touchX = 0, touchY = 0;
-    bool touched = false; //tft.getTouch(&touchX, &touchY, 600);
+  if (touch_has_signal())
+  {
+    if (touch_touched())
+    {
+      data->state = LV_INDEV_STATE_PR;
 
-    if (!touched)
-    {
-        data->state = LV_INDEV_STATE_REL;
+      /*Set the coordinates*/
+      data->point.x = touch_last_x;
+      data->point.y = touch_last_y;
     }
-    else
+    else if (touch_released())
     {
-        data->state = LV_INDEV_STATE_PR;
-        data->point.x = touchX;
-        data->point.y = touchY;
+      data->state = LV_INDEV_STATE_REL;
     }
+  }
+  else
+  {
+    data->state = LV_INDEV_STATE_REL;
+  }
 }
 
 void getVersion(char const *date, char const *time, char *buff)
@@ -168,6 +174,7 @@ void setup()
     {
         Serial.println("gfx->begin() failed!");
     }
+    delay(500);
     gfx->fillScreen(BLACK);
 
     #ifdef GFX_BL
@@ -176,7 +183,7 @@ void setup()
     #endif
 
     // Init touch device
-    //touch_init(gfx->width(), gfx->height(), gfx->getRotation());
+    touch_init(gfx->width(), gfx->height(), gfx->getRotation());
 
     // Initialize LVGL
     lv_init();
@@ -203,6 +210,7 @@ void setup()
         static lv_indev_drv_t indev_drv;
         lv_indev_drv_init(&indev_drv);
         indev_drv.type = LV_INDEV_TYPE_POINTER;
+        indev_drv.read_cb = my_touchpad_read;
         lv_indev_drv_register(&indev_drv);
     }
 

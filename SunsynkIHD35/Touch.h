@@ -1,3 +1,8 @@
+#ifndef __TOUCH_H
+#define __TOUCH_H
+
+#include "Config.h"
+
 /*******************************************************************************
  * Touch libraries:
  * XPT2046: https://github.com/PaulStoffregen/XPT2046_Touchscreen.git
@@ -7,14 +12,14 @@
  ******************************************************************************/
 
 /* uncomment for XPT2046 */
-#define TOUCH_XPT2046
-#define TOUCH_XPT2046_SCK 18
-#define TOUCH_XPT2046_MISO 19
-#define TOUCH_XPT2046_MOSI 23
-#define TOUCH_XPT2046_CS 21
-#define TOUCH_XPT2046_INT 27
-#define TOUCH_XPT2046_ROTATION 0
-#define TOUCH_XPT2046_SAMPLES 50
+//#define TOUCH_XPT2046
+//#define TOUCH_XPT2046_SCK 18
+//#define TOUCH_XPT2046_MISO 19
+//#define TOUCH_XPT2046_MOSI 23
+//#define TOUCH_XPT2046_CS 21
+//#define TOUCH_XPT2046_INT 27
+//#define TOUCH_XPT2046_ROTATION 0
+//#define TOUCH_XPT2046_SAMPLES 50
 
 // uncomment for most capacitive touchscreen
 //#define TOUCH_MODULES_FT5x06 // GT911 / CST_SELF / CST_MUTUAL / ZTW622 / L58 / FT3267 / FT5x06
@@ -25,11 +30,14 @@
 // #define TOUCH_INT -1
 
 // Please fill below values from Arduino_GFX Example - TouchCalibration
-bool touch_swap_xy = true;
-int16_t touch_map_x1 = 173;
-int16_t touch_map_x2 = 3889;
-int16_t touch_map_y1 = 4072;
-int16_t touch_map_y2 = 256;
+
+#define TOUCH_XPT2046_SCK TOUCH_SCK
+#define TOUCH_XPT2046_MISO TOUCH_MISO
+#define TOUCH_XPT2046_MOSI TOUCH_MOSI
+#define TOUCH_XPT2046_CS TOUCH_CS
+#define TOUCH_XPT2046_INT TOUCH_INT
+#define TOUCH_XPT2046_ROTATION 0
+#define TOUCH_XPT2046_SAMPLES 50
 
 int16_t touch_max_x = 0, touch_max_y = 0;
 int16_t touch_raw_x = 0, touch_raw_y = 0;
@@ -131,7 +139,7 @@ void translate_touch_raw()
     touch_last_x = map(touch_raw_x, touch_map_x1, touch_map_x2, 0, touch_max_x);
     touch_last_y = map(touch_raw_y, touch_map_y1, touch_map_y2, 0, touch_max_y);
   }
-  // Serial.printf("touch_raw_x: %d, touch_raw_y: %d, touch_last_x: %d, touch_last_y: %d\n", touch_raw_x, touch_raw_y, touch_last_x, touch_last_y);
+  //Serial.printf("touch_raw_x: %d, touch_raw_y: %d, touch_last_x: %d, touch_last_y: %d\n", touch_raw_x, touch_raw_y, touch_last_x, touch_last_y);
 }
 
 bool touch_touched()
@@ -155,7 +163,7 @@ bool touch_touched()
         touch_raw_y = p.y;
         max_z = p.z;
       }
-      // Serial.printf("touch_raw_x: %d, touch_raw_y: %d, p.z: %d\n", touch_raw_x, touch_raw_y, p.z);
+      //Serial.printf("touch_raw_x: %d, touch_raw_y: %d, p.z: %d\n", touch_raw_x, touch_raw_y, p.z);
     }
     translate_touch_raw();
     return true;
@@ -188,3 +196,5 @@ bool touch_released()
   return false;
 #endif                           // TouchLib
 }
+
+#endif // __TOUCH_H

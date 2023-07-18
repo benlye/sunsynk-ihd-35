@@ -2,24 +2,20 @@
 #define __GRAPHICS_H
 
 #include <Arduino_GFX_Library.h>
-
 #include "Config.h"
 
 #ifdef ESP32_ILI9488_SPI_TFT
 #define HAS_DISPLAY 1
 
-Arduino_DataBus *bus = new Arduino_ESP32SPI(0 /* DC */, 15 /* CS */, 18 /* SCK */, 23 /* MOSI */, GFX_NOT_DEFINED /* MISO */, VSPI /* spi_num */);
-Arduino_GFX *gfx = new Arduino_ILI9488_18bit(bus, 4 /* RST */, 3 /* rotation */, false /* IPS */);
+#define SCREEN_WIDTH 480
+#define SCREEN_HEIGHT 320
 
-#define GFX_BL 32
+#define GFX_BL LCD_BL
 
-/* Screen resolution */
-static uint32_t screenWidth = 480;
-static uint32_t screenHeight = 320;
-
+Arduino_DataBus *bus = new Arduino_ESP32SPI(LCD_DC /* DC */, LCD_CS /* CS */, LCD_SCK /* SCK */, LCD_MOSI /* MOSI */, GFX_NOT_DEFINED /* MISO */, VSPI /* spi_num */);
+Arduino_GFX *gfx = new Arduino_ILI9488_18bit(bus, LCD_RST /* RST */, LCD_ROTATION /* rotation */, false /* IPS */);
 
 #endif // ESP32_ILI9488_SPI_TFT
-
 
 #ifdef HAS_DISPLAY
 
@@ -29,6 +25,9 @@ static lv_disp_drv_t disp_drv;
 
 int16_t gfx_x1, gfx_y1;
 uint16_t gfx_w, gfx_h;
+
+static uint32_t screenWidth = SCREEN_WIDTH;
+static uint32_t screenHeight = SCREEN_HEIGHT;
 
 #endif // HAS_DISPLAY
 
