@@ -1,39 +1,30 @@
-#include <lvgl.h>
-#include <TFT_eSPI.h>
 #include <Arduino.h>
-#include <WiFi.h>
-#include <WiFiMulti.h>
-#include <HTTPClient.h>
-#include <WiFiMulti.h>
-#include <WiFiClientSecure.h>
+#include <Arduino_GFX_Library.h>
 #include <ArduinoJson.h>
+#include <HTTPClient.h>
+#include <lvgl.h>
 #include <Time.h>
 #include <TimeLib.h>
+#include <WiFi.h>
+#include <WiFiClientSecure.h>
+#include <WiFiMulti.h>
 
 #include "Config.h"
+#include "FreeSans8pt7b.h"
+#include "FreeSansBold10pt7b.h"
+#include "Graphics.h"
 #include "SunsynkApi.h"
+//#include "Touch.h"
 #include "ui.h"
 
 #ifndef __CONFIG_H
 #error Configuration file is missing!
 #endif
 
-/* Screen resolution */
-static const uint16_t screenWidth = 480;
-static const uint16_t screenHeight = 320;
-
-static lv_disp_draw_buf_t draw_buf;
-static lv_color_t buf[screenWidth * screenHeight / 10];
-
 // Variables for looping
 long lastUpdateTime = 0;
 long lastClockUpdateTime = 0;
 int loopDelaySec = 30;
-
-const char compileDate[] = __DATE__ " " __TIME__;
-
-// Global TFT instance
-TFT_eSPI tft = TFT_eSPI(screenWidth, screenHeight);
 
 // Global instance of Wi-Fi client
 WiFiMulti WiFiMulti;
@@ -121,22 +112,23 @@ String getTimeString()
 /* Display flushing */
 void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p)
 {
-    uint32_t w = (area->x2 - area->x1 + 1);
-    uint32_t h = (area->y2 - area->y1 + 1);
+  uint32_t w = (area->x2 - area->x1 + 1);
+  uint32_t h = (area->y2 - area->y1 + 1);
 
-    tft.startWrite();
-    tft.setAddrWindow(area->x1, area->y1, w, h);
-    tft.pushColors((uint16_t *)&color_p->full, w * h, true);
-    tft.endWrite();
+#if (LV_COLOR_16_SWAP != 0)
+  gfx->draw16bitBeRGBBitmap(area->x1, area->y1, (uint16_t *)&color_p->full, w, h);
+#else
+  gfx->draw16bitRGBBitmap(area->x1, area->y1, (uint16_t *)&color_p->full, w, h);
+#endif
 
-    lv_disp_flush_ready(disp);
+  lv_disp_flush_ready(disp);
 }
 
 /*Read the touchpad*/
 void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
 {
     uint16_t touchX = 0, touchY = 0;
-    bool touched = tft.getTouch(&touchX, &touchY, 600);
+    bool touched = false; //tft.getTouch(&touchX, &touchY, 600);
 
     if (!touched)
     {
@@ -171,83 +163,122 @@ void setup()
     Serial.printf("\n%s\n", version);
     Serial.println("\nBooting ...");
 
+    // Init Display
+    if (!gfx->begin())
+    {
+        Serial.println("gfx->begin() failed!");
+    }
+    gfx->fillScreen(BLACK);
+
+    #ifdef GFX_BL
+    pinMode(GFX_BL, OUTPUT);
+    digitalWrite(GFX_BL, HIGH);
+    #endif
+
+    // Init touch device
+    //touch_init(gfx->width(), gfx->height(), gfx->getRotation());
+
     // Initialize LVGL
     lv_init();
 
-    // Initialize the screen and set the rotation
-    tft.begin();
-    tft.setRotation(TFT_ROTATION);
+    // Allocate the LVGL display buffer
+    disp_draw_buf = (lv_color_t *)heap_caps_malloc(sizeof(lv_color_t) * screenWidth * 40, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
+    if (!disp_draw_buf)
+    {
+        Serial.println("LVGL disp_draw_buf allocate failed!");
+    }
+    else
+    {
+        lv_disp_draw_buf_init(&draw_buf, disp_draw_buf, NULL, screenWidth * 40);
 
-// Apply the screen calibration data
-#ifdef USE_TOUCH_CAL
-    tft.setTouch(calData);
-#endif
+        /* Initialize the display */
+        lv_disp_drv_init(&disp_drv);
+        disp_drv.hor_res = screenWidth;
+        disp_drv.ver_res = screenHeight;
+        disp_drv.flush_cb = my_disp_flush;
+        disp_drv.draw_buf = &draw_buf;
+        lv_disp_drv_register(&disp_drv);
 
-    // Initialize the display buffer
-    lv_disp_draw_buf_init(&draw_buf, buf, NULL, screenWidth * screenHeight / 10);
+        /* Initialize the (dummy) input device driver */
+        static lv_indev_drv_t indev_drv;
+        lv_indev_drv_init(&indev_drv);
+        indev_drv.type = LV_INDEV_TYPE_POINTER;
+        lv_indev_drv_register(&indev_drv);
+    }
 
-    // Initialize the display
-    static lv_disp_drv_t disp_drv;
-    lv_disp_drv_init(&disp_drv);
-    disp_drv.hor_res = screenWidth;
-    disp_drv.ver_res = screenHeight;
-    disp_drv.flush_cb = my_disp_flush;
-    disp_drv.draw_buf = &draw_buf;
-    lv_disp_drv_register(&disp_drv);
+    // Print the heading
+    gfx->setFont(&FreeSansBold10pt7b);
+    gfx->setTextColor(CYAN, true);
+    gfx->getTextBounds("3.5\" IHD for Sunsynk", 0, 0, &gfx_x1, &gfx_y1, &gfx_w, &gfx_h);
+    gfx->setCursor((gfx->width() - gfx_w) / 2, 28);
+    gfx->print("3.5\" IHD for Sunsynk");
+    
+    // Print the version
+    gfx->setFont(&FreeSans8pt7b);
+    gfx->setTextColor(LIGHTGREY);
+    gfx->getTextBounds(version, 0, 0, &gfx_x1, &gfx_y1, &gfx_w, &gfx_h);
+    gfx->setCursor((gfx->width() - gfx_w) / 2, 55);
+    gfx->print(version);
 
-    // Initialize the (dummy) input device driver
-    static lv_indev_drv_t indev_drv;
-    lv_indev_drv_init(&indev_drv);
-    indev_drv.type = LV_INDEV_TYPE_POINTER;
-    indev_drv.read_cb = my_touchpad_read;
-    lv_indev_drv_register(&indev_drv);
-
-    // Initialize the TFT
-    ui_init();
-    tft.fillScreen(TFT_BLACK);
-    tft.setTextPadding(300);
-    tft.setTextDatum(TC_DATUM);
-    tft.setTextColor(TFT_CYAN, true);
-    tft.drawString("3.5\" IHD for Sunsynk", tft.width() / 2, 10, 4);
-    tft.setTextColor(TFT_LIGHTGREY);
-    tft.drawString("https://github.com/benlye/sunsynk-ihd-35", tft.width() / 2, 40, 2);
-    tft.setTextDatum(BC_DATUM);
-    tft.drawString(version, tft.width() / 2, tft.height() - 10, 2);
-
+    // Print the Git URL
+    gfx->setTextColor(LIGHTGREY);
+    gfx->getTextBounds("https://github.com/benlye/sunsynk-ihd-35", 0, 0, &gfx_x1, &gfx_y1, &gfx_w, &gfx_h);
+    gfx->setCursor((gfx->width() - gfx_w) / 2, 80);
+    gfx->print("https://github.com/benlye/sunsynk-ihd-35");
+    
     // Connect to WiFi
-    tft.setTextDatum(MC_DATUM);
-    tft.setTextColor(TFT_YELLOW, true);
-    tft.drawString(" Connecting to wireless network ...", tft.width() / 2, tft.height() / 2, 2);
+    gfx->setFont(&FreeSans8pt7b);
+    gfx->getTextBounds("Connecting to wireless network ...", 0, 0, &gfx_x1, &gfx_y1, &gfx_w, &gfx_h);
+    gfx->setCursor((gfx->width() - gfx_w) / 2, (gfx->height() / 2));
+    gfx->setTextColor(YELLOW);
+    gfx->print("Connecting to wireless network ...");
     connectWifI();
-    tft.setTextDatum(BR_DATUM);
-    tft.setTextColor(TFT_GREEN);
-    tft.drawString(WiFi.localIP().toString().c_str(), tft.width() - 10, tft.height() - 10, 2);
+
+    // Print the IP address
+    gfx->getTextBounds(WiFi.localIP().toString().c_str(), 0, 0, &gfx_x1, &gfx_y1, &gfx_w, &gfx_h);
+    gfx->setCursor((gfx->width() - gfx_w) - 20, gfx->height() - 10);
+    gfx->setTextColor(GREEN);
+    gfx->print(WiFi.localIP().toString().c_str());
 
     // Set the clock
-    tft.setTextDatum(MC_DATUM);
-    tft.setTextColor(TFT_YELLOW, true);
-    tft.drawString("Synchronizing the clock ...", tft.width() / 2, tft.height() / 2, 2);
+    gfx->setFont(&FreeSans8pt7b);
+    gfx->fillRect(0, (gfx->height() / 2) - 35, gfx->width(), 50, BLACK);
+    gfx->getTextBounds("Synchronizing the clock ...", 0, 0, &gfx_x1, &gfx_y1, &gfx_w, &gfx_h);
+    gfx->setCursor((gfx->width() - gfx_w) / 2, (gfx->height() / 2));
+    gfx->setTextColor(YELLOW);
+    gfx->print("Synchronizing the clock ...");
     setClock();
-    tft.setTextDatum(BL_DATUM);
-    tft.setTextColor(TFT_GREEN);
-    tft.drawString(getDateTimeString().c_str(), 10, tft.height() - 10, 2);
+
+    // Print the time
+    gfx->setCursor(20, gfx->height() - 10);
+    gfx->setTextColor(GREEN);
+    gfx->print(getDateTimeString().c_str());
 
     // Get an API access token
-    tft.setTextDatum(MC_DATUM);
-    tft.setTextColor(TFT_YELLOW, true);
-    tft.drawString("Authenticating with Sunsynk ...", tft.width() / 2, tft.height() / 2, 2);
+    gfx->setFont(&FreeSans8pt7b);
+    gfx->fillRect(0, (gfx->height() / 2) - 35, gfx->width(), 50, BLACK);
+    gfx->getTextBounds("Authenticating with Sunsynk ...", 0, 0, &gfx_x1, &gfx_y1, &gfx_w, &gfx_h);
+    gfx->setCursor((gfx->width() - gfx_w) / 2, (gfx->height() / 2));
+    gfx->setTextColor(YELLOW);
+    gfx->print("Authenticating with Sunsynk ...");
     GetSunsynkAuthToken();
 
     // Last status update
-    tft.setTextDatum(MC_DATUM);
-    tft.setTextColor(TFT_YELLOW, true);
-    tft.drawString("Getting data from Sunsynk ...", tft.width() / 2, tft.height() / 2, 2);
-
+    gfx->setFont(&FreeSans8pt7b);
+    gfx->fillRect(0, (gfx->height() / 2) - 35, gfx->width(), 50, BLACK);
+    gfx->getTextBounds("Getting data from Sunsynk ...", 0, 0, &gfx_x1, &gfx_y1, &gfx_w, &gfx_h);
+    gfx->setCursor((gfx->width() - gfx_w) / 2, (gfx->height() / 2));
+    gfx->setTextColor(YELLOW);
+    gfx->print("Getting data from Sunsynk ...");
+    
     // Send status update to serial
     Serial.printf("\nNetwork SSID: %s\n", WIFI_SSID);
     Serial.printf("IP Address:   %s\n", WiFi.localIP().toString().c_str());
     Serial.printf("\nUTC Time:     %s\n", getDateTimeString(getTime()).c_str());
     Serial.println("\nReady.\n");
+    
+    // Initialize the IHD UI
+    ui_init();
 }
 
 void loop()
