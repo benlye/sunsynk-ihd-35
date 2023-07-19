@@ -189,9 +189,6 @@ void setup()
     Serial.printf("IP Address:   %s\n", WiFi.localIP().toString().c_str());
     Serial.printf("\nUTC Time:     %s\n", getDateTimeString(getTime()).c_str());
     Serial.println("\nReady.\n");
-    
-    // Initialize the IHD UI
-    ui_init();
 
     // Create the task to update the clock value
     uint32_t ntp_delay = 86400 * 1000; // One day
@@ -207,6 +204,9 @@ void setup()
     {
         delay(100);
     }
+
+    // Initialize the LVGL UI
+    ui_init();
 
     // Task to update the display
     uint32_t output_delay = 100; // One tenth of a second
