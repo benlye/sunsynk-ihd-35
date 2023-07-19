@@ -2,6 +2,7 @@
 #include <lvgl.h>
 #include "Graphics.h"
 #include "SunsynkApi.h"
+#include "ui.h"
 
 void UpdateDisplayFields()
 {
@@ -13,7 +14,7 @@ void UpdateDisplayFields()
             pvWattsColor = UI_GREEN;
         }
         lv_obj_set_style_text_color(ui_pvWatts, lv_color_hex(pvWattsColor), LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_label_set_text_fmt(ui_pvWatts, "%dW", ihdData.pvWatts);
+        lv_label_set_text_fmt(ui_pvWatts, "%d", ihdData.pvWatts);
 
         // Update the grid energy
         int gridWattsColor = UI_GREY;
@@ -29,7 +30,7 @@ void UpdateDisplayFields()
             }
         }
         lv_obj_set_style_text_color(ui_gridWatts, lv_color_hex(gridWattsColor), LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_label_set_text_fmt(ui_gridWatts, "%dW", ihdData.gridWatts);
+        lv_label_set_text_fmt(ui_gridWatts, "%d", ihdData.gridWatts);
 
         // Update the battery energy
         int battWattsColor = UI_GREY;
@@ -45,7 +46,7 @@ void UpdateDisplayFields()
             }
         }
         lv_obj_set_style_text_color(ui_battWatts, lv_color_hex(battWattsColor), LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_label_set_text_fmt(ui_battWatts, "%dW", abs(ihdData.battWatts));
+        lv_label_set_text_fmt(ui_battWatts, "%d", abs(ihdData.battWatts));
 
         // Update the load energy
         int loadWattsColor = UI_GREY;
@@ -54,7 +55,7 @@ void UpdateDisplayFields()
             loadWattsColor = UI_RED;
         }
         lv_obj_set_style_text_color(ui_loadWatts, lv_color_hex(loadWattsColor), LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_label_set_text_fmt(ui_loadWatts, "%dW", ihdData.loadWatts);
+        lv_label_set_text_fmt(ui_loadWatts, "%d", ihdData.loadWatts);
 
         // Update the battery SOC
         lv_label_set_text_fmt(ui_battSoc, "%d%%", ihdData.battSoc);
