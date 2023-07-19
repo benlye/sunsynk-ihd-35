@@ -109,7 +109,7 @@ void ui_home_screen_init(void)
     lv_obj_set_x(ui_battSoc, 152);
     lv_obj_set_y(ui_battSoc, 74);
     lv_obj_set_align(ui_battSoc, LV_ALIGN_LEFT_MID);
-    lv_label_set_text(ui_battSoc, "0%");
+    lv_label_set_text(ui_battSoc, " - %");
     lv_obj_set_style_text_color(ui_battSoc, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_battSoc, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui_battSoc, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN | LV_STATE_DEFAULT);
