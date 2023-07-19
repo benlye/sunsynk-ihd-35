@@ -3,6 +3,7 @@
 #include <WiFiClientSecure.h>
 
 #include "Config.h"
+#include "DateTime.h"
 #include "SunsynkApi.h"
 #include "ui.h"
 
@@ -175,39 +176,6 @@ DynamicJsonDocument CallSunsynkApi(String uri, int size, DeserializationOption::
     return doc;
 }
 
-void GetPlantRealtime()
-{
-    Serial.println("Getting plant realtime data ...");
-    char apiUri[128];
-    sprintf(apiUri, "%s/plant/%s/realtime", SUNSYNK_API_URL, SUNSYNK_PLANT_ID);
-
-    StaticJsonDocument<200> filter;
-    filter["code"] = true;
-    filter["msg"] = true;
-    filter["data"]["pac"] = true;
-    filter["data"]["etoday"] = true;
-
-    int docSize = 192;
-    DynamicJsonDocument responseJson(docSize);
-    responseJson = CallSunsynkApi(apiUri, docSize, DeserializationOption::Filter(filter));
-
-    if (responseJson["code"] == 0 && responseJson["msg"] == "Success")
-    {
-        int pac = responseJson["data"]["pac"];
-        double eTodayDbl = responseJson["data"]["etoday"];
-
-        char eTodayStr[8];
-        dtostrf(eTodayDbl, 3, 1, eTodayStr);
-        ihdData.pvWatts = pac;
-        ihdData.pvDailyTotal = eTodayDbl;
-        
-        Serial.println();
-        Serial.printf("PV Now:   %6d W\n", pac);
-        Serial.printf("PV Today: %6s kWh\n", eTodayStr);
-        Serial.println();
-    }
-}
-
 void GetPlantFlow()
 {
     Serial.println("Getting plant flow data ...");
@@ -249,116 +217,80 @@ void GetPlantFlow()
     }
 }
 
-void GetGridTotals()
-{
-    Serial.println("Getting grid daily total data ...");
-    char apiUri[128];
-    sprintf(apiUri, "%s/inverter/grid/%s/realtime?sn=%s", SUNSYNK_API_URL, SUNSYNK_INVERTER_ID, SUNSYNK_INVERTER_ID);
-
-    StaticJsonDocument<200> filter;
-    filter["code"] = true;
-    filter["msg"] = true;
-    filter["data"]["etodayTo"] = true;
-    filter["data"]["etodayFrom"] = true;
-
-    int docSize = 192;
-    DynamicJsonDocument responseJson(docSize);
-    responseJson = CallSunsynkApi(apiUri, docSize, DeserializationOption::Filter(filter));
-
-    if (responseJson["code"] == 0 && responseJson["msg"] == "Success")
-    {
-        ihdData.gridDailyExport = responseJson["data"]["etodayTo"];
-        ihdData.gridDailyImport = responseJson["data"]["etodayFrom"];
-    
-        double eTodayToDbl = responseJson["data"]["etodayTo"];
-        char eTodayToStr[8];
-        dtostrf(eTodayToDbl, 3, 1, eTodayToStr);
-
-        double eTodayFromDbl = responseJson["data"]["etodayFrom"];
-        char eTodayFromStr[8];
-        dtostrf(eTodayFromDbl, 3, 1, eTodayFromStr);
-
-        Serial.println();
-        Serial.printf("Export Today: %4s kWh\n", eTodayToStr);
-        Serial.printf("Import Today: %4s kWh\n", eTodayFromStr);
-        Serial.println();
-    }
-}
-
-void GetBatteryTotals()
-{
-    Serial.println("Getting battery daily total data ...");
-    char apiUri[128];
-    sprintf(apiUri, "%s/inverter/battery/%s/realtime?sn=%s&lan=en", SUNSYNK_API_URL, SUNSYNK_INVERTER_ID, SUNSYNK_INVERTER_ID);
-
-    StaticJsonDocument<200> filter;
-    filter["code"] = true;
-    filter["msg"] = true;
-    filter["data"]["etodayChg"] = true;
-    filter["data"]["etodayDischg"] = true;
-
-    int docSize = 192;
-    DynamicJsonDocument responseJson(docSize);
-    responseJson = CallSunsynkApi(apiUri, docSize, DeserializationOption::Filter(filter));
-
-    if (responseJson["code"] == 0 && responseJson["msg"] == "Success")
-    {
-        ihdData.battDailyCharge = responseJson["data"]["etodayChg"];
-        ihdData.battDailyDischarge = responseJson["data"]["etodayDischg"];
-
-        double eTodayChgDbl = responseJson["data"]["etodayChg"];
-        char eTodayChgStr[8];
-        dtostrf(eTodayChgDbl, 3, 1, eTodayChgStr);
-
-        double eTodayDischgDbl = responseJson["data"]["etodayDischg"];
-        char eTodayDischgStr[8];
-        dtostrf(eTodayDischgDbl, 3, 1, eTodayDischgStr);
-
-        Serial.println();
-        Serial.printf("Charge Today:    %4s kWH\n", eTodayChgStr);
-        Serial.printf("Dischange Today: %4s kWh\n", eTodayDischgStr);
-        Serial.println();
-    }
-}
-
-void GetLoadTotal()
+void GetDailyTotals()
 {
     Serial.println("Getting load daily total data ...");
+    String month = getMonthString();
+    String today = getDateString();
+
     char apiUri[128];
-    sprintf(apiUri, "%s/inverter/load/%s/realtime?sn=%s", SUNSYNK_API_URL, SUNSYNK_INVERTER_ID, SUNSYNK_INVERTER_ID);
+    sprintf(apiUri, "%s/plant/energy/%s/month?lan=en&date=%s&id=%s", SUNSYNK_API_URL, SUNSYNK_PLANT_ID, month, SUNSYNK_PLANT_ID);
 
     StaticJsonDocument<200> filter;
+    filter = true;
     filter["code"] = true;
     filter["msg"] = true;
-    filter["data"]["dailyUsed"] = true;
+    filter["data"]["infos"][0]["label"] = true;
+    filter["data"]["infos"][0]["records"][0]["time"] = true;
+    filter["data"]["infos"][0]["records"][0]["value"] = true;
 
-    int docSize = 128;
+    int docSize = 16384;
     DynamicJsonDocument responseJson(docSize);
     responseJson = CallSunsynkApi(apiUri, docSize, DeserializationOption::Filter(filter));
 
-    if (responseJson["code"] == 0 && responseJson["msg"] == "Success")
+    int numElements = responseJson["data"]["infos"].size();
+    Serial.println();
+    for (int i = 0; i < numElements; i++)
     {
-        ihdData.loadDailyTotal = responseJson["data"]["dailyUsed"];
-        
-        double loadTotalDbl = responseJson["data"]["dailyUsed"];
-        char eLoadTotalStr[8];
-        dtostrf(loadTotalDbl, 3, 1, eLoadTotalStr);
+        String label = responseJson["data"]["infos"][i]["label"];
+        int lastRecord = responseJson["data"]["infos"][i]["records"].size() - 1;
+        String date = responseJson["data"]["infos"][i]["records"][lastRecord]["time"];
+        double value = responseJson["data"]["infos"][i]["records"][lastRecord]["value"];
 
-        Serial.println();
-        Serial.printf("Load Today: %4s kWh\n", eLoadTotalStr);
-        Serial.println();
+        if (today == date)
+        {
+            char valStr[8];
+            dtostrf(value, 3, 1, valStr);
+
+            String labelStr = label + ":";
+            while (labelStr.length() < 10) {
+                labelStr = labelStr + " ";
+            }
+            Serial.printf("%s % 5s kWh\n", labelStr.c_str(), valStr);
+
+            if (label == "PV")
+            {
+                ihdData.pvDailyTotal = value;
+            }
+            else if (label == "Load")
+            {
+                ihdData.loadDailyTotal = value;
+            }
+            else if (label == "Export")
+            {
+                ihdData.gridDailyExport = value;
+            }
+            else if (label == "Import")
+            {
+                ihdData.gridDailyImport = value;
+            }
+            else if (label == "Discharge")
+            {
+                ihdData.battDailyDischarge = value;
+            }
+            else if (label == "Charge")
+            {
+                ihdData.battDailyCharge = value;
+            }
+        }
     }
+    Serial.println();
 }
 
 void GetIhdData()
 {
     ihdDataReady = false;
-    GetPlantRealtime();
     GetPlantFlow();
-    GetGridTotals();
-    GetBatteryTotals();
-    GetLoadTotal();
-    //GetPlotData();
+    GetDailyTotals();
     ihdDataReady = true;
-    //Serial.printf("Waiting %d seconds before next API poll ...\n\n", loopDelaySec);
 }

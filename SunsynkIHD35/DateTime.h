@@ -3,10 +3,11 @@
 
 #include <Arduino.h>
 
-void setClock();
-unsigned long getTime();
-String getDateTimeString();
+void setClock(void);
+unsigned long getTime(void);
+String getDateTimeString(void);
 String getDateTimeString(unsigned long val);
-String getTimeString();
+String getTimeString(void);
+String getDateString(void);
 
 #endif // __DATETIME_H

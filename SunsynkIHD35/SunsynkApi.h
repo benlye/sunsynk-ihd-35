@@ -18,7 +18,6 @@ struct IhdData {
   bool toBatt = false;
   bool toGrid = false;
   String time = "00:00";
-  bool ready = false;
 };
 
 IhdData ihdData;
@@ -50,20 +49,11 @@ void GetSunsynkAuthToken(void);
 // Checks the validity of the stored API token.
 boolean CheckSunsynkAuthToken();
 
-// Gets the realtime data for the plant.
-void GetPlantRealtime(void);
-
 // Gets the realtime energy flow for the plant.
 void GetPlantFlow(void);
 
-// Gets the daily grid import and export totals.
-void GetGridTotals(void);
-
-// Gets the daily batter charge and discharge totals.
-void GetBatteryTotals(void);
-
-// Gets the daily load total.
-void GetLoadTotal(void);
+// Gets the daily totals for the plant.
+void GetDailyTotals(void);
 
 /*
  * Root certificate for pv.inteless.com

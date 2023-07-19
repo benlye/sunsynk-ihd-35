@@ -69,3 +69,31 @@ String getTimeString()
     sprintf(timeString, "%02d:%02d", timeinfo.tm_hour, timeinfo.tm_min);
     return String(timeString);
 }
+
+// Gets a date string in the format YYYY-MM-DD
+String getDateString()
+{
+    struct tm timeinfo;
+    char dateString[20];
+    if (!getLocalTime(&timeinfo))
+    {
+        Serial.println("Failed to obtain time");
+        return "1970-01-01";
+    }
+    sprintf(dateString, "%d-%02d-%02d", timeinfo.tm_year + 1900, timeinfo.tm_mon + 1, timeinfo.tm_mday);
+    return String(dateString);
+}
+
+// Gets a date string in the format YYYY-MM
+String getMonthString()
+{
+    struct tm timeinfo;
+    char dateString[20];
+    if (!getLocalTime(&timeinfo))
+    {
+        Serial.println("Failed to obtain time");
+        return "1970-01-01";
+    }
+    sprintf(dateString, "%d-%02d", timeinfo.tm_year + 1900, timeinfo.tm_mon + 1);
+    return String(dateString);
+}
