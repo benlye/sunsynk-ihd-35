@@ -20,10 +20,10 @@
 #error Configuration file is missing!
 #endif
 
-// Variables for looping
-long lastUpdateTime = 0;
-long lastClockUpdateTime = 0;
-int loopDelaySec = 30;
+void TaskNtp( void *pvParameters );
+void TaskClock( void *pvParameters );
+void TaskSunsynkApi( void *pvParameters );
+void TaskOutput( void *pvParameters );
 
 // Global instance of Wi-Fi client
 WiFiMulti WiFiMulti;
@@ -53,6 +53,39 @@ void getVersion(char const *date, char const *time, char *buff)
     sprintf(buff, "v%d.%02d%02d-%02d%02d", year, month, day, hour, min);
 }
 
+void TaskNtp(void *pvParameters){
+  uint32_t ntp_delay = *((uint32_t*)pvParameters);
+  for (;;){
+    setClock();
+    delay(ntp_delay);
+  }
+}
+
+void TaskClock(void *pvParameters){
+  uint32_t time_delay = *((uint32_t*)pvParameters);
+  for (;;){
+    ihdData.time = getTimeString();
+    delay(time_delay);
+  }
+}
+
+void TaskSunsynkApi(void *pvParameters){
+  uint32_t api_delay = *((uint32_t*)pvParameters);
+  for (;;){
+    GetIhdData();
+    delay(api_delay);
+  }
+}
+
+void TaskOutput(void *pvParameters){
+  uint32_t output_delay = *((uint32_t*)pvParameters);
+  for (;;){
+    UpdateDisplayFields();
+    lv_timer_handler();
+    delay(output_delay);
+  }
+}
+
 void setup()
 {
     char version[24];
@@ -68,7 +101,7 @@ void setup()
     {
         Serial.println("gfx->begin() failed!");
     }
-    delay(500);
+    delay(1000);
     gfx->fillScreen(BLACK);
 
     // Turn on the LCD backlight
@@ -143,10 +176,11 @@ void setup()
     printCenterString("Authenticating with Sunsynk ...", &FreeSans8pt7b, YELLOW, (gfx->height() / 2));
     GetSunsynkAuthToken();
 
-    // Last status update
+    // Get the initial data
     gfx->fillRect(0, (gfx->height() / 2) - 35, gfx->width(), 50, BLACK);
     printCenterString("Getting data from Sunsynk ...", &FreeSans8pt7b, YELLOW, (gfx->height() / 2));
-    
+    //GetIhdData();
+
     // Send status update to serial
     Serial.printf("\nNetwork SSID: %s\n", WIFI_SSID);
     Serial.printf("IP Address:   %s\n", WiFi.localIP().toString().c_str());
@@ -155,52 +189,54 @@ void setup()
     
     // Initialize the IHD UI
     ui_init();
+    //UpdateDisplayFields();
+
+    // Task to update the clock
+    uint32_t ntp_delay = 86400 * 1000; // One day
+    xTaskCreate(
+        TaskNtp
+        ,  "Task NTP" // A name just for humans
+        ,  2048        // The stack size can be checked by calling `uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);`
+        ,  (void*) &ntp_delay // Task parameter which can modify the task behavior. This must be passed as pointer to void.
+        ,  2  // Priority
+        ,  NULL // Task handle is not used here - simply pass NULL
+        );
+
+    // Task to update the UI time
+    uint32_t time_delay = 1000; // One second
+    xTaskCreate(
+        TaskClock
+        ,  "Task Clock" // A name just for humans
+        ,  2048        // The stack size can be checked by calling `uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);`
+        ,  (void*) &time_delay // Task parameter which can modify the task behavior. This must be passed as pointer to void.
+        ,  2  // Priority
+        ,  NULL // Task handle is not used here - simply pass NULL
+        );
+
+    // Task to call the API to get the data
+    uint32_t api_delay = 30000; // 30 seconds
+    xTaskCreate(
+        TaskSunsynkApi
+        ,  "Task API" // A name just for humans
+        ,  20480        // The stack size can be checked by calling `uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);`
+        ,  (void*) &api_delay // Task parameter which can modify the task behavior. This must be passed as pointer to void.
+        ,  2  // Priority
+        ,  NULL // Task handle is not used here - simply pass NULL
+        );
+
+    // Task to update the display
+    uint32_t output_delay = 100; // One tenth of a second
+    xTaskCreate(
+        TaskOutput
+        ,  "Task Output" // A name just for humans
+        ,  20480        // The stack size can be checked by calling `uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);`
+        ,  (void*) &output_delay // Task parameter which can modify the task behavior. This must be passed as pointer to void.
+        ,  2  // Priority
+        ,  NULL // Task handle is not used here - simply pass NULL
+        );
 }
 
 void loop()
 {
-    // Update the clock at startup or after the interval has elapsed
-    if ((lastClockUpdateTime == 0) || (millis() - lastClockUpdateTime >= 1000L))
-    {
-        String timeNow = getTimeString();
-        lv_label_set_text(ui_time, timeNow.c_str());
-        lastClockUpdateTime = millis();
-    }
-
-    // Poll the API at startup or after the interval has elapsed
-    if ((lastUpdateTime == 0) || (millis() - lastUpdateTime >= (loopDelaySec * 1000L)))
-    {
-        // Get a new token if one is needed
-        if (!CheckSunsynkAuthToken())
-        {
-            GetSunsynkAuthToken();
-        }
-
-        // Get the plant realtime data
-        GetPlantRealtime();
-
-        // Get the plant flow data
-        GetPlantFlow();
-
-        // Get the grid import and export totals
-        GetGridTotals();
-
-        // Get the battery charge and discharge totals
-        GetBatteryTotals();
-
-        // Get the load total
-        GetLoadTotal();
-
-        // Store the time
-        lastUpdateTime = millis();
-
-        // Wait for a bit
-        Serial.printf("Waiting %d seconds before next API poll ...\n\n", loopDelaySec);
-    }
-
-    // Update the GUI
-    lv_timer_handler();
-
-    // Sleep for a bit
-    delay(5);
+    // Nothing to do here as all the work is done by the tasks
 }

@@ -1,6 +1,28 @@
 #ifndef __SUNSYNKAPI_H
 #define __SUNSYNKAPI_H
 
+bool ihdDataReady = false;
+
+struct IhdData {
+  uint16_t pvWatts = 0;
+  double pvDailyTotal = 0;
+  int16_t battWatts = 0;
+  uint16_t battSoc = 0;
+  double battDailyCharge = 0.0;
+  double battDailyDischarge = 0.0;
+  uint16_t gridWatts = 0;
+  double gridDailyExport = 0;
+  double gridDailyImport = 0;
+  uint16_t loadWatts = 0;
+  double loadDailyTotal = 0;
+  bool toBatt = false;
+  bool toGrid = false;
+  String time = "00:00";
+  bool ready = false;
+};
+
+IhdData ihdData;
+
 /*
  * Authentication endpoint for the Sunsynk API
  */
@@ -19,6 +41,8 @@ struct ApiToken
     unsigned long expiresIn = 0;
     unsigned long expiresAt = 0;
 };
+
+void GetIhdData(void);
 
 // Connects to the Sunsynk authentication endpoint and retrieves and stores an authentication token.
 void GetSunsynkAuthToken(void);

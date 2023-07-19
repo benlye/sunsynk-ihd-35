@@ -198,9 +198,9 @@ void GetPlantRealtime()
 
         char eTodayStr[8];
         dtostrf(eTodayDbl, 3, 1, eTodayStr);
-
-        lv_label_set_text(ui_pvTotal, eTodayStr);
-
+        ihdData.pvWatts = pac;
+        ihdData.pvDailyTotal = eTodayDbl;
+        
         Serial.println();
         Serial.printf("PV Now:   %6d W\n", pac);
         Serial.printf("PV Today: %6s kWh\n", eTodayStr);
@@ -231,74 +231,20 @@ void GetPlantFlow()
 
     if (responseJson["code"] == 0 && responseJson["msg"] == "Success")
     {
-        int pvPower = responseJson["data"]["pvPower"];                   // Energy from solar generation
-        int battPower = responseJson["data"]["battPower"];               // Energy flowing in or out of the battery
-        int gridOrMeterPower = responseJson["data"]["gridOrMeterPower"]; // Energy flowing in or out of the grid
-        int loadOrEpsPower = responseJson["data"]["loadOrEpsPower"];     // Energy flowing to the load
-        int battSoc = responseJson["data"]["soc"];                       // Battery state of charge percentage
-        bool toBatt = responseJson["data"]["toBat"];                     // True if battery is charging; false if discharging
-        bool toGrid = responseJson["data"]["toGrid"];                    // True if exporting; false if importing
-
-        // Update the PV energy
-        int pvWattsColor = UI_GREY;
-        if (pvPower > 0)
-        { // Generating
-            pvWattsColor = UI_GREEN;
-        }
-        lv_obj_set_style_text_color(ui_pvWatts, lv_color_hex(pvWattsColor), LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_label_set_text_fmt(ui_pvWatts, "%dW", pvPower);
-
-        // Update the grid energy
-        int gridWattsColor = UI_GREY;
-        if (gridOrMeterPower > 0)
-        {
-            if (toGrid)
-            { // Exporting
-                gridWattsColor = UI_GREEN;
-            }
-            else
-            { // Importing
-                gridWattsColor = UI_RED;
-            }
-        }
-        lv_obj_set_style_text_color(ui_gridWatts, lv_color_hex(gridWattsColor), LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_label_set_text_fmt(ui_gridWatts, "%dW", gridOrMeterPower);
-
-        // Update the battery energy
-        int battWattsColor = UI_GREY;
-        if (battPower != 0)
-        { // Neither charging nor discharging
-            if (toBatt)
-            { // Charging
-                battWattsColor = UI_GREEN;
-                battPower = battPower * -1;
-            }
-            else
-            { // Discharging
-                battWattsColor = UI_RED;
-            }
-        }
-        lv_obj_set_style_text_color(ui_battWatts, lv_color_hex(battWattsColor), LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_label_set_text_fmt(ui_battWatts, "%dW", battPower);
-
-        // Update the load energy
-        int loadWattsColor = UI_GREY;
-        if (loadOrEpsPower > 0)
-        { // Consuming
-            loadWattsColor = UI_RED;
-        }
-        lv_obj_set_style_text_color(ui_loadWatts, lv_color_hex(loadWattsColor), LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_label_set_text_fmt(ui_loadWatts, "%dW", loadOrEpsPower);
-
-        // Update the battery SOC
-        lv_label_set_text_fmt(ui_battSoc, "%d%%", battSoc);
+        ihdData.pvWatts = responseJson["data"]["pvPower"];
+        ihdData.battWatts = responseJson["data"]["battPower"];
+        ihdData.gridWatts = responseJson["data"]["gridOrMeterPower"];
+        ihdData.loadWatts =  responseJson["data"]["loadOrEpsPower"]; 
+        ihdData.battSoc = responseJson["data"]["soc"];
+        ihdData.toBatt = responseJson["data"]["toBat"]; 
+        ihdData.toGrid = responseJson["data"]["toGrid"];
 
         Serial.println();
-        Serial.printf("PV:      %6d W\n", pvPower);
-        Serial.printf("Battery: %6d W\n", battPower);
-        Serial.printf("Grid:    %6d W\n", gridOrMeterPower);
-        Serial.printf("Load:    %6d W\n", loadOrEpsPower);
-        Serial.printf("SOC:     %6d %%\n", battSoc);
+        Serial.printf("PV:      %6d W\n", ihdData.pvWatts);
+        Serial.printf("Battery: %6d W\n", ihdData.battWatts);
+        Serial.printf("Grid:    %6d W\n", ihdData.gridWatts);
+        Serial.printf("Load:    %6d W\n", ihdData.loadWatts);
+        Serial.printf("SOC:     %6d %%\n", ihdData.battSoc);
         Serial.println();
     }
 }
@@ -321,16 +267,16 @@ void GetGridTotals()
 
     if (responseJson["code"] == 0 && responseJson["msg"] == "Success")
     {
-
+        ihdData.gridDailyExport = responseJson["data"]["etodayTo"];
+        ihdData.gridDailyImport = responseJson["data"]["etodayFrom"];
+    
         double eTodayToDbl = responseJson["data"]["etodayTo"];
         char eTodayToStr[8];
         dtostrf(eTodayToDbl, 3, 1, eTodayToStr);
-        lv_label_set_text(ui_gridDailyExport, eTodayToStr);
 
         double eTodayFromDbl = responseJson["data"]["etodayFrom"];
         char eTodayFromStr[8];
         dtostrf(eTodayFromDbl, 3, 1, eTodayFromStr);
-        lv_label_set_text(ui_gridDailyImport, eTodayFromStr);
 
         Serial.println();
         Serial.printf("Export Today: %4s kWh\n", eTodayToStr);
@@ -357,16 +303,16 @@ void GetBatteryTotals()
 
     if (responseJson["code"] == 0 && responseJson["msg"] == "Success")
     {
+        ihdData.battDailyCharge = responseJson["data"]["etodayChg"];
+        ihdData.battDailyDischarge = responseJson["data"]["etodayDischg"];
 
         double eTodayChgDbl = responseJson["data"]["etodayChg"];
         char eTodayChgStr[8];
         dtostrf(eTodayChgDbl, 3, 1, eTodayChgStr);
-        lv_label_set_text(ui_battDailyCharge, eTodayChgStr);
 
         double eTodayDischgDbl = responseJson["data"]["etodayDischg"];
         char eTodayDischgStr[8];
         dtostrf(eTodayDischgDbl, 3, 1, eTodayDischgStr);
-        lv_label_set_text(ui_battDailyDischarge, eTodayDischgStr);
 
         Serial.println();
         Serial.printf("Charge Today:    %4s kWH\n", eTodayChgStr);
@@ -392,13 +338,27 @@ void GetLoadTotal()
 
     if (responseJson["code"] == 0 && responseJson["msg"] == "Success")
     {
+        ihdData.loadDailyTotal = responseJson["data"]["dailyUsed"];
+        
         double loadTotalDbl = responseJson["data"]["dailyUsed"];
         char eLoadTotalStr[8];
         dtostrf(loadTotalDbl, 3, 1, eLoadTotalStr);
-        lv_label_set_text(ui_loadTotal, eLoadTotalStr);
 
         Serial.println();
         Serial.printf("Load Today: %4s kWh\n", eLoadTotalStr);
         Serial.println();
     }
+}
+
+void GetIhdData()
+{
+    ihdDataReady = false;
+    GetPlantRealtime();
+    GetPlantFlow();
+    GetGridTotals();
+    GetBatteryTotals();
+    GetLoadTotal();
+    //GetPlotData();
+    ihdDataReady = true;
+    //Serial.printf("Waiting %d seconds before next API poll ...\n\n", loopDelaySec);
 }

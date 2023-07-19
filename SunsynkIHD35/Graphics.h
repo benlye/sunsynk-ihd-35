@@ -20,6 +20,8 @@ Arduino_GFX *gfx = new Arduino_ILI9488_18bit(bus, LCD_RST /* RST */, LCD_ROTATIO
 
 #ifdef HAS_DISPLAY
 
+void UpdateDisplayFields();
+
 void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p);
 
 void printCenterString(char* string, int y_pos);
