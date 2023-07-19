@@ -179,7 +179,10 @@ void setup()
     // Get the initial data
     gfx->fillRect(0, (gfx->height() / 2) - 35, gfx->width(), 50, BLACK);
     printCenterString("Getting data from Sunsynk ...", &FreeSans8pt7b, YELLOW, (gfx->height() / 2));
-    //GetIhdData();
+    
+    // Create the task to call the API to get the data
+    uint32_t api_delay = 30000; // 30 seconds
+    xTaskCreate(TaskSunsynkApi, "Task API", 20480, (void *)&api_delay, 2, NULL);
 
     // Send status update to serial
     Serial.printf("\nNetwork SSID: %s\n", WIFI_SSID);
@@ -189,51 +192,25 @@ void setup()
     
     // Initialize the IHD UI
     ui_init();
-    //UpdateDisplayFields();
 
-    // Task to update the clock
+    // Create the task to update the clock value
     uint32_t ntp_delay = 86400 * 1000; // One day
-    xTaskCreate(
-        TaskNtp
-        ,  "Task NTP" // A name just for humans
-        ,  2048        // The stack size can be checked by calling `uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);`
-        ,  (void*) &ntp_delay // Task parameter which can modify the task behavior. This must be passed as pointer to void.
-        ,  2  // Priority
-        ,  NULL // Task handle is not used here - simply pass NULL
-        );
+    xTaskCreate(TaskNtp, "Task NTP", 2048, (void *)&ntp_delay, 2, NULL);
 
-    // Task to update the UI time
+    // Create the task to update the time on the IHD
     uint32_t time_delay = 1000; // One second
-    xTaskCreate(
-        TaskClock
-        ,  "Task Clock" // A name just for humans
-        ,  2048        // The stack size can be checked by calling `uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);`
-        ,  (void*) &time_delay // Task parameter which can modify the task behavior. This must be passed as pointer to void.
-        ,  2  // Priority
-        ,  NULL // Task handle is not used here - simply pass NULL
-        );
+    xTaskCreate(TaskClock, "Task Clock", 2048, (void *)&time_delay, 2, NULL);
 
-    // Task to call the API to get the data
-    uint32_t api_delay = 30000; // 30 seconds
-    xTaskCreate(
-        TaskSunsynkApi
-        ,  "Task API" // A name just for humans
-        ,  20480        // The stack size can be checked by calling `uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);`
-        ,  (void*) &api_delay // Task parameter which can modify the task behavior. This must be passed as pointer to void.
-        ,  2  // Priority
-        ,  NULL // Task handle is not used here - simply pass NULL
-        );
+    // Wait up to 10s for API data
+    int delayEnd = millis() + (10 * 1000);
+    while (!ihdData.ready && millis() < delayEnd )
+    {
+        delay(100);
+    }
 
     // Task to update the display
     uint32_t output_delay = 100; // One tenth of a second
-    xTaskCreate(
-        TaskOutput
-        ,  "Task Output" // A name just for humans
-        ,  20480        // The stack size can be checked by calling `uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);`
-        ,  (void*) &output_delay // Task parameter which can modify the task behavior. This must be passed as pointer to void.
-        ,  2  // Priority
-        ,  NULL // Task handle is not used here - simply pass NULL
-        );
+    xTaskCreate(TaskOutput, "Task Output", 5120, (void *)&output_delay, 2, NULL);
 }
 
 void loop()
