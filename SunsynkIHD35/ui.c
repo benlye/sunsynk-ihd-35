@@ -49,6 +49,10 @@ lv_obj_t * ui_Inverter;
 lv_obj_t * ui_SunsynkLogo;
 lv_obj_t * ui_configIcon;
 lv_obj_t * ui_time;
+lv_obj_t * ui_syncing;
+lv_obj_t * ui_wifiHigh;
+lv_obj_t * ui_wifiMed;
+lv_obj_t * ui_wifiLow;
 lv_obj_t * ui____initial_actions0;
 const lv_img_dsc_t * ui_imgset_867608463[1] = {&ui_img_705529016};
 const lv_img_dsc_t * ui_imgset_1070557679[1] = {&ui_img_670870020};
@@ -57,6 +61,7 @@ const lv_img_dsc_t * ui_imgset_1703005419[1] = {&ui_img_540100334};
 const lv_img_dsc_t * ui_imgset_1375169470[1] = {&ui_img_1549501229};
 const lv_img_dsc_t * ui_imgset_1399112042[1] = {&ui_img_264836261};
 const lv_img_dsc_t * ui_imgset_1178831554[1] = {&ui_img_1933564998};
+const lv_img_dsc_t * ui_imgset_1337852551[1] = {&ui_img_1833520713};
 
 ///////////////////// TEST LVGL SETTINGS ////////////////////
 #if LV_COLOR_DEPTH != 16

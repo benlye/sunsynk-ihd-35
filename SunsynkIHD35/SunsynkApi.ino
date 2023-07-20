@@ -125,6 +125,7 @@ DynamicJsonDocument CallSunsynkApi(String uri, int size, DeserializationOption::
     WiFiClientSecure *client = new WiFiClientSecure;
     if (client)
     {
+        client->setInsecure();
         client->setCACert(SUNSYNK_API_CERT);
         {
             // Add a scoping block for HTTPClient https to make sure it is destroyed before WiFiClientSecure *client is
@@ -295,7 +296,7 @@ void GetDailyTotals()
 void GetIhdData()
 {
     ihdDataReady = false;
-    GetDailyTotals();
     GetPlantFlow();
+    GetDailyTotals();
     ihdDataReady = true;
 }

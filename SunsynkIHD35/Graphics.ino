@@ -1,5 +1,6 @@
 #include <Arduino_GFX_Library.h>
 #include <lvgl.h>
+#include <WiFi.h>
 #include "Graphics.h"
 #include "SunsynkApi.h"
 #include "ui.h"
@@ -7,6 +8,28 @@
 void UpdateDisplayFields()
 {
     if(ihdDataReady) {
+        // Hide the syncing icon
+        lv_obj_add_flag(ui_syncing, LV_OBJ_FLAG_HIDDEN);
+
+        // Hide all the WiFi symbols
+        lv_obj_add_flag(ui_wifiLow, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(ui_wifiMed, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN);
+
+        // Show the appropriate WiFi symbol
+        if (WiFi.RSSI() < -80)  // Poor signal
+        {
+            lv_obj_clear_flag(ui_wifiLow, LV_OBJ_FLAG_HIDDEN);  
+        }
+        else if (WiFi.RSSI() < -67)  // Moderate signal
+        {
+            lv_obj_clear_flag(ui_wifiMed, LV_OBJ_FLAG_HIDDEN);
+        }
+        else  // Good signal
+        {
+            lv_obj_clear_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN);
+        }
+
         // Update the PV energy
         int pvWattsColor = UI_GREY;
         if (ihdData.pvWatts > 0)
@@ -94,6 +117,11 @@ void UpdateDisplayFields()
         char eTodayStr[8];
         dtostrf(ihdData.pvDailyTotal,3,1,eTodayStr);
         lv_label_set_text(ui_pvTotal, eTodayStr);
+    }
+    else 
+    {
+        // Show the syncing icon
+        lv_obj_clear_flag(ui_syncing, LV_OBJ_FLAG_HIDDEN);
     }
 
     // Update time

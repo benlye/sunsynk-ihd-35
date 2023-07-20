@@ -263,7 +263,7 @@ void ui_home_screen_init(void)
     lv_obj_set_x(ui_gridWatts, 115);
     lv_obj_set_y(ui_gridWatts, -130);
     lv_obj_set_align(ui_gridWatts, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_gridWatts, "  - ");
+    lv_label_set_text(ui_gridWatts, " - ");
     lv_obj_set_style_text_color(ui_gridWatts, lv_color_hex(0xA2A2A2), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_gridWatts, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui_gridWatts, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -446,5 +446,49 @@ void ui_home_screen_init(void)
     lv_obj_set_style_text_color(ui_time, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_time, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_time, &lv_font_montserrat_22, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_syncing = lv_img_create(ui_home);
+    lv_img_set_src(ui_syncing, &ui_img_1833520713);
+    lv_obj_set_width(ui_syncing, LV_SIZE_CONTENT);   /// 24
+    lv_obj_set_height(ui_syncing, LV_SIZE_CONTENT);    /// 24
+    lv_obj_set_x(ui_syncing, -201);
+    lv_obj_set_y(ui_syncing, -147);
+    lv_obj_set_align(ui_syncing, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_syncing, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_syncing, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_img_set_zoom(ui_syncing, 200);
+
+    ui_wifiHigh = lv_img_create(ui_home);
+    lv_img_set_src(ui_wifiHigh, &ui_img_2090272629);
+    lv_obj_set_width(ui_wifiHigh, LV_SIZE_CONTENT);   /// 24
+    lv_obj_set_height(ui_wifiHigh, LV_SIZE_CONTENT);    /// 24
+    lv_obj_set_x(ui_wifiHigh, -226);
+    lv_obj_set_y(ui_wifiHigh, -147);
+    lv_obj_set_align(ui_wifiHigh, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_wifiHigh, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_img_set_zoom(ui_wifiHigh, 200);
+
+    ui_wifiMed = lv_img_create(ui_home);
+    lv_img_set_src(ui_wifiMed, &ui_img_1521978509);
+    lv_obj_set_width(ui_wifiMed, LV_SIZE_CONTENT);   /// 24
+    lv_obj_set_height(ui_wifiMed, LV_SIZE_CONTENT);    /// 24
+    lv_obj_set_x(ui_wifiMed, -226);
+    lv_obj_set_y(ui_wifiMed, -147);
+    lv_obj_set_align(ui_wifiMed, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_wifiMed, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_wifiMed, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_img_set_zoom(ui_wifiMed, 200);
+
+    ui_wifiLow = lv_img_create(ui_home);
+    lv_img_set_src(ui_wifiLow, &ui_img_1651064979);
+    lv_obj_set_width(ui_wifiLow, LV_SIZE_CONTENT);   /// 24
+    lv_obj_set_height(ui_wifiLow, LV_SIZE_CONTENT);    /// 24
+    lv_obj_set_x(ui_wifiLow, -226);
+    lv_obj_set_y(ui_wifiLow, -147);
+    lv_obj_set_align(ui_wifiLow, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_wifiLow, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_wifiLow, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_img_set_zoom(ui_wifiLow, 200);
 
 }

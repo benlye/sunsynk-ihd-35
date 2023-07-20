@@ -24,6 +24,7 @@ void TaskNtp( void *pvParameters );
 void TaskClock( void *pvParameters );
 void TaskSunsynkApi( void *pvParameters );
 void TaskOutput( void *pvParameters );
+void TaskStatus( void *pvParameters );
 
 // Global instance of Wi-Fi client
 WiFiMulti WiFiMulti;
@@ -51,6 +52,20 @@ void getVersion(char const *date, char const *time, char *buff)
     year = year % 100U;
     sscanf(time, "%d:%d:%d", &hour, &min, &sec);
     sprintf(buff, "v%d.%02d%02d-%02d%02d", year, month, day, hour, min);
+}
+
+void printStatus()
+{
+    unsigned long uptimeSecs = millis() / 1000;
+    uint16_t hrs = uptimeSecs / 3600;
+    uint8_t mins = (uptimeSecs / 60) % 60;
+    uint8_t secs = uptimeSecs % 60;
+    Serial.println();
+    Serial.printf("Time:                %s\n", getDateTimeString(getTime()).c_str());
+    Serial.printf("Uptime:              %d:%02d:%02d\n", hrs, mins, secs);
+    Serial.printf("Wifi RSSI:           %d\n", WiFi.RSSI());
+    Serial.printf("Free memory (bytes): %d\n", esp_get_free_heap_size());
+    Serial.println();
 }
 
 void TaskNtp(void *pvParameters){
@@ -82,6 +97,14 @@ void TaskOutput(void *pvParameters){
   for (;;){
     UpdateDisplayFields();
     lv_timer_handler();
+    delay(output_delay);
+  }
+}
+
+void TaskStatus(void *pvParameters){
+  uint32_t output_delay = *((uint32_t*)pvParameters);
+  for (;;){
+    printStatus();
     delay(output_delay);
   }
 }
@@ -189,6 +212,10 @@ void setup()
     Serial.printf("IP Address:   %s\n", WiFi.localIP().toString().c_str());
     Serial.printf("\nUTC Time:     %s\n", getDateTimeString(getTime()).c_str());
     Serial.println("\nReady.\n");
+
+    // Task to print the status
+    uint32_t status_delay = 60 * 1000; // One minute
+    xTaskCreate(TaskStatus, "Task Status", 5120, (void *)&status_delay, 2, NULL);
 
     // Create the task to update the clock value
     uint32_t ntp_delay = 86400 * 1000; // One day
