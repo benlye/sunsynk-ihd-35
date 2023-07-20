@@ -120,7 +120,7 @@ void GetSunsynkAuthToken()
 
 DynamicJsonDocument CallSunsynkApi(String uri, int size, DeserializationOption::Filter(filter))
 {
-    // Serial.println(uri);
+    Serial.println(uri);
     DynamicJsonDocument doc(size);
     WiFiClientSecure *client = new WiFiClientSecure;
     if (client)
@@ -207,6 +207,7 @@ void GetPlantFlow()
         ihdData.toBatt = responseJson["data"]["toBat"]; 
         ihdData.toGrid = responseJson["data"]["toGrid"];
 
+        /*
         Serial.println();
         Serial.printf("PV:      %6d W\n", ihdData.pvWatts);
         Serial.printf("Battery: %6d W\n", ihdData.battWatts);
@@ -214,12 +215,14 @@ void GetPlantFlow()
         Serial.printf("Load:    %6d W\n", ihdData.loadWatts);
         Serial.printf("SOC:     %6d %%\n", ihdData.battSoc);
         Serial.println();
+        */
     }
+    Serial.println();
 }
 
 void GetDailyTotals()
 {
-    Serial.println("Getting load daily total data ...");
+    Serial.println("Getting daily total data ...");
     String month = getMonthString();
     String today = getDateString();
 
@@ -239,7 +242,7 @@ void GetDailyTotals()
     responseJson = CallSunsynkApi(apiUri, docSize, DeserializationOption::Filter(filter));
 
     int numElements = responseJson["data"]["infos"].size();
-    Serial.println();
+    //Serial.println();
     for (int i = 0; i < numElements; i++)
     {
         String label = responseJson["data"]["infos"][i]["label"];
@@ -252,11 +255,13 @@ void GetDailyTotals()
             char valStr[8];
             dtostrf(value, 3, 1, valStr);
 
+            /*
             String labelStr = label + ":";
             while (labelStr.length() < 10) {
                 labelStr = labelStr + " ";
             }
             Serial.printf("%s % 5s kWh\n", labelStr.c_str(), valStr);
+            */
 
             if (label == "PV")
             {
@@ -290,7 +295,7 @@ void GetDailyTotals()
 void GetIhdData()
 {
     ihdDataReady = false;
-    GetPlantFlow();
     GetDailyTotals();
+    GetPlantFlow();
     ihdDataReady = true;
 }
