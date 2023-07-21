@@ -1,6 +1,7 @@
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
 #include <WiFiClientSecure.h>
+#include <esp_http_client.h>
 
 #include "Config.h"
 #include "DateTime.h"
@@ -9,40 +10,15 @@
 
 ApiToken apiToken;
 
-boolean CheckSunsynkAuthToken()
+boolean GetSunsynkAuthToken()
 {
+    apiToken.accessToken = "";
+    apiToken.refreshToken = "";
+    apiToken.expiresIn = 0;
+    apiToken.expiresAt = 0;
+    boolean gotToken = false;
 
-    // Check if the access token is valid
-    char *tokenState = "Unknown";
-    bool tokenValid = false;
-    if (apiToken.accessToken != "" && apiToken.expiresIn > 0)
-    {
-        Serial.printf("Stored Token Expiry: %s\n", getDateTimeString(apiToken.expiresAt).c_str());
-        if (apiToken.expiresAt > getTime())
-        {
-            tokenState = "Valid";
-            tokenValid = true;
-        }
-        else
-        {
-            tokenState = "Expired";
-        }
-    }
-    else
-    {
-        tokenState = "Missing";
-    }
-
-    // Report Sunsynk token state
-    Serial.printf("Stored Token State: %s\n", tokenState);
-    Serial.println();
-
-    return tokenValid;
-}
-
-void GetSunsynkAuthToken()
-{
-    Serial.println("Fetching new Sunsynk auth token ...");
+    Serial.println("Fetching API auth token ...");
     DynamicJsonDocument authResponseJson(384);
     WiFiClientSecure *client = new WiFiClientSecure;
 
@@ -92,6 +68,8 @@ void GetSunsynkAuthToken()
                             apiToken.refreshToken = String(refreshToken);
                             apiToken.expiresIn = expiresIn;
                             apiToken.expiresAt = expiresAt;
+
+                            gotToken = true;
                         }
                     }
                 }
@@ -116,6 +94,7 @@ void GetSunsynkAuthToken()
     {
         Serial.println("Unable to create client");
     }
+    return gotToken;
 }
 
 DynamicJsonDocument CallSunsynkApi(String uri, int size, DeserializationOption::Filter(filter))
@@ -126,21 +105,19 @@ DynamicJsonDocument CallSunsynkApi(String uri, int size, DeserializationOption::
     if (client)
     {
         client->setInsecure();
-        client->setCACert(SUNSYNK_API_CERT);
+        //client->setCACert(SUNSYNK_API_CERT1);
         {
             // Add a scoping block for HTTPClient https to make sure it is destroyed before WiFiClientSecure *client is
             HTTPClient https;
             https.useHTTP10(true);
             if (https.begin(*client, uri))
             { // HTTPS
-
                 // start connection and send HTTP header
                 https.addHeader("Authorization", "Bearer " + apiToken.accessToken);
                 https.addHeader("Content-Type", "application/json");
                 https.addHeader("Accept", "application/json");
 
                 int httpCode = https.GET();
-
                 if (httpCode > 0)
                 {
                     Serial.printf("Response: %d\n", httpCode);
@@ -296,7 +273,10 @@ void GetDailyTotals()
 void GetIhdData()
 {
     ihdDataReady = false;
-    GetPlantFlow();
-    GetDailyTotals();
+    if (GetSunsynkAuthToken())
+    {
+        GetPlantFlow();
+        GetDailyTotals();
+    }
     ihdDataReady = true;
 }

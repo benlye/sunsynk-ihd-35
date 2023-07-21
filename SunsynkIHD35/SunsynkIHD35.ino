@@ -225,8 +225,8 @@ void setup()
     uint32_t time_delay = 1000; // One second
     xTaskCreate(TaskClock, "Task Clock", 2048, (void *)&time_delay, 2, NULL);
 
-    // Wait up to 5s for API data
-    int delayEnd = millis() + (5 * 1000);
+    // Wait up to 10s for API data
+    int delayEnd = millis() + (10 * 1000);
     while (!ihdDataReady && millis() < delayEnd )
     {
         delay(100);
