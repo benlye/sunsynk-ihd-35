@@ -62,7 +62,7 @@ boolean GetSunsynkAuthToken()
                             const char *refreshToken = authResponseJson["data"]["refresh_token"];
                             unsigned long expiresIn = authResponseJson["data"]["expires_in"];
                             unsigned long expiresAt = getTime() + expiresIn;
-                            Serial.printf("New Token Expires: %s\n\n", getDateTimeString(expiresAt).c_str());
+                            //Serial.printf("Token Expires: %s\n\n", getDateTimeString(expiresAt).c_str());
 
                             apiToken.accessToken = String(accessToken);
                             apiToken.refreshToken = String(refreshToken);
@@ -94,6 +94,7 @@ boolean GetSunsynkAuthToken()
     {
         Serial.println("Unable to create client");
     }
+    Serial.println()
     return gotToken;
 }
 
