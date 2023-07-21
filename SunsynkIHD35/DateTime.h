@@ -9,5 +9,6 @@ String getDateTimeString(void);
 String getDateTimeString(unsigned long val);
 String getTimeString(void);
 String getDateString(void);
+String getMonthString(void);
 
 #endif // __DATETIME_H
