@@ -94,7 +94,7 @@ boolean GetSunsynkAuthToken()
     {
         Serial.println("Unable to create client");
     }
-    Serial.println()
+    Serial.println();
     return gotToken;
 }
 
