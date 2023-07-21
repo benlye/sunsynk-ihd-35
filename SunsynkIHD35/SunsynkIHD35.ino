@@ -27,16 +27,16 @@ void TaskOutput( void *pvParameters );
 void TaskStatus( void *pvParameters );
 
 // Global instance of Wi-Fi client
-WiFiMulti WiFiMulti;
+WiFiMulti wiFiMulti;
 
 // Connect to WiFi
 void connectWifI()
 {
     WiFi.mode(WIFI_STA);
-    WiFiMulti.addAP(WIFI_SSID, WIFI_PASSWORD);
+    wiFiMulti.addAP(WIFI_SSID, WIFI_PASSWORD);
 
     Serial.print(" - Waiting for WiFi to connect ...");
-    while ((WiFiMulti.run() != WL_CONNECTED))
+    while ((wiFiMulti.run() != WL_CONNECTED))
     {
         // Serial.print(".");
     }
