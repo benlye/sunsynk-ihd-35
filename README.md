@@ -1,7 +1,7 @@
 # Sunsynk IHD 35
 An in-home display (IHD) for a Sunsynk hybrid inverter, using an ESP32 SoC and a 3.5" 480x320 TFT touchscreen.
 
-The IHD uses the Sunsynk API to retrieve near real-time data so no additional hardware or software integrations needed - if the inverter is reporting data to Sunsynk, and the Sunsynk app or website are showing it, the IHD will be able to display it.
+The IHD uses the Sunsynk API to retrieve near real-time data so no additional hardware or software integrations needed - if the inverter is reporting data to Sunsynk, and the Sunsynk app or website are showing it, the IHD will be able to display it. The icons are by [Icons8](https://icons8.com).
 
 <p align="center"><img src="img/interface.png" alt="IHD Interface" width="400"/><br><i>IHD Home Screen</i></p>
 
