@@ -24,6 +24,7 @@ boolean GetSunsynkAuthToken()
 
     if (client)
     {
+        Serial.println(SUNSYNK_LOGIN_URL);
         client->setCACert(SUNSYNK_API_CERT);
         {
             // Add a scoping block for HTTPClient https to make sure it is destroyed before WiFiClientSecure *client is

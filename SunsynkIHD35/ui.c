@@ -44,7 +44,6 @@ lv_obj_t * ui_loadIcon;
 lv_obj_t * ui_loadLine;
 lv_obj_t * ui_loadTotal;
 lv_obj_t * ui_loadTotalUnits;
-lv_obj_t * ui_inverterIcon;
 lv_obj_t * ui_Inverter;
 lv_obj_t * ui_SunsynkLogo;
 lv_obj_t * ui_configIcon;
@@ -61,7 +60,7 @@ const lv_img_dsc_t * ui_imgset_1703005419[1] = {&ui_img_540100334};
 const lv_img_dsc_t * ui_imgset_1375169470[1] = {&ui_img_1549501229};
 const lv_img_dsc_t * ui_imgset_1399112042[1] = {&ui_img_264836261};
 const lv_img_dsc_t * ui_imgset_1178831554[1] = {&ui_img_1933564998};
-const lv_img_dsc_t * ui_imgset_1337852551[1] = {&ui_img_1833520713};
+const lv_img_dsc_t * ui_imgset_535857063[1] = {&ui_img_1683162281};
 
 ///////////////////// TEST LVGL SETTINGS ////////////////////
 #if LV_COLOR_DEPTH != 16

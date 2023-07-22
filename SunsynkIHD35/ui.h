@@ -60,7 +60,6 @@ extern lv_obj_t * ui_loadIcon;
 extern lv_obj_t * ui_loadLine;
 extern lv_obj_t * ui_loadTotal;
 extern lv_obj_t * ui_loadTotalUnits;
-extern lv_obj_t * ui_inverterIcon;
 extern lv_obj_t * ui_Inverter;
 extern lv_obj_t * ui_SunsynkLogo;
 extern lv_obj_t * ui_configIcon;
@@ -80,10 +79,10 @@ LV_IMG_DECLARE(ui_img_264836261);    // assets\icons8-transmission-tower-100.png
 LV_IMG_DECLARE(ui_img_1076282785);    // assets\icons8-house-100.png
 LV_IMG_DECLARE(ui_img_1551709364);    // assets\sunsynk-logo-40px.png
 LV_IMG_DECLARE(ui_img_540100334);    // assets\icons8-settings-50.png
-LV_IMG_DECLARE(ui_img_1833520713);    // assets\icons8-sync-24.png
-LV_IMG_DECLARE(ui_img_2090272629);    // assets\icons8-wi-fi-24-high.png
-LV_IMG_DECLARE(ui_img_1521978509);    // assets\icons8-wi-fi-24-med.png
-LV_IMG_DECLARE(ui_img_1651064979);    // assets\icons8-wi-fi-24-low.png
+LV_IMG_DECLARE(ui_img_1765460539);    // assets\icons8-transfer-24 (1).png
+LV_IMG_DECLARE(ui_img_1683162281);    // assets\icons8-wifi-26.png
+LV_IMG_DECLARE(ui_img_1288183160);    // assets\icons8-wifi-26-med.png
+LV_IMG_DECLARE(ui_img_811431924);    // assets\icons8-wifi-26-low.png
 
 void ui_init(void);
 
