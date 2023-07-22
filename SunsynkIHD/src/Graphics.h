@@ -31,9 +31,9 @@ void UpdateDisplayFields(void);
 
 void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p);
 
-void printCenterString(char* string, int y_pos);
-void printCenterString(char* string, const GFXfont* font, int color, int y_pos);
-void printRightString(char* string, const GFXfont* font, int color, int y_pos, int x_indent);
+void printCenterString(const char* string, int y_pos);
+void printCenterString(const char* string, const GFXfont* font, int color, int y_pos);
+void printRightString(const char* string, const GFXfont* font, int color, int y_pos, int x_indent);
 
 static lv_disp_draw_buf_t draw_buf;
 static lv_color_t *disp_draw_buf;

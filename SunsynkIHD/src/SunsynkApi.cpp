@@ -10,6 +10,23 @@
 
 struct ApiToken apiToken;
 
+void ClearSunsynkAuthToken()
+{
+    apiToken.accessToken = "";
+    apiToken.refreshToken = "";
+    apiToken.expiresAt = 0;
+    apiToken.expiresIn = 0;
+}
+
+boolean CheckSunsynkAuthToken()
+{
+    if (apiToken.accessToken == "" || apiToken.expiresAt < getTime()) {
+        ClearSunsynkAuthToken();
+        return false;
+    }
+    return true;
+}
+
 boolean GetSunsynkAuthToken()
 {
     apiToken.accessToken = "";
@@ -25,7 +42,7 @@ boolean GetSunsynkAuthToken()
     if (client)
     {
         Serial.println(SUNSYNK_LOGIN_URL);
-        client->setCACert(SUNSYNK_API_CERT);
+        client->setCACertBundle(certBundle);
         {
             // Add a scoping block for HTTPClient https to make sure it is destroyed before WiFiClientSecure *client is
             HTTPClient https;
@@ -106,8 +123,7 @@ DynamicJsonDocument CallSunsynkApi(String uri, int size, DeserializationOption::
     WiFiClientSecure *client = new WiFiClientSecure;
     if (client)
     {
-        client->setInsecure();
-        //client->setCACert(SUNSYNK_API_CERT1);
+        client->setCACertBundle(certBundle);
         {
             // Add a scoping block for HTTPClient https to make sure it is destroyed before WiFiClientSecure *client is
             HTTPClient https;
@@ -131,6 +147,10 @@ DynamicJsonDocument CallSunsynkApi(String uri, int size, DeserializationOption::
                             Serial.print(F("deserializeJson() failed: "));
                             Serial.println(error.f_str());
                         }
+                    }
+                    else if (httpCode == HTTP_CODE_UNAUTHORIZED)
+                    {
+                        ClearSunsynkAuthToken();
                     }
                 }
                 else
@@ -275,10 +295,11 @@ void GetDailyTotals()
 void GetIhdData()
 {
     ihdDataReady = false;
-    if (GetSunsynkAuthToken())
+    if (!CheckSunsynkAuthToken())
     {
-        GetPlantFlow();
-        GetDailyTotals();
+        GetSunsynkAuthToken();
     }
+    GetPlantFlow();
+    GetDailyTotals();
     ihdDataReady = true;
 }

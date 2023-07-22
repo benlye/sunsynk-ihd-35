@@ -32,8 +32,6 @@ WiFiMulti wiFiMulti;
 IhdData ihdData;
 boolean ihdDataReady = false;
 
-
-
 // Connect to WiFi
 void connectWifI()
 {
@@ -216,7 +214,7 @@ void setup()
     Serial.println("\nReady.\n");
 
     // Task to print the status
-    uint32_t status_delay = 60 * 1000; // One minute
+    uint32_t status_delay = 300 * 1000; // Five minutes
     xTaskCreate(TaskStatus, "Task Status", 5120, (void *)&status_delay, 2, NULL);
 
     // Create the task to update the clock value

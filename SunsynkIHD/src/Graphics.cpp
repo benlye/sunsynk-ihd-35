@@ -152,14 +152,14 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
     lv_disp_flush_ready(disp);
 }
 
-void printCenterString(char* string, int y_pos)
+void printCenterString(const char* string, int y_pos)
 {
     gfx->getTextBounds(string, 0, 0, &gfx_x1, &gfx_y1, &gfx_w, &gfx_h);
     gfx->setCursor((gfx->width() - gfx_w) / 2, y_pos);
     gfx->print(string);
 }
 
-void printCenterString(char* string, const GFXfont* font, int color, int y_pos)
+void printCenterString(const char* string, const GFXfont* font, int color, int y_pos)
 {
     gfx->setFont(font);
     gfx->setTextColor(color);
@@ -168,7 +168,7 @@ void printCenterString(char* string, const GFXfont* font, int color, int y_pos)
     gfx->print(string);
 }
 
-void printRightString(char* string, const GFXfont* font, int color, int y_pos, int x_indent = 0)
+void printRightString(const char* string, const GFXfont* font, int color, int y_pos, int x_indent = 0)
 {
     gfx->setFont(font);
     gfx->setTextColor(color);
