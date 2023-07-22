@@ -8,7 +8,7 @@
 #include "SunsynkApi.h"
 #include "ui.h"
 
-ApiToken apiToken;
+struct ApiToken apiToken;
 
 boolean GetSunsynkAuthToken()
 {

@@ -1,6 +1,21 @@
+#include <Arduino.h>
 #include <lvgl.h>
 #include <XPT2046_Touchscreen.h>
 #include "Touch.h"
+
+bool touch_swap_xy = true;
+int16_t touch_map_x1 = TOUCH_CAL_X1;
+int16_t touch_map_x2 = TOUCH_CAL_X2;
+int16_t touch_map_y1 = TOUCH_CAL_Y1;
+int16_t touch_map_y2 = TOUCH_CAL_Y2;
+
+int16_t touch_max_x = 0, touch_max_y = 0;
+int16_t touch_raw_x = 0, touch_raw_y = 0;
+int16_t touch_last_x = 0, touch_last_y = 0;
+
+#ifdef TOUCH_XPT2046
+XPT2046_Touchscreen ts(TOUCH_XPT2046_CS, TOUCH_XPT2046_INT);
+#endif
 
 void touch_init(int16_t w, int16_t h, uint8_t r)
 {

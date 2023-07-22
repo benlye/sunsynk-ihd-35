@@ -21,13 +21,7 @@
 #define TOUCH_XPT2046_ROTATION 0
 #define TOUCH_XPT2046_SAMPLES 50
 
-XPT2046_Touchscreen ts(TOUCH_XPT2046_CS, TOUCH_XPT2046_INT);
-
 #endif // TOUCH_XPT2046
-
-int16_t touch_max_x = 0, touch_max_y = 0;
-int16_t touch_raw_x = 0, touch_raw_y = 0;
-int16_t touch_last_x = 0, touch_last_y = 0;
 
 void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data);
 void touch_init(int16_t w, int16_t h, uint8_t r);

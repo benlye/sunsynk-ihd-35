@@ -1,9 +1,18 @@
+#include <Arduino.h>
 #include <Arduino_GFX_Library.h>
 #include <lvgl.h>
 #include <WiFi.h>
 #include "Graphics.h"
 #include "SunsynkApi.h"
 #include "ui.h"
+
+#ifdef ESP32_ILI9488_SPI_TFT
+Arduino_DataBus *bus = new Arduino_ESP32SPI(LCD_DC /* DC */, LCD_CS /* CS */, LCD_SCK /* SCK */, LCD_MOSI /* MOSI */, GFX_NOT_DEFINED /* MISO */, VSPI /* spi_num */);
+Arduino_GFX *gfx = new Arduino_ILI9488_18bit(bus, LCD_RST /* RST */, LCD_ROTATION /* rotation */, false /* IPS */);
+#endif // ESP32_ILI9488_SPI_TFT
+
+int16_t gfx_x1, gfx_y1;
+uint16_t gfx_w, gfx_h;
 
 void UpdateDisplayFields()
 {
@@ -156,5 +165,14 @@ void printCenterString(char* string, const GFXfont* font, int color, int y_pos)
     gfx->setTextColor(color);
     gfx->getTextBounds(string, 0, 0, &gfx_x1, &gfx_y1, &gfx_w, &gfx_h);
     gfx->setCursor((gfx->width() - gfx_w) / 2, y_pos);
+    gfx->print(string);
+}
+
+void printRightString(char* string, const GFXfont* font, int color, int y_pos, int x_indent = 0)
+{
+    gfx->setFont(font);
+    gfx->setTextColor(color);
+    gfx->getTextBounds(WiFi.localIP().toString().c_str(), 0, 0, &gfx_x1, &gfx_y1, &gfx_w, &gfx_h);
+    gfx->setCursor((gfx->width() - gfx_w) - x_indent, y_pos);
     gfx->print(string);
 }

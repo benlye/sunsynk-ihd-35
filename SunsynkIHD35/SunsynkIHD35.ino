@@ -29,6 +29,11 @@ void TaskStatus( void *pvParameters );
 // Global instance of Wi-Fi client
 WiFiMulti wiFiMulti;
 
+IhdData ihdData;
+boolean ihdDataReady = false;
+
+
+
 // Connect to WiFi
 void connectWifI()
 {
@@ -179,10 +184,7 @@ void setup()
     connectWifI();
 
     // Print the IP address
-    gfx->getTextBounds(WiFi.localIP().toString().c_str(), 0, 0, &gfx_x1, &gfx_y1, &gfx_w, &gfx_h);
-    gfx->setCursor((gfx->width() - gfx_w) - 20, gfx->height() - 10);
-    gfx->setTextColor(GREEN);
-    gfx->print(WiFi.localIP().toString().c_str());
+    printRightString((char *)WiFi.localIP().toString().c_str(), &FreeSans8pt7b, GREEN, gfx->height() - 10, 20);
 
     // Set the clock
     gfx->fillRect(0, (gfx->height() / 2) - 35, gfx->width(), 50, BLACK);
