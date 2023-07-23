@@ -3,7 +3,7 @@
 // LVGL version: 8.3.6
 // Project name: Solar_UI
 
-#include "ui.h"
+#include "../ui.h"
 
 void ui_home_screen_init(void)
 {
@@ -443,8 +443,8 @@ void ui_home_screen_init(void)
     lv_img_set_src(ui_syncing, &ui_img_1765460539);
     lv_obj_set_width(ui_syncing, LV_SIZE_CONTENT);   /// 24
     lv_obj_set_height(ui_syncing, LV_SIZE_CONTENT);    /// 24
-    lv_obj_set_x(ui_syncing, -200);
-    lv_obj_set_y(ui_syncing, -143);
+    lv_obj_set_x(ui_syncing, -194);
+    lv_obj_set_y(ui_syncing, -144);
     lv_obj_set_align(ui_syncing, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_syncing, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
     lv_obj_clear_flag(ui_syncing, LV_OBJ_FLAG_SCROLLABLE);      /// Flags

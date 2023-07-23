@@ -6,7 +6,7 @@
 #include "Graphics.h"
 #include "SunsynkApi.h"
 #include "Touch.h"
-#include "ui.h"
+#include <ui.h>
 
 #ifdef ESP32_ILI9488_SPI_TFT
 Arduino_DataBus *bus = new Arduino_ESP32SPI(LCD_DC /* DC */, LCD_CS /* CS */, LCD_SCK /* SCK */, LCD_MOSI /* MOSI */, GFX_NOT_DEFINED /* MISO */, VSPI /* spi_num */);

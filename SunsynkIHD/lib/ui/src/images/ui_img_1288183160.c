@@ -3,7 +3,7 @@
 // LVGL version: 8.3.6
 // Project name: Solar_UI
 
-#include "ui.h"
+#include "../ui.h"
 
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
     #define LV_ATTRIBUTE_MEM_ALIGN
