@@ -31,6 +31,7 @@ WiFiMulti wiFiMulti;
 
 IhdData ihdData;
 boolean ihdDataReady = false;
+unsigned long lastTouchTime = 0;
 
 // Connect to WiFi
 void connectWifI()
@@ -98,6 +99,9 @@ void TaskSunsynkApi(void *pvParameters){
 void TaskOutput(void *pvParameters){
   uint32_t output_delay = *((uint32_t*)pvParameters);
   for (;;){
+#ifdef GFX_BL
+    SetNightMode();
+#endif
     UpdateDisplayFields();
     lv_timer_handler();
     delay(output_delay);

@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <lvgl.h>
 #include <XPT2046_Touchscreen.h>
+#include "DateTime.h"
 #include "Touch.h"
 
 bool touch_swap_xy = true;
@@ -105,6 +106,7 @@ bool touch_touched()
             //Serial.printf("touch_raw_x: %d, touch_raw_y: %d, p.z: %d\n", touch_raw_x, touch_raw_y, p.z);
         }
         translate_touch_raw();
+        lastTouchTime = getTime();
         return true;
     }
     return false;

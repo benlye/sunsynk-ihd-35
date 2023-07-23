@@ -2,8 +2,10 @@
 #include <Arduino_GFX_Library.h>
 #include <lvgl.h>
 #include <WiFi.h>
+#include "DateTime.h"
 #include "Graphics.h"
 #include "SunsynkApi.h"
+#include "Touch.h"
 #include "ui.h"
 
 #ifdef ESP32_ILI9488_SPI_TFT
@@ -150,6 +152,39 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
 #endif
 
     lv_disp_flush_ready(disp);
+}
+
+boolean NightModeEnabled()
+{
+    String timeNow = getTimeString();
+    uint16_t timeNowInt = (timeNow.substring(0,2).toInt() * 60) + timeNow.substring(3,5).toInt();
+    uint16_t timeOffInt = (String(SCREEN_OFF_TIME).substring(0,2).toInt() * 60) + String(SCREEN_OFF_TIME).substring(3,5).toInt();
+    uint16_t timeOnInt = (String(SCREEN_ON_TIME).substring(0,2).toInt() * 60) + String(SCREEN_ON_TIME).substring(3,5).toInt();
+
+    if (lastTouchTime + SCREEN_OFF_TIMEOUT < getTime())
+    {
+        if (timeOffInt > timeOnInt)
+        {
+            if ((timeNowInt >= timeOffInt) || (timeNowInt < timeOnInt))
+            {
+                return true;
+            }
+        }
+        else
+        {
+            if ((timeNowInt >= timeOffInt) && (timeNowInt < timeOnInt))
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+void SetNightMode()
+{
+    digitalWrite(GFX_BL, !NightModeEnabled());
 }
 
 void printCenterString(const char* string, int y_pos)

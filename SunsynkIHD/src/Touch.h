@@ -30,4 +30,6 @@ bool touch_touched();
 bool touch_released();
 void translate_touch_raw();
 
+extern unsigned long lastTouchTime;
+
 #endif // __TOUCH_H
