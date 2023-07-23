@@ -1,13 +1,25 @@
+#include <Arduino.h>
 #include <Arduino_GFX_Library.h>
 #include <lvgl.h>
 #include <WiFi.h>
+#include "DateTime.h"
 #include "Graphics.h"
 #include "SunsynkApi.h"
+#include "Touch.h"
 #include "ui.h"
+
+#ifdef ESP32_ILI9488_SPI_TFT
+Arduino_DataBus *bus = new Arduino_ESP32SPI(LCD_DC /* DC */, LCD_CS /* CS */, LCD_SCK /* SCK */, LCD_MOSI /* MOSI */, GFX_NOT_DEFINED /* MISO */, VSPI /* spi_num */);
+Arduino_GFX *gfx = new Arduino_ILI9488_18bit(bus, LCD_RST /* RST */, LCD_ROTATION /* rotation */, false /* IPS */);
+#endif // ESP32_ILI9488_SPI_TFT
+
+int16_t gfx_x1, gfx_y1;
+uint16_t gfx_w, gfx_h;
 
 void UpdateDisplayFields()
 {
-    if(ihdDataReady) {
+    if (ihdDataReady)
+    {
         // Hide the syncing icon
         lv_obj_add_flag(ui_syncing, LV_OBJ_FLAG_HIDDEN);
 
@@ -17,15 +29,15 @@ void UpdateDisplayFields()
         lv_obj_add_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN);
 
         // Show the appropriate WiFi symbol
-        if (WiFi.RSSI() < -80)  // Poor signal
+        if (WiFi.RSSI() < -80) // Poor signal
         {
-            lv_obj_clear_flag(ui_wifiLow, LV_OBJ_FLAG_HIDDEN);  
+            lv_obj_clear_flag(ui_wifiLow, LV_OBJ_FLAG_HIDDEN);
         }
-        else if (WiFi.RSSI() < -67)  // Moderate signal
+        else if (WiFi.RSSI() < -67) // Moderate signal
         {
             lv_obj_clear_flag(ui_wifiMed, LV_OBJ_FLAG_HIDDEN);
         }
-        else  // Good signal
+        else // Good signal
         {
             lv_obj_clear_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN);
         }
@@ -115,10 +127,10 @@ void UpdateDisplayFields()
 
         // Update PV total
         char eTodayStr[8];
-        dtostrf(ihdData.pvDailyTotal,3,1,eTodayStr);
+        dtostrf(ihdData.pvDailyTotal, 3, 1, eTodayStr);
         lv_label_set_text(ui_pvTotal, eTodayStr);
     }
-    else 
+    else
     {
         // Show the syncing icon
         lv_obj_clear_flag(ui_syncing, LV_OBJ_FLAG_HIDDEN);
@@ -143,18 +155,60 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
     lv_disp_flush_ready(disp);
 }
 
-void printCenterString(char* string, int y_pos)
+boolean NightModeEnabled()
+{
+    String timeNow = getTimeString();
+    uint16_t timeNowInt = (timeNow.substring(0, 2).toInt() * 60) + timeNow.substring(3, 5).toInt();
+    uint16_t timeOffInt = (String(SCREEN_OFF_TIME).substring(0, 2).toInt() * 60) + String(SCREEN_OFF_TIME).substring(3, 5).toInt();
+    uint16_t timeOnInt = (String(SCREEN_ON_TIME).substring(0, 2).toInt() * 60) + String(SCREEN_ON_TIME).substring(3, 5).toInt();
+
+    if (lastTouchTime + SCREEN_OFF_TIMEOUT < getTime())
+    {
+        if (timeOffInt > timeOnInt)
+        {
+            if ((timeNowInt >= timeOffInt) || (timeNowInt < timeOnInt))
+            {
+                return true;
+            }
+        }
+        else
+        {
+            if ((timeNowInt >= timeOffInt) && (timeNowInt < timeOnInt))
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+void SetNightMode()
+{
+    digitalWrite(GFX_BL, !NightModeEnabled());
+}
+
+void printCenterString(const char *string, int y_pos)
 {
     gfx->getTextBounds(string, 0, 0, &gfx_x1, &gfx_y1, &gfx_w, &gfx_h);
     gfx->setCursor((gfx->width() - gfx_w) / 2, y_pos);
     gfx->print(string);
 }
 
-void printCenterString(char* string, const GFXfont* font, int color, int y_pos)
+void printCenterString(const char *string, const GFXfont *font, int color, int y_pos)
 {
     gfx->setFont(font);
     gfx->setTextColor(color);
     gfx->getTextBounds(string, 0, 0, &gfx_x1, &gfx_y1, &gfx_w, &gfx_h);
     gfx->setCursor((gfx->width() - gfx_w) / 2, y_pos);
+    gfx->print(string);
+}
+
+void printRightString(const char *string, const GFXfont *font, int color, int y_pos, int x_indent = 0)
+{
+    gfx->setFont(font);
+    gfx->setTextColor(color);
+    gfx->getTextBounds(WiFi.localIP().toString().c_str(), 0, 0, &gfx_x1, &gfx_y1, &gfx_w, &gfx_h);
+    gfx->setCursor((gfx->width() - gfx_w) - x_indent, y_pos);
     gfx->print(string);
 }
