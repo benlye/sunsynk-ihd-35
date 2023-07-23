@@ -27,6 +27,8 @@ void TaskSunsynkApi(void *pvParameters);
 void TaskOutput(void *pvParameters);
 void TaskStatus(void *pvParameters);
 
+TaskHandle_t TaskSunsynkApi_h;
+
 // Global instance of Wi-Fi client
 WiFiMulti wiFiMulti;
 
@@ -71,6 +73,72 @@ void printStatus()
     Serial.printf("Wifi RSSI:           %d\n", WiFi.RSSI());
     Serial.printf("Free memory (bytes): %d\n", esp_get_free_heap_size());
     Serial.println();
+}
+
+// Check if night mode should be enabled.
+boolean IsNightMode()
+{
+    String timeNow = getTimeString();
+    uint16_t timeNowInt = (timeNow.substring(0, 2).toInt() * 60) + timeNow.substring(3, 5).toInt();
+    uint16_t timeOffInt = (String(SCREEN_OFF_TIME).substring(0, 2).toInt() * 60) + String(SCREEN_OFF_TIME).substring(3, 5).toInt();
+    uint16_t timeOnInt = (String(SCREEN_ON_TIME).substring(0, 2).toInt() * 60) + String(SCREEN_ON_TIME).substring(3, 5).toInt();
+
+    if (lastTouchTime + SCREEN_OFF_TIMEOUT < getTime())
+    {
+        if (timeOffInt > timeOnInt)
+        {
+            if ((timeNowInt >= timeOffInt) || (timeNowInt < timeOnInt))
+            {
+                return true;
+            }
+        }
+        else
+        {
+            if ((timeNowInt >= timeOffInt) && (timeNowInt < timeOnInt))
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+// Enable or disable night mode.
+void SetNightMode()
+{   
+    if (IsNightMode())
+    {
+        // Get the backlight state, turn it off if it's on.
+        if (digitalRead(GFX_BL))
+        {
+            Serial.println("Turning LCD backlight off.");
+            digitalWrite(GFX_BL, LOW);
+        }
+
+        // Get the API task state, disable it if it's enabled
+        eTaskState state = eTaskGetState(TaskSunsynkApi_h);
+        if (state != eSuspended)
+        {
+            Serial.println("Suspending API polling task.");
+            vTaskSuspend(TaskSunsynkApi_h);
+        }
+    } else {
+        // Get the API task state, enable it if it's disabled
+        eTaskState state = eTaskGetState(TaskSunsynkApi_h);
+        if (state == eSuspended)
+        {
+            Serial.println("Resuming API polling task.");
+            vTaskResume(TaskSunsynkApi_h);
+        }
+
+        // Get the backlight state, turn it on if it's off
+        if (!digitalRead(GFX_BL))
+        {
+            Serial.println("Turning LCD backlight on.");
+            digitalWrite(GFX_BL, HIGH);
+        }
+    }
 }
 
 void TaskNtp(void *pvParameters)
@@ -220,7 +288,7 @@ void setup()
 
     // Create the task to call the API to get the data
     uint32_t api_delay = 30000; // 30 seconds
-    xTaskCreate(TaskSunsynkApi, "Task API", 20480, (void *)&api_delay, 2, NULL);
+    xTaskCreate(TaskSunsynkApi, "Task API", 20480, (void *)&api_delay, 2, &TaskSunsynkApi_h);
 
     // Send status update to serial
     Serial.printf("\nNetwork SSID: %s\n", WIFI_SSID);

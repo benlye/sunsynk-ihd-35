@@ -29,7 +29,7 @@ extern Arduino_GFX *gfx;
 
 void UpdateDisplayFields(void);
 
-boolean NightModeEnabled(void);
+boolean IsNightMode(void);
 
 void SetNightMode(void);
 
