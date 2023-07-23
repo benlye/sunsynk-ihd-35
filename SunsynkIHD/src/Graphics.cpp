@@ -18,7 +18,8 @@ uint16_t gfx_w, gfx_h;
 
 void UpdateDisplayFields()
 {
-    if(ihdDataReady) {
+    if (ihdDataReady)
+    {
         // Hide the syncing icon
         lv_obj_add_flag(ui_syncing, LV_OBJ_FLAG_HIDDEN);
 
@@ -28,15 +29,15 @@ void UpdateDisplayFields()
         lv_obj_add_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN);
 
         // Show the appropriate WiFi symbol
-        if (WiFi.RSSI() < -80)  // Poor signal
+        if (WiFi.RSSI() < -80) // Poor signal
         {
-            lv_obj_clear_flag(ui_wifiLow, LV_OBJ_FLAG_HIDDEN);  
+            lv_obj_clear_flag(ui_wifiLow, LV_OBJ_FLAG_HIDDEN);
         }
-        else if (WiFi.RSSI() < -67)  // Moderate signal
+        else if (WiFi.RSSI() < -67) // Moderate signal
         {
             lv_obj_clear_flag(ui_wifiMed, LV_OBJ_FLAG_HIDDEN);
         }
-        else  // Good signal
+        else // Good signal
         {
             lv_obj_clear_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN);
         }
@@ -126,10 +127,10 @@ void UpdateDisplayFields()
 
         // Update PV total
         char eTodayStr[8];
-        dtostrf(ihdData.pvDailyTotal,3,1,eTodayStr);
+        dtostrf(ihdData.pvDailyTotal, 3, 1, eTodayStr);
         lv_label_set_text(ui_pvTotal, eTodayStr);
     }
-    else 
+    else
     {
         // Show the syncing icon
         lv_obj_clear_flag(ui_syncing, LV_OBJ_FLAG_HIDDEN);
@@ -157,9 +158,9 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
 boolean NightModeEnabled()
 {
     String timeNow = getTimeString();
-    uint16_t timeNowInt = (timeNow.substring(0,2).toInt() * 60) + timeNow.substring(3,5).toInt();
-    uint16_t timeOffInt = (String(SCREEN_OFF_TIME).substring(0,2).toInt() * 60) + String(SCREEN_OFF_TIME).substring(3,5).toInt();
-    uint16_t timeOnInt = (String(SCREEN_ON_TIME).substring(0,2).toInt() * 60) + String(SCREEN_ON_TIME).substring(3,5).toInt();
+    uint16_t timeNowInt = (timeNow.substring(0, 2).toInt() * 60) + timeNow.substring(3, 5).toInt();
+    uint16_t timeOffInt = (String(SCREEN_OFF_TIME).substring(0, 2).toInt() * 60) + String(SCREEN_OFF_TIME).substring(3, 5).toInt();
+    uint16_t timeOnInt = (String(SCREEN_ON_TIME).substring(0, 2).toInt() * 60) + String(SCREEN_ON_TIME).substring(3, 5).toInt();
 
     if (lastTouchTime + SCREEN_OFF_TIMEOUT < getTime())
     {
@@ -187,14 +188,14 @@ void SetNightMode()
     digitalWrite(GFX_BL, !NightModeEnabled());
 }
 
-void printCenterString(const char* string, int y_pos)
+void printCenterString(const char *string, int y_pos)
 {
     gfx->getTextBounds(string, 0, 0, &gfx_x1, &gfx_y1, &gfx_w, &gfx_h);
     gfx->setCursor((gfx->width() - gfx_w) / 2, y_pos);
     gfx->print(string);
 }
 
-void printCenterString(const char* string, const GFXfont* font, int color, int y_pos)
+void printCenterString(const char *string, const GFXfont *font, int color, int y_pos)
 {
     gfx->setFont(font);
     gfx->setTextColor(color);
@@ -203,7 +204,7 @@ void printCenterString(const char* string, const GFXfont* font, int color, int y
     gfx->print(string);
 }
 
-void printRightString(const char* string, const GFXfont* font, int color, int y_pos, int x_indent = 0)
+void printRightString(const char *string, const GFXfont *font, int color, int y_pos, int x_indent = 0)
 {
     gfx->setFont(font);
     gfx->setTextColor(color);
