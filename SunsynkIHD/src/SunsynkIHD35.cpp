@@ -20,11 +20,11 @@
 #error Configuration file is missing!
 #endif
 
-void TaskNtp( void *pvParameters );
-void TaskClock( void *pvParameters );
-void TaskSunsynkApi( void *pvParameters );
-void TaskOutput( void *pvParameters );
-void TaskStatus( void *pvParameters );
+void TaskNtp(void *pvParameters);
+void TaskClock(void *pvParameters);
+void TaskSunsynkApi(void *pvParameters);
+void TaskOutput(void *pvParameters);
+void TaskStatus(void *pvParameters);
 
 // Global instance of Wi-Fi client
 WiFiMulti wiFiMulti;
@@ -72,48 +72,58 @@ void printStatus()
     Serial.println();
 }
 
-void TaskNtp(void *pvParameters){
-  uint32_t ntp_delay = *((uint32_t*)pvParameters);
-  for (;;){
-    setClock();
-    delay(ntp_delay);
-  }
+void TaskNtp(void *pvParameters)
+{
+    uint32_t ntp_delay = *((uint32_t *)pvParameters);
+    for (;;)
+    {
+        setClock();
+        delay(ntp_delay);
+    }
 }
 
-void TaskClock(void *pvParameters){
-  uint32_t time_delay = *((uint32_t*)pvParameters);
-  for (;;){
-    ihdData.time = getTimeString();
-    delay(time_delay);
-  }
+void TaskClock(void *pvParameters)
+{
+    uint32_t time_delay = *((uint32_t *)pvParameters);
+    for (;;)
+    {
+        ihdData.time = getTimeString();
+        delay(time_delay);
+    }
 }
 
-void TaskSunsynkApi(void *pvParameters){
-  uint32_t api_delay = *((uint32_t*)pvParameters);
-  for (;;){
-    GetIhdData();
-    delay(api_delay);
-  }
+void TaskSunsynkApi(void *pvParameters)
+{
+    uint32_t api_delay = *((uint32_t *)pvParameters);
+    for (;;)
+    {
+        GetIhdData();
+        delay(api_delay);
+    }
 }
 
-void TaskOutput(void *pvParameters){
-  uint32_t output_delay = *((uint32_t*)pvParameters);
-  for (;;){
+void TaskOutput(void *pvParameters)
+{
+    uint32_t output_delay = *((uint32_t *)pvParameters);
+    for (;;)
+    {
 #ifdef GFX_BL
-    SetNightMode();
+        SetNightMode();
 #endif
-    UpdateDisplayFields();
-    lv_timer_handler();
-    delay(output_delay);
-  }
+        UpdateDisplayFields();
+        lv_timer_handler();
+        delay(output_delay);
+    }
 }
 
-void TaskStatus(void *pvParameters){
-  uint32_t output_delay = *((uint32_t*)pvParameters);
-  for (;;){
-    printStatus();
-    delay(output_delay);
-  }
+void TaskStatus(void *pvParameters)
+{
+    uint32_t output_delay = *((uint32_t *)pvParameters);
+    for (;;)
+    {
+        printStatus();
+        delay(output_delay);
+    }
 }
 
 void setup()
@@ -174,13 +184,13 @@ void setup()
 
     // Print the heading
     printCenterString("3.5\" IHD for Sunsynk", &FreeSansBold10pt7b, CYAN, 28);
-    
+
     // Print the version
     printCenterString(version, &FreeSans8pt7b, LIGHTGREY, 55);
 
     // Print the Git URL
     printCenterString("https://github.com/benlye/sunsynk-ihd-35", &FreeSans8pt7b, LIGHTGREY, 80);
-    
+
     // Connect to WiFi
     printCenterString("Connecting to wireless network ...", &FreeSans8pt7b, YELLOW, (gfx->height() / 2));
     connectWifI();
@@ -206,7 +216,7 @@ void setup()
     // Get the initial data
     gfx->fillRect(0, (gfx->height() / 2) - 35, gfx->width(), 50, BLACK);
     printCenterString("Getting data from Sunsynk ...", &FreeSans8pt7b, YELLOW, (gfx->height() / 2));
-    
+
     // Create the task to call the API to get the data
     uint32_t api_delay = 30000; // 30 seconds
     xTaskCreate(TaskSunsynkApi, "Task API", 20480, (void *)&api_delay, 2, NULL);
@@ -231,7 +241,7 @@ void setup()
 
     // Wait up to 10s for API data
     int delayEnd = millis() + (10 * 1000);
-    while (!ihdDataReady && millis() < delayEnd )
+    while (!ihdDataReady && millis() < delayEnd)
     {
         delay(100);
     }
