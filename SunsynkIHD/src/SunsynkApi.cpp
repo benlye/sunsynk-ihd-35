@@ -46,6 +46,7 @@ boolean GetSunsynkAuthToken()
             // Add a scoping block for HTTPClient https to make sure it is destroyed before WiFiClientSecure *client is
             HTTPClient https;
             https.useHTTP10(true);
+            https.setTimeout(API_READ_TIMEOUT);
             if (https.begin(*client, SUNSYNK_LOGIN_URL))
             { // HTTPS
 
@@ -127,6 +128,7 @@ DynamicJsonDocument CallSunsynkApi(String uri, int size, DeserializationOption::
             // Add a scoping block for HTTPClient https to make sure it is destroyed before WiFiClientSecure *client is
             HTTPClient https;
             https.useHTTP10(true);
+            https.setTimeout(API_READ_TIMEOUT);
             if (https.begin(*client, uri))
             { // HTTPS
                 // start connection and send HTTP header

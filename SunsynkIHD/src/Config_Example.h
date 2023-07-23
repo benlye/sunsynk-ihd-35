@@ -26,6 +26,7 @@
 #define SUNSYNK_USERNAME    "<Your username for the Sunsynk app>"   // Username for Sunsynk API
 #define SUNSYNK_PASSWORD    "<Your password for the Sunsynk app>"   // Password for Sunsynk API
 #define SUNSYNK_PLANT_ID    "<The ID of your Sunsynk plant>"        // Numeric ID of the Sunsynk plant
+#define API_READ_TIMEOUT    5000                                    // API read timeout in milliseconds (default is 5000)
 
 /*
  * Timezone and NTP server settings
@@ -40,7 +41,7 @@
  */
 #define SCREEN_OFF_TIME     "23:00"                                 // Time when the LCD backlight will be turned off
 #define SCREEN_ON_TIME      "06:00"                                 // Time when the LCD backlight will be turned back on
-#define SCREEN_OFF_TIMEOUT  30                                      // Number of seconds to keep LCD backlight on after it has been touched
+#define SCREEN_OFF_TIMEOUT  30                                      // Number of seconds to keep LCD backlight on after it has been touched (default is 30)
 
 /*
  * Touchpad calibration data
