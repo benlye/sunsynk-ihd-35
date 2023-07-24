@@ -10,10 +10,10 @@ SET(SOURCES screens/ui_home.c
     images/ui_img_264836261.c
     images/ui_img_1076282785.c
     images/ui_img_1551709364.c
-    images/ui_img_540100334.c
     images/ui_img_1765460539.c
     images/ui_img_1683162281.c
     images/ui_img_1288183160.c
-    images/ui_img_811431924.c)
+    images/ui_img_811431924.c
+    images/ui_img_226794803.c)
 
 add_library(ui ${SOURCES})
