@@ -7,15 +7,13 @@
 #include <WiFiClientSecure.h>
 #include <WiFiMulti.h>
 
+#include <fonts.h>
+#include <ui.h>
 #include "Config.h"
 #include "DateTime.h"
-//#include "FreeSans8pt7b.h"
-//#include "FreeSansBold10pt7b.h"
-#include <fonts.h>
 #include "Graphics.h"
 #include "SunsynkApi.h"
 #include "Touch.h"
-#include <ui.h>
 
 #ifndef __CONFIG_H
 #error Configuration file is missing!
