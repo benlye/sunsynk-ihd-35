@@ -317,7 +317,7 @@ void setup()
     ui_init();
 
     // Task to update the display
-    uint32_t output_delay = 100; // One tenth of a second
+    uint32_t output_delay = 5;
     xTaskCreate(TaskOutput, "Task Output", 5120, (void *)&output_delay, 2, NULL);
 }
 
