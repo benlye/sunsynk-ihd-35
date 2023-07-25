@@ -20,6 +20,12 @@ extern Arduino_GFX *gfx;
 #endif // ESP32_ILI9488_SPI_TFT
 
 #ifdef ESP32S3_ELECROW_HMI_35
+
+extern Arduino_GFX *gfx;
+#define SCREEN_WIDTH    480
+#define SCREEN_HEIGHT   320
+#define TFT_BL          46
+
 #endif // ESP32S3_ELECROW_HMI_35
 
 #ifdef ESP32S3_ELECROW_HMI_70

@@ -6,6 +6,23 @@
 
 int16_t touch_last_x = 0, touch_last_y = 0;
 
+#ifdef TOUCH_XPT2046
+#include <XPT2046_Touchscreen.h>
+XPT2046_Touchscreen ts(TOUCH_XPT2046_CS, TOUCH_XPT2046_INT);
+#endif
+
+#ifdef TOUCH_GT911
+#include <Wire.h>
+#include <TAMC_GT911.h>
+TAMC_GT911 ts = TAMC_GT911(TOUCH_GT911_SDA, TOUCH_GT911_SCL, TOUCH_GT911_INT, TOUCH_GT911_RST, max(TOUCH_MAP_X1, TOUCH_MAP_X2), max(TOUCH_MAP_Y1, TOUCH_MAP_Y2));
+#endif
+
+#ifdef TOUCH_FT6X36
+FT6X36 ts(&Wire, TOUCH_FT6X36_INT);
+bool touch_touched_flag = true;
+bool touch_released_flag = true;
+#endif
+
 #if defined(TOUCH_FT6X36)
 void touch(TPoint p, TEvent e)
 {
@@ -45,17 +62,6 @@ void touch(TPoint p, TEvent e)
         break;
     }
 }
-#endif
-
-#ifdef TOUCH_XPT2046
-#include <XPT2046_Touchscreen.h>
-XPT2046_Touchscreen ts(TOUCH_XPT2046_CS, TOUCH_XPT2046_INT);
-#endif
-
-#ifdef TOUCH_GT911
-#include <Wire.h>
-#include <TAMC_GT911.h>
-TAMC_GT911 ts = TAMC_GT911(TOUCH_GT911_SDA, TOUCH_GT911_SCL, TOUCH_GT911_INT, TOUCH_GT911_RST, max(TOUCH_MAP_X1, TOUCH_MAP_X2), max(TOUCH_MAP_Y1, TOUCH_MAP_Y2));
 #endif
 
 void touch_init()
