@@ -34,31 +34,42 @@ Arduino_RGB_Display *gfx = new Arduino_RGB_Display(
 int16_t gfx_x1, gfx_y1;
 uint16_t gfx_w, gfx_h;
 
+int8_t rssi;
+int8_t lastRssi = 0;
+
 void UpdateDisplayFields()
 {
-    if (ihdDataReady)
+    // Prevent Wi-Fi symbol hysteresis
+    if (WiFi.RSSI() > lastRssi + 1 || WiFi.RSSI() < lastRssi - 1)
+    {
+        lastRssi = rssi;
+        rssi = WiFi.RSSI();
+    }
+
+    // Show the appropriate WiFi symbol
+    if (rssi < -80) // Poor signal
+    {
+        lv_obj_clear_flag(ui_wifiLow, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(ui_wifiMed, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN);
+    }
+    else if (rssi < -67) // Moderate signal
+    {
+        lv_obj_add_flag(ui_wifiLow, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_clear_flag(ui_wifiMed, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN);
+    }
+    else // Good signal
+    {
+        lv_obj_add_flag(ui_wifiLow, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(ui_wifiMed, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_clear_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN);
+    }
+
+    if (ihdDataReady &! ihdScreenRefreshed)
     {
         // Hide the syncing icon
         lv_obj_add_flag(ui_syncing, LV_OBJ_FLAG_HIDDEN);
-
-        // Hide all the WiFi symbols
-        lv_obj_add_flag(ui_wifiLow, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_add_flag(ui_wifiMed, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_add_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN);
-
-        // Show the appropriate WiFi symbol
-        if (WiFi.RSSI() < -80) // Poor signal
-        {
-            lv_obj_clear_flag(ui_wifiLow, LV_OBJ_FLAG_HIDDEN);
-        }
-        else if (WiFi.RSSI() < -67) // Moderate signal
-        {
-            lv_obj_clear_flag(ui_wifiMed, LV_OBJ_FLAG_HIDDEN);
-        }
-        else // Good signal
-        {
-            lv_obj_clear_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN);
-        }
 
         // Update the PV energy
         int pvWattsColor = UI_GREY;
@@ -147,8 +158,10 @@ void UpdateDisplayFields()
         char eTodayStr[8];
         dtostrf(ihdData.pvDailyTotal, 3, 1, eTodayStr);
         lv_label_set_text(ui_pvTotal, eTodayStr);
+
+        ihdScreenRefreshed = true;
     }
-    else
+    else if (!ihdDataReady)
     {
         // Show the syncing icon
         lv_obj_clear_flag(ui_syncing, LV_OBJ_FLAG_HIDDEN);

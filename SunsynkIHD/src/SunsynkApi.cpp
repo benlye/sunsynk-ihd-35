@@ -303,4 +303,5 @@ void GetIhdData()
     GetPlantFlow();
     GetDailyTotals();
     ihdDataReady = true;
+    ihdScreenRefreshed = false;
 }

@@ -32,6 +32,7 @@ WiFiMulti wiFiMulti;
 
 IhdData ihdData;
 boolean ihdDataReady = false;
+boolean ihdScreenRefreshed = false;
 unsigned long lastTouchTime = 0;
 
 // Connect to WiFi
