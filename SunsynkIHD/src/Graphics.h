@@ -5,9 +5,6 @@
 #include <lvgl.h>
 #include "Config.h"
 
-//Arduino_DataBus *bus;
-extern Arduino_GFX *gfx;
-
 #define UI_GREEN    0x00E05A    // Color used for generating, charging, exporting
 #define UI_RED      0xE00000    // Color used for consuming, discharging, importing
 #define UI_GREY     0xA2A2A2    // Color used for no activity
@@ -15,9 +12,10 @@ extern Arduino_GFX *gfx;
 
 #ifdef ESP32_ILI9488_SPI_TFT
 
+extern Arduino_GFX *gfx;
 #define SCREEN_WIDTH    480
 #define SCREEN_HEIGHT   320
-#define GFX_BL          LCD_BL
+#define TFT_BL          LCD_BL
 
 #endif // ESP32_ILI9488_SPI_TFT
 
@@ -25,7 +23,13 @@ extern Arduino_GFX *gfx;
 #endif // ESP32S3_ELECROW_HMI_35
 
 #ifdef ESP32S3_ELECROW_HMI_70
-#endif // ESP32S3_ELECROW_HMI_35
+extern Arduino_RGB_Display *gfx;
+
+#define SCREEN_WIDTH    800
+#define SCREEN_HEIGHT   480
+#define TFT_BL          2
+
+#endif // ESP32S3_ELECROW_HMI_70
 
 void UpdateDisplayFields(void);
 
