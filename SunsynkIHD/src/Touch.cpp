@@ -18,16 +18,14 @@ TAMC_GT911 ts = TAMC_GT911(TOUCH_GT911_SDA, TOUCH_GT911_SCL, TOUCH_GT911_INT, TO
 #endif
 
 #ifdef TOUCH_FT6X36
-#include <TAMC_FT62X6.h>
-TAMC_FT62X6 ts = TAMC_FT62X6();
+#include <FT6236.h>
+FT6236 ts = FT6236();
 #endif
 
 void touch_init()
 {
 #if defined(TOUCH_FT6X36)
-    Wire.begin(TOUCH_FT6X36_SDA, TOUCH_FT6X36_SCL);
-    ts.begin();
-    ts.setRotation(TOUCH_FT6X36_ROTATION);
+    ts.begin(40, TOUCH_FT6X36_SDA, TOUCH_FT6X36_SCL);
 #elif defined(TOUCH_GT911)
     Wire.begin(TOUCH_GT911_SDA, TOUCH_GT911_SCL);
     ts.begin();
@@ -55,17 +53,15 @@ bool touch_has_signal()
 bool touch_touched()
 {
 #if defined(TOUCH_FT6X36)
-    ts.read();
-    if (ts.isTouched)
+    if (ts.touched())
     {
+        TS_Point p = ts.getPoint();
 #if defined(TOUCH_SWAP_XY)
-        touch_last_x = map(ts.points[0].y, TOUCH_MAP_X1, TOUCH_MAP_X2, 0, SCREEN_WIDTH - 1);
-        touch_last_y = map(ts.points[0].x, TOUCH_MAP_Y1, TOUCH_MAP_Y2, 0, SCREEN_HEIGHT - 1);
+        touch_last_x = map(p.y, TOUCH_MAP_X1, TOUCH_MAP_X2, 0, SCREEN_WIDTH - 1);
+        touch_last_y = map(p.x, TOUCH_MAP_Y1, TOUCH_MAP_Y2, 0, SCREEN_HEIGHT - 1);
 #else
-        touch_last_x = map(ts.points[0].x, TOUCH_MAP_X1, TOUCH_MAP_X2, 0, SCREEN_WIDTH - 1);
-        touch_last_y = map(ts.points[0].y, TOUCH_MAP_Y1, TOUCH_MAP_Y2, 0, SCREEN_HEIGHT - 1);
-        //touch_last_x = ts.points[0].x;
-        //touch_last_y = ts.points[0].y;
+        touch_last_x = map(p.x, TOUCH_MAP_X1, TOUCH_MAP_X2, 0, SCREEN_WIDTH - 1);
+        touch_last_y = map(p.y, TOUCH_MAP_Y1, TOUCH_MAP_Y2, 0, SCREEN_HEIGHT - 1);
 #endif
         lastTouchTime = getTime();
         return true;
