@@ -212,6 +212,14 @@ void setup()
     delay(1000);
     gfx->fillScreen(BLACK);
 
+    // Turn off the buzzer
+#ifdef BUZZER_PIN
+    pinMode(BUZZER_PIN, OUTPUT);
+    ledcSetup(4, 5000, 8);
+    ledcAttachPin(BUZZER_PIN, 4);
+    ledcWrite(4, 0);
+#endif
+
     // Turn on the LCD backlight
 #ifdef TFT_BL
     pinMode(TFT_BL, OUTPUT);
