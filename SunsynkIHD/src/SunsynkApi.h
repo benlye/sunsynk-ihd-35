@@ -35,6 +35,9 @@ extern const uint8_t certBundle[] asm("_binary_data_cert_x509_crt_bundle_bin_sta
 // Indicates if all the data has been collected from the API and is ready for the UI refresh.
 extern boolean ihdDataReady;
 
+// Indicates if the UI has been updated with the latest data.
+extern boolean ihdScreenRefreshed;
+
 // Oauth token API endpoint URL.
 #define SUNSYNK_LOGIN_URL "https://pv.inteless.com/oauth/token"
 

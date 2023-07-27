@@ -12,34 +12,68 @@ Arduino_DataBus *bus = new Arduino_ESP32SPI(LCD_DC /* DC */, LCD_CS /* CS */, LC
 Arduino_GFX *gfx = new Arduino_ILI9488_18bit(bus, LCD_RST /* RST */, LCD_ROTATION /* rotation */, false /* IPS */);
 #endif // ESP32_ILI9488_SPI_TFT
 
+#ifdef ESP32S3_ELECROW_HMI_35
+Arduino_DataBus *bus = new Arduino_ESP32PAR16(
+    45 /* DC */, GFX_NOT_DEFINED /* CS */, 18 /* WR */, 48 /* RD */,
+    47 /* D0 */, 21 /* D1 */, 14 /* D2 */, 13 /* D3 */, 12 /* D4 */, 11 /* D5 */, 10 /* D6 */, 9 /* D7 */,
+     3 /* D8 */,  8 /* D9 */, 16 /* D10 */, 15 /* D11 */, 7 /* D12 */, 6 /* D13 */, 5 /* D14 */, 4 /* D15 */);
+Arduino_GFX *gfx = new Arduino_ILI9488(bus, GFX_NOT_DEFINED /* RST */, LCD_ROTATION /* rotation */, false /* IPS */);
+#endif // ESP32S3_ELECROW_HMI_35
+
+#ifdef ESP32S3_ELECROW_HMI_70
+Arduino_ESP32RGBPanel *rgbpanel = new Arduino_ESP32RGBPanel(
+  41 /* DE */, 40 /* VSYNC */, 39 /* HSYNC */, 0 /* PCLK */,
+  14 /* R0 */, 21 /* R1 */, 47 /* R2 */, 48 /* R3 */, 45 /* R4 */,
+   9 /* G0 */, 46 /* G1 */,  3 /* G2 */,  8 /* G3 */, 16 /* G4 */, 1 /* G5 */,
+  15 /* B0 */,  7 /* B1 */,  6 /* B2 */,  5 /* B3 */,  4 /* B4 */,
+   0 /* hsync_polarity */, 40 /* hsync_front_porch */, 48 /* hsync_pulse_width */, 40 /* hsync_back_porch */,
+   0 /* vsync_polarity */, 13 /* vsync_front_porch */, 1 /* vsync_pulse_width */, 31 /* vsync_back_porch */,
+   1 /* pclk_active_neg */, 16000000 /* prefer_speed */
+);
+Arduino_RGB_Display *gfx = new Arduino_RGB_Display(
+    SCREEN_WIDTH /* width */, SCREEN_HEIGHT /* height */, rgbpanel, 0 /* rotation */, true /* auto_flush */
+);
+#endif // ESP32S3_ELECROW_HMI_70
+
 int16_t gfx_x1, gfx_y1;
 uint16_t gfx_w, gfx_h;
 
+int8_t rssi;
+int8_t lastRssi = 0;
+
 void UpdateDisplayFields()
 {
-    if (ihdDataReady)
+    // Prevent Wi-Fi symbol hysteresis
+    if (WiFi.RSSI() > lastRssi + 2 || WiFi.RSSI() < lastRssi - 2)
+    {
+        lastRssi = rssi;
+        rssi = WiFi.RSSI();
+    }
+
+    // Show the appropriate WiFi symbol
+    if (rssi < -80) // Poor signal
+    {
+        lv_obj_clear_flag(ui_wifiLow, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(ui_wifiMed, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN);
+    }
+    else if (rssi < -67) // Moderate signal
+    {
+        lv_obj_add_flag(ui_wifiLow, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_clear_flag(ui_wifiMed, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN);
+    }
+    else // Good signal
+    {
+        lv_obj_add_flag(ui_wifiLow, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(ui_wifiMed, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_clear_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN);
+    }
+
+    if (ihdDataReady &! ihdScreenRefreshed)
     {
         // Hide the syncing icon
         lv_obj_add_flag(ui_syncing, LV_OBJ_FLAG_HIDDEN);
-
-        // Hide all the WiFi symbols
-        lv_obj_add_flag(ui_wifiLow, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_add_flag(ui_wifiMed, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_add_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN);
-
-        // Show the appropriate WiFi symbol
-        if (WiFi.RSSI() < -80) // Poor signal
-        {
-            lv_obj_clear_flag(ui_wifiLow, LV_OBJ_FLAG_HIDDEN);
-        }
-        else if (WiFi.RSSI() < -67) // Moderate signal
-        {
-            lv_obj_clear_flag(ui_wifiMed, LV_OBJ_FLAG_HIDDEN);
-        }
-        else // Good signal
-        {
-            lv_obj_clear_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN);
-        }
 
         // Update the PV energy
         int pvWattsColor = UI_GREY;
@@ -128,8 +162,10 @@ void UpdateDisplayFields()
         char eTodayStr[8];
         dtostrf(ihdData.pvDailyTotal, 3, 1, eTodayStr);
         lv_label_set_text(ui_pvTotal, eTodayStr);
+
+        ihdScreenRefreshed = true;
     }
-    else
+    else if (!ihdDataReady)
     {
         // Show the syncing icon
         lv_obj_clear_flag(ui_syncing, LV_OBJ_FLAG_HIDDEN);

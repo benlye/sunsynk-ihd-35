@@ -32,6 +32,7 @@ WiFiMulti wiFiMulti;
 
 IhdData ihdData;
 boolean ihdDataReady = false;
+boolean ihdScreenRefreshed = false;
 unsigned long lastTouchTime = 0;
 
 // Connect to WiFi
@@ -108,10 +109,10 @@ void SetNightMode()
     if (IsNightMode())
     {
         // Get the backlight state, turn it off if it's on.
-        if (digitalRead(GFX_BL))
+        if (digitalRead(TFT_BL))
         {
             Serial.println("Turning LCD backlight off.");
-            digitalWrite(GFX_BL, LOW);
+            digitalWrite(TFT_BL, LOW);
         }
 
         // Get the API task state, disable it if it's enabled
@@ -131,10 +132,10 @@ void SetNightMode()
         }
 
         // Get the backlight state, turn it on if it's off
-        if (!digitalRead(GFX_BL))
+        if (!digitalRead(TFT_BL))
         {
             Serial.println("Turning LCD backlight on.");
-            digitalWrite(GFX_BL, HIGH);
+            digitalWrite(TFT_BL, HIGH);
         }
     }
 }
@@ -174,7 +175,7 @@ void TaskOutput(void *pvParameters)
     uint32_t output_delay = *((uint32_t *)pvParameters);
     for (;;)
     {
-#ifdef GFX_BL
+#ifdef TFT_BL
         SetNightMode();
 #endif
         UpdateDisplayFields();
@@ -211,14 +212,22 @@ void setup()
     delay(1000);
     gfx->fillScreen(BLACK);
 
+    // Turn off the buzzer
+#ifdef BUZZER_PIN
+    pinMode(BUZZER_PIN, OUTPUT);
+    ledcSetup(4, 5000, 8);
+    ledcAttachPin(BUZZER_PIN, 4);
+    ledcWrite(4, 0);
+#endif
+
     // Turn on the LCD backlight
-#ifdef GFX_BL
-    pinMode(GFX_BL, OUTPUT);
-    digitalWrite(GFX_BL, HIGH);
+#ifdef TFT_BL
+    pinMode(TFT_BL, OUTPUT);
+    digitalWrite(TFT_BL, HIGH);
 #endif
 
     // Init touch device
-    touch_init(gfx->width(), gfx->height(), gfx->getRotation());
+    touch_init();
 
     // Initialize LVGL
     lv_init();
