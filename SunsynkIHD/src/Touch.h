@@ -46,17 +46,16 @@
 #endif // TOUCH_GT911
 
 #ifdef TOUCH_FT6X36
-//#include <FT6X36.h>
-#include <TAMC_FT62X6.h>
-//#define TOUCH_SWAP_XY
+#include <FT6236.h>
+#define TOUCH_SWAP_XY
 #define TOUCH_FT6X36_SCL 39
 #define TOUCH_FT6X36_SDA 38
 #define TOUCH_FT6X36_INT 0
 #define TOUCH_FT6X36_ROTATION 3
 #define TOUCH_MAP_X1 480
 #define TOUCH_MAP_X2 0
-#define TOUCH_MAP_Y1 320
-#define TOUCH_MAP_Y2 0
+#define TOUCH_MAP_Y1 0
+#define TOUCH_MAP_Y2 320
 #endif // TOUCH_FT6X36
 
 void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data);
