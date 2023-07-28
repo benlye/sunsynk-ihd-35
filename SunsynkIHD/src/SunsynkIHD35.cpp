@@ -228,7 +228,10 @@ void setup()
 #ifdef TFT_BL
     pinMode(TFT_BL, OUTPUT);
     digitalWrite(TFT_BL, HIGH);
-#endif
+    ledcSetup(1, 300, 8);
+    ledcAttachPin(TFT_BL, 1);
+    ledcWrite(1, TFT_BRIGHTNESS);
+#endif // TFT_BL
 
     // Init touch device
     touch_init();
@@ -330,7 +333,7 @@ void setup()
     ui_init();
 
     // Task to update the display
-    uint32_t output_delay = 5;
+    uint32_t output_delay = 100;
     xTaskCreate(TaskOutput, "Task Output", 5120, (void *)&output_delay, 2, NULL);
 }
 

@@ -55,6 +55,9 @@
 // LCD Rotation
 #define LCD_ROTATION        3
 
+// LCD Brightess
+#define TFT_BRIGHTNESS      255
+
 // LCD pins
 #define LCD_DC              0
 #define LCD_CS              15
@@ -73,9 +76,19 @@
 #endif // ESP32_ILI9488_SPI_TFT
 
 #ifdef ESP32S3_ELECROW_HMI_35
+// LCD Rotation
+#define LCD_ROTATION        3
+
+// LCD Brightess
+#define TFT_BRIGHTNESS      255
 #endif // ESP32S3_ELECROW_HMI_35
 
 #ifdef ESP32S3_ELECROW_HMI_70
-#endif // ESP32S3_ELECROW_HMI_35
+// LCD Rotation
+#define LCD_ROTATION        3
+
+// LCD Brightess
+#define TFT_BRIGHTNESS      255
+#endif // ESP32S3_ELECROW_HMI_70
 
 #endif // __CONFIG_H

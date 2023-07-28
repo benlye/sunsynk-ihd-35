@@ -26,6 +26,8 @@ extern Arduino_GFX *gfx;
 #define SCREEN_HEIGHT   320
 #define TFT_BL          46
 
+#define BUZZER_PIN      20
+
 #endif // ESP32S3_ELECROW_HMI_35
 
 #ifdef ESP32S3_ELECROW_HMI_70
