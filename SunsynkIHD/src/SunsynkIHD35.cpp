@@ -34,6 +34,7 @@ IhdData ihdData;
 boolean ihdDataReady = false;
 boolean ihdScreenRefreshed = false;
 unsigned long lastTouchTime = 0;
+boolean backlightOn = true;
 
 // Connect to WiFi
 void connectWifI()
@@ -109,10 +110,11 @@ void SetNightMode()
     if (IsNightMode())
     {
         // Get the backlight state, turn it off if it's on.
-        if (digitalRead(TFT_BL))
+        if (backlightOn)
         {
             Serial.println("Turning LCD backlight off.");
-            digitalWrite(TFT_BL, LOW);
+            ledcWrite(1, SCREEN_OFF_BRIGHTNESS);
+            backlightOn = false;
         }
 
         // Get the API task state, disable it if it's enabled
@@ -132,10 +134,11 @@ void SetNightMode()
         }
 
         // Get the backlight state, turn it on if it's off
-        if (!digitalRead(TFT_BL))
+        if (!backlightOn)
         {
             Serial.println("Turning LCD backlight on.");
-            digitalWrite(TFT_BL, HIGH);
+            ledcWrite(1, LCD_BRIGHTNESS);
+            backlightOn = true;
         }
     }
 }
@@ -230,7 +233,7 @@ void setup()
     digitalWrite(TFT_BL, HIGH);
     ledcSetup(1, 300, 8);
     ledcAttachPin(TFT_BL, 1);
-    ledcWrite(1, TFT_BRIGHTNESS);
+    ledcWrite(1, LCD_BRIGHTNESS);
 #endif // TFT_BL
 
     // Init touch device
