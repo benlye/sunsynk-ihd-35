@@ -21,18 +21,18 @@ Arduino_GFX *gfx = new Arduino_ILI9488(bus, GFX_NOT_DEFINED /* RST */, LCD_ROTAT
 #endif // ESP32S3_ELECROW_HMI_35
 
 #ifdef ESP32S3_ELECROW_HMI_70
-Arduino_ESP32RGBPanel *rgbpanel = new Arduino_ESP32RGBPanel(
+Arduino_ESP32RGBPanel *bus = new Arduino_ESP32RGBPanel(
+  GFX_NOT_DEFINED /* CS */, GFX_NOT_DEFINED /* SCK */, GFX_NOT_DEFINED /* SDA */,
   41 /* DE */, 40 /* VSYNC */, 39 /* HSYNC */, 0 /* PCLK */,
   14 /* R0 */, 21 /* R1 */, 47 /* R2 */, 48 /* R3 */, 45 /* R4 */,
-   9 /* G0 */, 46 /* G1 */,  3 /* G2 */,  8 /* G3 */, 16 /* G4 */, 1 /* G5 */,
-  15 /* B0 */,  7 /* B1 */,  6 /* B2 */,  5 /* B3 */,  4 /* B4 */,
-   0 /* hsync_polarity */, 210 /* hsync_front_porch */, 30 /* hsync_pulse_width */, 16 /* hsync_back_porch */,
-   0 /* vsync_polarity */,  22 /* vsync_front_porch */, 13 /* vsync_pulse_width */, 10 /* vsync_back_porch */,
-   1 /* pclk_active_neg */, 16000000 /* prefer_speed */
+  9 /* G0 */, 46 /* G1 */, 3 /* G2 */, 8 /* G3 */, 16 /* G4 */, 1 /* G5 */,
+  15 /* B0 */, 7 /* B1 */, 6 /* B2 */, 5 /* B3 */, 4 /* B4 */
 );
-Arduino_RGB_Display *gfx = new Arduino_RGB_Display(
-    SCREEN_WIDTH /* width */, SCREEN_HEIGHT /* height */, rgbpanel, 0 /* rotation */, true /* auto_flush */
-);
+Arduino_RPi_DPI_RGBPanel *gfx = new Arduino_RPi_DPI_RGBPanel(
+  bus,
+      800 /* width */, 0 /* hsync_polarity */, 210 /* hsync_front_porch */, 30 /* hsync_pulse_width */, 16 /* hsync_back_porch */,
+      480 /* height */, 0 /* vsync_polarity */, 22 /* vsync_front_porch */, 13 /* vsync_pulse_width */, 10 /* vsync_back_porch */,
+      1 /* pclk_active_neg */, 16000000 /* prefer_speed */, true /* auto_flush */);
 #endif // ESP32S3_ELECROW_HMI_70
 
 int16_t gfx_x1, gfx_y1;

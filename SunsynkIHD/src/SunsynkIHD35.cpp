@@ -213,10 +213,14 @@ void setup()
     Serial.println("\nBooting ...");
 
     // Init Display
+#if defined(ESP32S3_ELECROW_HMI_70)
+    gfx->begin();
+#else
     if (!gfx->begin())
     {
         Serial.println("gfx->begin() failed!");
     }
+#endif
     delay(1000);
     gfx->fillScreen(BLACK);
 

@@ -29,7 +29,7 @@ extern Arduino_GFX *gfx;
 #endif // ESP32S3_ELECROW_HMI_35
 
 #ifdef ESP32S3_ELECROW_HMI_70
-extern Arduino_RGB_Display *gfx;
+extern Arduino_RPi_DPI_RGBPanel *gfx;
 
 #define SCREEN_WIDTH    800
 #define SCREEN_HEIGHT   480
