@@ -230,7 +230,6 @@ void setup()
     // Turn on the LCD backlight
 #ifdef TFT_BL
     pinMode(TFT_BL, OUTPUT);
-    digitalWrite(TFT_BL, HIGH);
     ledcSetup(1, 300, 8);
     ledcAttachPin(TFT_BL, 1);
     ledcWrite(1, LCD_BRIGHTNESS);
@@ -269,39 +268,47 @@ void setup()
     }
 
     // Print the heading
-    printCenterString("3.5\" IHD for Sunsynk", &FreeSansBold10pt7b, CYAN, 28);
+    gfx->setTextColor(TFT_CYAN);
+    gfx->drawCentreString("3.5\" IHD for Sunsynk", gfx->width() / 2, 40, &fonts::Font2);
 
     // Print the version
-    printCenterString(version, &FreeSans8pt7b, LIGHTGREY, 55);
+    gfx->setTextColor(TFT_LIGHTGREY);
+    gfx->drawCentreString(version, gfx->width() / 2, 55, &fonts::Font0);
 
     // Print the Git URL
-    printCenterString("https://github.com/benlye/sunsynk-ihd-35", &FreeSans8pt7b, LIGHTGREY, 80);
+    gfx->drawCentreString("https://github.com/benlye/sunsynk-ihd-35", gfx->width() / 2, 80, &fonts::Font0);
 
     // Connect to WiFi
-    printCenterString("Connecting to wireless network ...", &FreeSans8pt7b, YELLOW, (gfx->height() / 2));
+    gfx->setTextColor(TFT_YELLOW);
+    gfx->drawCentreString("Connecting to wireless network ...", gfx->width() / 2, gfx->height() / 2, &fonts::Font0);
     connectWifI();
 
     // Print the IP address
-    printRightString((char *)WiFi.localIP().toString().c_str(), &FreeSans8pt7b, GREEN, gfx->height() - 10, 20);
+    gfx->setTextColor(TFT_GREEN);
+    gfx->setTextDatum(textdatum_t::bottom_right);
+    gfx->drawString(WiFi.localIP().toString().c_str(), gfx->width() - 20, gfx->height() - 10, &fonts::Font0);
 
     // Set the clock
     gfx->fillRect(0, (gfx->height() / 2) - 35, gfx->width(), 50, BLACK);
-    printCenterString("Synchronizing the clock ...", &FreeSans8pt7b, YELLOW, (gfx->height() / 2));
+    gfx->setTextColor(TFT_YELLOW);
+    gfx->drawCentreString("Synchronizing the clock ...", gfx->width() / 2, gfx->height() / 2, &fonts::Font0);
     setClock();
 
     // Print the time
-    gfx->setCursor(20, gfx->height() - 10);
-    gfx->setTextColor(GREEN);
-    gfx->print(getDateTimeString().c_str());
+    gfx->setTextColor(TFT_GREEN);
+    gfx->setTextDatum(textdatum_t::bottom_left);
+    gfx->drawString(getDateTimeString().c_str(), 20, gfx->height() - 10, &fonts::Font0);
 
     // Get an API access token
     gfx->fillRect(0, (gfx->height() / 2) - 35, gfx->width(), 50, BLACK);
-    printCenterString("Authenticating with Sunsynk ...", &FreeSans8pt7b, YELLOW, (gfx->height() / 2));
+    gfx->setTextColor(TFT_YELLOW);
+    gfx->drawCentreString("Authenticating with Sunsynk ...", gfx->width() / 2, gfx->height() / 2, &fonts::Font0);
     GetSunsynkAuthToken();
 
     // Get the initial data
     gfx->fillRect(0, (gfx->height() / 2) - 35, gfx->width(), 50, BLACK);
-    printCenterString("Getting data from Sunsynk ...", &FreeSans8pt7b, YELLOW, (gfx->height() / 2));
+    gfx->setTextColor(TFT_YELLOW);
+    gfx->drawCentreString("Getting data from Sunsynk ...", gfx->width() / 2, gfx->height() / 2, &fonts::Font0);
 
     // Create the task to call the API to get the data
     uint32_t api_delay = 30000; // 30 seconds
