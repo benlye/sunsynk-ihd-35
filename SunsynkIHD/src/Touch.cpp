@@ -24,9 +24,7 @@ FT6236 ts = FT6236();
 
 void touch_init()
 {
-#if defined(TOUCH_FT6X36)
-    ts.begin(40, TOUCH_FT6X36_SDA, TOUCH_FT6X36_SCL);
-#elif defined(TOUCH_GT911)
+#if defined(TOUCH_GT911)
     Wire.begin(TOUCH_GT911_SDA, TOUCH_GT911_SCL);
     ts.begin();
     ts.setRotation(TOUCH_GT911_ROTATION);
@@ -127,7 +125,9 @@ bool touch_released()
 #endif
 }
 
+
 /*Read the touchpad*/
+/*
 void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
 {
     if (touch_has_signal())
@@ -136,7 +136,6 @@ void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
         {
             data->state = LV_INDEV_STATE_PR;
 
-            /*Set the coordinates*/
             data->point.x = touch_last_x;
             data->point.y = touch_last_y;
             Serial.printf("Touched: X:%d Y:%d\n", data->point.x, data->point.y);
@@ -149,5 +148,27 @@ void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
     else
     {
         data->state = LV_INDEV_STATE_REL;
+    }
+}
+*/
+
+void my_touchpad_read( lv_indev_drv_t * indev_driver, lv_indev_data_t * data )
+{
+    uint16_t touchX, touchY;
+    data->state = LV_INDEV_STATE_REL;
+    if(gfx->getTouchRaw( &touchX, &touchY ))
+    {
+#if defined(TOUCH_SWAP_XY)
+        touch_last_x = map(touchY, TOUCH_MAP_X1, TOUCH_MAP_X2, 0, SCREEN_WIDTH - 1);
+        touch_last_y = map(touchX, TOUCH_MAP_Y1, TOUCH_MAP_Y2, 0, SCREEN_HEIGHT - 1);
+#else
+        touch_last_x = map(touchX, TOUCH_MAP_X1, TOUCH_MAP_X2, 0, SCREEN_WIDTH - 1);
+        touch_last_y = map(touchY, TOUCH_MAP_Y1, TOUCH_MAP_Y2, 0, SCREEN_HEIGHT - 1);
+#endif
+        data->state = LV_INDEV_STATE_PR;
+        data->point.x = touch_last_x;
+        data->point.y = touch_last_y;
+        Serial.printf("Touched: X:%d Y:%d\n", data->point.x, data->point.y);
+        lastTouchTime = getTime();
     }
 }

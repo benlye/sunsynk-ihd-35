@@ -4,17 +4,14 @@
 #include "Config.h"
 
 #ifdef ESP32_ILI9488_SPI_TFT
-#define HAS_TOUCH
 #define TOUCH_XPT2046
 #endif // ESP32_ILI9488_SPI_TFT
 
 #ifdef ESP32S3_ELECROW_HMI_35
-#define HAS_TOUCH
 #define TOUCH_FT6X36
 #endif // ESP32S3_ELECROW_HMI_35
 
 #ifdef ESP32S3_ELECROW_HMI_70
-#define HAS_TOUCH
 #define TOUCH_GT911
 #endif // ESP32S3_ELECROW_HMI_70
 
@@ -52,6 +49,7 @@
 #define TOUCH_FT6X36_SDA 38
 #define TOUCH_FT6X36_INT 0
 #define TOUCH_FT6X36_ROTATION 3
+
 #define TOUCH_MAP_X1 480
 #define TOUCH_MAP_X2 0
 #define TOUCH_MAP_Y1 0

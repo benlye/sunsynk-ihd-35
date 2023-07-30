@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <Arduino_GFX_Library.h>
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
 #include <lvgl.h>
@@ -7,7 +6,7 @@
 #include <WiFiClientSecure.h>
 #include <WiFiMulti.h>
 
-#include <fonts.h>
+//#include <fonts.h>
 #include <ui.h>
 #include "Config.h"
 #include "DateTime.h"
@@ -113,16 +112,19 @@ void SetNightMode()
         if (backlightOn)
         {
             Serial.println("Turning LCD backlight off.");
-            ledcWrite(1, SCREEN_OFF_BRIGHTNESS);
+            gfx->setBrightness(LCD_BRIGHTNESS_NIGHT);
             backlightOn = false;
         }
 
-        // Get the API task state, disable it if it's enabled
-        eTaskState state = eTaskGetState(TaskSunsynkApi_h);
-        if (state != eSuspended)
+        if (LCD_BRIGHTNESS_NIGHT == 0)
         {
-            Serial.println("Suspending API polling task.");
-            vTaskSuspend(TaskSunsynkApi_h);
+            // Get the API task state, disable it if it's enabled
+            eTaskState state = eTaskGetState(TaskSunsynkApi_h);
+            if (state != eSuspended)
+            {
+                Serial.println("Suspending API polling task.");
+                vTaskSuspend(TaskSunsynkApi_h);
+            }
         }
     } else {
         // Get the API task state, enable it if it's disabled
@@ -137,7 +139,7 @@ void SetNightMode()
         if (!backlightOn)
         {
             Serial.println("Turning LCD backlight on.");
-            ledcWrite(1, LCD_BRIGHTNESS);
+            gfx->setBrightness(LCD_BRIGHTNESS_DAY);
             backlightOn = true;
         }
     }
@@ -216,24 +218,15 @@ void setup()
     Serial.println("\nBooting ...");
 
     // Init Display
-#if defined(ESP32S3_ELECROW_HMI_70)
-    gfx->begin();
-#else
     if (!gfx->begin())
     {
         Serial.println("gfx->begin() failed!");
     }
-#endif
-    delay(1000);
-    gfx->fillScreen(BLACK);
+    delay(500);
+    gfx->fillScreen(TFT_BLACK);
 
     // Turn on the LCD backlight
-#ifdef TFT_BL
-    pinMode(TFT_BL, OUTPUT);
-    ledcSetup(1, 300, 8);
-    ledcAttachPin(TFT_BL, 1);
-    ledcWrite(1, LCD_BRIGHTNESS);
-#endif // TFT_BL
+    gfx->setBrightness(LCD_BRIGHTNESS_DAY);
 
     // Init touch device
     touch_init();
@@ -289,7 +282,7 @@ void setup()
     gfx->drawString(WiFi.localIP().toString().c_str(), gfx->width() - 20, gfx->height() - 10, &fonts::Font0);
 
     // Set the clock
-    gfx->fillRect(0, (gfx->height() / 2) - 35, gfx->width(), 50, BLACK);
+    gfx->fillRect(0, (gfx->height() / 2) - 35, gfx->width(), 50, TFT_BLACK);
     gfx->setTextColor(TFT_YELLOW);
     gfx->drawCentreString("Synchronizing the clock ...", gfx->width() / 2, gfx->height() / 2, &fonts::Font0);
     setClock();
@@ -300,13 +293,13 @@ void setup()
     gfx->drawString(getDateTimeString().c_str(), 20, gfx->height() - 10, &fonts::Font0);
 
     // Get an API access token
-    gfx->fillRect(0, (gfx->height() / 2) - 35, gfx->width(), 50, BLACK);
+    gfx->fillRect(0, (gfx->height() / 2) - 35, gfx->width(), 50, TFT_BLACK);
     gfx->setTextColor(TFT_YELLOW);
     gfx->drawCentreString("Authenticating with Sunsynk ...", gfx->width() / 2, gfx->height() / 2, &fonts::Font0);
     GetSunsynkAuthToken();
 
     // Get the initial data
-    gfx->fillRect(0, (gfx->height() / 2) - 35, gfx->width(), 50, BLACK);
+    gfx->fillRect(0, (gfx->height() / 2) - 35, gfx->width(), 50, TFT_BLACK);
     gfx->setTextColor(TFT_YELLOW);
     gfx->drawCentreString("Getting data from Sunsynk ...", gfx->width() / 2, gfx->height() / 2, &fonts::Font0);
 

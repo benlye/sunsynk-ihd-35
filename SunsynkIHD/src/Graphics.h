@@ -2,7 +2,6 @@
 #define __GRAPHICS_H
 
 #define LGFX_USE_V1
-#include <Arduino_GFX_Library.h>
 #include <LovyanGFX.hpp>
 #include <lvgl.h>
 #include "Config.h"
@@ -36,15 +35,14 @@ public:
       auto cfg = _bus_instance.config();
       cfg.spi_host = VSPI_HOST;
       cfg.spi_mode = 0;
-      cfg.freq_write = 40000000;
-      cfg.freq_read  = 16000000;
+      cfg.freq_write = 27000000;
+      cfg.freq_read  = 20000000;
       cfg.spi_3wire  = true;
       cfg.use_lock   = true;
       cfg.dma_channel = SPI_DMA_CH_AUTO;
-      cfg.freq_write = 40000000;
       cfg.pin_sclk = LCD_SCK;
-      cfg.pin_mosi = LCD_MOSI ;
-      cfg.pin_miso = GFX_NOT_DEFINED;
+      cfg.pin_mosi = LCD_MOSI;
+      cfg.pin_miso = LCD_MISO;
       cfg.pin_dc = LCD_DC;
 
       _bus_instance.config(cfg);
@@ -55,22 +53,22 @@ public:
     {
       auto cfg = _panel_instance.config();
 
-      cfg.pin_cs           =    LCD_CS;
-      cfg.pin_rst          =    -1;
+      cfg.pin_cs           = LCD_CS;
+      cfg.pin_rst          = LCD_RST;
       cfg.pin_busy         =    -1;
 
-      cfg.panel_width      =   480;
-      cfg.panel_height     =   320;
+      cfg.panel_width      =   320;
+      cfg.panel_height     =   480;
       cfg.offset_x         =     0;
       cfg.offset_y         =     0;
-      cfg.offset_rotation  =     3;
+      cfg.offset_rotation  = LCD_ROTATION;
       cfg.dummy_read_pixel =     8;
       cfg.dummy_read_bits  =     1;
       cfg.readable         =  true;
       cfg.invert           = false;
       cfg.rgb_order        = false;
       cfg.dlen_16bit       = false;
-      cfg.bus_shared       =  true;
+      cfg.bus_shared       = false;
 
       _panel_instance.config(cfg);
     }
@@ -79,9 +77,6 @@ public:
       auto cfg = _light_instance.config();
 
       cfg.pin_bl = TFT_BL;
-      //cfg.invert = false;
-      //cfg.freq   = 44100;
-      //cfg.pwm_channel = 7;
 
       _light_instance.config(cfg);
       _panel_instance.light(&_light_instance);
@@ -99,7 +94,6 @@ public:
 #define SCREEN_WIDTH    480
 #define SCREEN_HEIGHT   320
 #define TFT_BL          46
-
 #define BUZZER_PIN      20
 
 class LGFX : public lgfx::LGFX_Device
@@ -108,7 +102,7 @@ public:
   lgfx::Bus_Parallel16 _bus_instance;
   lgfx::Panel_ILI9488 _panel_instance;
   lgfx::Light_PWM     _light_instance;
-  lgfx::ITouch*  _touch_instance_ptr = nullptr;
+  lgfx::Touch_FT5x06  _touch_instance;
 
   LGFX(void)
   {
@@ -163,13 +157,29 @@ public:
       auto cfg = _light_instance.config();
 
       cfg.pin_bl = GPIO_NUM_46;
-      //cfg.invert = false;
-      //cfg.freq   = 44100;
-      //cfg.pwm_channel = 7;
 
       _light_instance.config(cfg);
       _panel_instance.light(&_light_instance);
     }
+
+    {
+      auto cfg = _touch_instance.config();
+      cfg.i2c_port = 0;
+      cfg.i2c_addr = 0x38;
+      cfg.pin_sda  = 38;
+      cfg.pin_scl  = 39;
+      cfg.pin_int  = -1;
+      cfg.freq = 400000;
+      
+      cfg.x_min = 0;
+      cfg.x_max = 480;
+      cfg.y_min = 0;
+      cfg.y_max = 320;
+
+      _touch_instance.config(cfg);
+      _panel_instance.setTouch(&_touch_instance);
+    }
+
     setPanel(&_panel_instance);
   }
 
