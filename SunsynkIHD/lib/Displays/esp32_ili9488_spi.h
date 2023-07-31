@@ -27,7 +27,7 @@ public:
   {
     {
       auto cfg = _bus_instance.config();
-      cfg.spi_host = VSPI_HOST;
+      cfg.spi_host = SPI3_HOST;
       cfg.spi_mode = 0;
       cfg.freq_write = 27000000;
       cfg.freq_read  = 20000000;
@@ -87,7 +87,7 @@ public:
       cfg.bus_shared = true;
       cfg.offset_rotation = 0;
 
-      cfg.spi_host = VSPI_HOST;
+      cfg.spi_host = SPI3_HOST;
       cfg.freq = 1000000;
       cfg.pin_sclk = TOUCH_SCK;
       cfg.pin_mosi = TOUCH_MOSI;
