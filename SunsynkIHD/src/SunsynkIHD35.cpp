@@ -228,9 +228,6 @@ void setup()
     // Turn on the LCD backlight
     gfx->setBrightness(LCD_BRIGHTNESS_DAY);
 
-    // Init touch device
-    touch_init();
-
     // Initialize LVGL
     lv_init();
 
