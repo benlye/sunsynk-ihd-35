@@ -1,7 +1,7 @@
-#ifndef __ESP32S3_ELECROW_HMI_70_H
-#define __ESP32S3_ELECROW_HMI_70_H
+#ifndef __ESP32S3_ELECROW_HMI_50_H
+#define __ESP32S3_ELECROW_HMI_50_H
 
-#ifdef ESP32S3_ELECROW_HMI_70
+#ifdef ESP32S3_ELECROW_HMI_50
 
 #define LGFX_USE_V1
 #include "Config.h"
@@ -62,8 +62,8 @@ public:
             cfg.pin_d14 = GPIO_NUM_48; // R3
             cfg.pin_d15 = GPIO_NUM_45; // R4
 
-            cfg.pin_henable = GPIO_NUM_41;
-            cfg.pin_vsync = GPIO_NUM_40;
+            cfg.pin_henable = GPIO_NUM_40;
+            cfg.pin_vsync = GPIO_NUM_41;
             cfg.pin_hsync = GPIO_NUM_39;
             cfg.pin_pclk = GPIO_NUM_0;
             cfg.freq_write = 16000000;
@@ -115,6 +115,6 @@ public:
     }
 };
 
-#endif // ESP32S3_ELECROW_HMI_70
+#endif // ESP32S3_ELECROW_HMI_50
 
-#endif // __ESP32S3_ELECROW_HMI_70_H
+#endif // __ESP32S3_ELECROW_HMI_50_H
