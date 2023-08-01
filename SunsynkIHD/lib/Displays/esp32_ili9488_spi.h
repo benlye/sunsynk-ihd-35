@@ -62,7 +62,7 @@ public:
       cfg.invert           = false;
       cfg.rgb_order        = false;
       cfg.dlen_16bit       = false;
-      cfg.bus_shared       = false;
+      cfg.bus_shared       =  true;
 
       _panel_instance.config(cfg);
     }
