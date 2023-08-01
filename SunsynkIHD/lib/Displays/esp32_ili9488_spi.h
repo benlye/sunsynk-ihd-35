@@ -27,7 +27,7 @@ public:
   {
     {
       auto cfg = _bus_instance.config();
-      cfg.spi_host = SPI3_HOST;
+      cfg.spi_host = SPI_HOST_DEV;
       cfg.spi_mode = 0;
       cfg.freq_write = 27000000;
       cfg.freq_read  = 20000000;

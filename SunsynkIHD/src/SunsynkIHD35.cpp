@@ -201,8 +201,8 @@ void TaskStatus(void *pvParameters)
 
 void setup()
 {
-    // Turn off the buzzer
 #ifdef BUZZER_PIN
+    // Turn off the buzzer
     pinMode(BUZZER_PIN, OUTPUT);
     ledcSetup(4, 5000, 8);
     ledcAttachPin(BUZZER_PIN, 4);
@@ -259,7 +259,7 @@ void setup()
 
     // Print the heading
     gfx->setTextColor(TFT_CYAN);
-    gfx->drawCentreString("3.5\" IHD for Sunsynk", gfx->width() / 2, 40, &fonts::Font2);
+    gfx->drawCentreString("3.5\" IHD for Sunsynk", gfx->width() / 2, 15, &fonts::Font4);
 
     // Print the version
     gfx->setTextColor(TFT_LIGHTGREY);
