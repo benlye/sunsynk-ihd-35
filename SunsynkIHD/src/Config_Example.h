@@ -8,13 +8,6 @@
  */
 
 /*
- * Screen type selection - uncomment one screen type
- */
-#define ESP32_ILI9488_SPI_TFT       // 'DIY' hardware using ESP32 and 3.5" SPI TFT LCD with ILI9488 and XPT2046
-//#define ESP32S3_ELECROW_HMI_35    // Elecrow 3.5" HMI with 16-bit parallel RGB interface
-//#define ESP32S3_ELECROW_HMI_70    // Elecrow 7.0" HMI with 16-bit parallel RGB interface
-
-/*
  * Wireless network
  */
 #define WIFI_SSID           "<Your wireless network SSID>"         // SSID of the wireless network to connect to
