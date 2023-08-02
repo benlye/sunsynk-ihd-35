@@ -479,7 +479,7 @@ void ui_home_screen_init(void)
     lv_img_set_src(ui_Image1, &ui_img_207095971);
     lv_obj_set_width(ui_Image1, LV_SIZE_CONTENT);   /// 150
     lv_obj_set_height(ui_Image1, LV_SIZE_CONTENT);    /// 50
-    lv_obj_set_x(ui_Image1, 139);
+    lv_obj_set_x(ui_Image1, 138);
     lv_obj_set_y(ui_Image1, -25);
     lv_obj_set_align(ui_Image1, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_Image1, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
