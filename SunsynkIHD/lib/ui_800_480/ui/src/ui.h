@@ -28,7 +28,6 @@ extern "C" {
 void ui_home_screen_init(void);
 extern lv_obj_t * ui_home;
 extern lv_obj_t * ui_pvIcon;
-extern lv_obj_t * ui_pvLine;
 extern lv_obj_t * ui_pvWatts;
 extern lv_obj_t * ui_pvWattsUnit;
 extern lv_obj_t * ui_pvTotal;
@@ -36,7 +35,6 @@ extern lv_obj_t * ui_pvTotalUnits;
 extern lv_obj_t * ui_loadWatts;
 extern lv_obj_t * ui_loadWattsUnit;
 extern lv_obj_t * ui_battIcon;
-extern lv_obj_t * ui_battLine;
 extern lv_obj_t * ui_battSoc;
 extern lv_obj_t * ui_battWatts;
 extern lv_obj_t * ui_battWattsUnit;
@@ -47,9 +45,8 @@ extern lv_obj_t * ui_battDailyChargeUnit;
 extern lv_obj_t * ui_battDischargeIcon;
 extern lv_obj_t * ui_battChargeIcon;
 extern lv_obj_t * ui_gridIcon;
-extern lv_obj_t * ui_gridLine;
 extern lv_obj_t * ui_gridWatts;
-extern lv_obj_t * ui_pvWattsUnit1;
+extern lv_obj_t * ui_gridWattsUnit;
 extern lv_obj_t * ui_gridDailyExport;
 extern lv_obj_t * ui_gridDailyExportUnit;
 extern lv_obj_t * ui_gridDailyImport;
@@ -57,7 +54,6 @@ extern lv_obj_t * ui_gridDailyImportUnit;
 extern lv_obj_t * ui_gridExportArrow;
 extern lv_obj_t * ui_gridImportArrow;
 extern lv_obj_t * ui_loadIcon;
-extern lv_obj_t * ui_loadLine;
 extern lv_obj_t * ui_loadTotal;
 extern lv_obj_t * ui_loadTotalUnits;
 extern lv_obj_t * ui_Inverter;
@@ -70,21 +66,30 @@ extern lv_obj_t * ui_wifiLow;
 extern lv_obj_t * ui_noData;
 extern lv_obj_t * ui_noDataLabel;
 extern lv_obj_t * ui_settingsIcon;
+extern lv_obj_t * ui_Image3;
+extern lv_obj_t * ui_Image1;
+extern lv_obj_t * ui_Image4;
+extern lv_obj_t * ui_Image2;
 extern lv_obj_t * ui____initial_actions0;
 
 LV_IMG_DECLARE(ui_img_1549501229);    // assets\icons8-solar-panel-100.png
-LV_IMG_DECLARE(ui_img_1933564998);    // assets\line-75-4.png
 LV_IMG_DECLARE(ui_img_670870020);    // assets\icons8-charging-battery-90.png
-LV_IMG_DECLARE(ui_img_1261930360);    // assets\line-75-4-inv.png
 LV_IMG_DECLARE(ui_img_705529016);    // assets\icons8-arrow-30.png
 LV_IMG_DECLARE(ui_img_264836261);    // assets\icons8-transmission-tower-100.png
 LV_IMG_DECLARE(ui_img_1076282785);    // assets\icons8-house-100.png
-LV_IMG_DECLARE(ui_img_1551709364);    // assets\sunsynk-logo-40px.png
+LV_IMG_DECLARE(ui_img_1416811391);    // assets\sunsynk-logo-large.png
 LV_IMG_DECLARE(ui_img_1765460539);    // assets\icons8-transfer-24 (1).png
 LV_IMG_DECLARE(ui_img_1683162281);    // assets\icons8-wifi-26.png
 LV_IMG_DECLARE(ui_img_1288183160);    // assets\icons8-wifi-26-med.png
 LV_IMG_DECLARE(ui_img_811431924);    // assets\icons8-wifi-26-low.png
 LV_IMG_DECLARE(ui_img_226794803);    // assets\icons8-settings-24-1.png
+LV_IMG_DECLARE(ui_img_207095971);    // assets\line-150-5.png
+LV_IMG_DECLARE(ui_img_1192762099);    // assets\line-150-5-inv.png
+LV_IMG_DECLARE(ui_img_836172127);    // assets\line-200.png
+
+LV_FONT_DECLARE(ui_font_montserrat_56);
+LV_FONT_DECLARE(ui_font_montserrat_64);
+LV_FONT_DECLARE(ui_font_montserrat_72);
 
 void ui_init(void);
 
