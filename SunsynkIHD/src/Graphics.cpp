@@ -4,7 +4,12 @@
 #include "Graphics.h"
 #include "SunsynkApi.h"
 #include "Touch.h"
-#include <ui.h>
+
+#if defined(SCREEN_800_480)
+#include <ui_800_480.h>
+#else
+#include <ui_480_320.h>
+#endif
 
 #ifdef ESP32_ILI9488_SPI_TFT
 #endif // ESP32_ILI9488_SPI_TFT

@@ -5,7 +5,6 @@
 #include "Config.h"
 #include "DateTime.h"
 #include "SunsynkApi.h"
-#include <ui.h>
 
 struct ApiToken apiToken;
 

@@ -6,13 +6,17 @@
 #include <WiFiClientSecure.h>
 #include <WiFiMulti.h>
 
-//#include <fonts.h>
-#include <ui.h>
 #include "Config.h"
 #include "DateTime.h"
 #include "Graphics.h"
 #include "SunsynkApi.h"
 #include "Touch.h"
+
+#if defined(SCREEN_800_480)
+#include <ui_800_480.h>
+#else
+#include <ui_480_320.h>
+#endif
 
 #ifndef __CONFIG_H
 #error Configuration file is missing!

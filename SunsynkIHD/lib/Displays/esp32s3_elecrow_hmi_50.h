@@ -10,6 +10,7 @@
 #include <lgfx/v1/platforms/esp32s3/Panel_RGB.hpp>
 #include <lgfx/v1/platforms/esp32s3/Bus_RGB.hpp>
 
+#define SCREEN_800_480
 #define SCREEN_WIDTH    800
 #define SCREEN_HEIGHT   480
 #define TFT_BL          2
