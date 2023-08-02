@@ -62,7 +62,6 @@ const lv_img_dsc_t * ui_imgset_59742990[1] = {&ui_img_226794803};
 const lv_img_dsc_t * ui_imgset_1375169470[1] = {&ui_img_1549501229};
 const lv_img_dsc_t * ui_imgset_1399112042[1] = {&ui_img_264836261};
 const lv_img_dsc_t * ui_imgset_535857063[1] = {&ui_img_1683162281};
-const lv_img_dsc_t * ui_imgset_649896585[1] = {&ui_img_836172127};
 const lv_img_dsc_t * ui_imgset_1912930371[1] = {&ui_img_207095971};
 
 ///////////////////// TEST LVGL SETTINGS ////////////////////

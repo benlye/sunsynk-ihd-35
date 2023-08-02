@@ -85,11 +85,8 @@ LV_IMG_DECLARE(ui_img_811431924);    // assets\icons8-wifi-26-low.png
 LV_IMG_DECLARE(ui_img_226794803);    // assets\icons8-settings-24-1.png
 LV_IMG_DECLARE(ui_img_207095971);    // assets\line-150-5.png
 LV_IMG_DECLARE(ui_img_1192762099);    // assets\line-150-5-inv.png
-LV_IMG_DECLARE(ui_img_836172127);    // assets\line-200.png
 
-LV_FONT_DECLARE(ui_font_montserrat_56);
 LV_FONT_DECLARE(ui_font_montserrat_64);
-LV_FONT_DECLARE(ui_font_montserrat_72);
 
 void ui_init(void);
 
