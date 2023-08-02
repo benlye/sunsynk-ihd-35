@@ -29,6 +29,7 @@ void TaskOutput(void *pvParameters);
 void TaskStatus(void *pvParameters);
 
 TaskHandle_t TaskSunsynkApi_h;
+TaskHandle_t TaskOutput_h;
 
 // Global instance of Wi-Fi client
 WiFiMulti wiFiMulti;
@@ -174,7 +175,9 @@ void TaskSunsynkApi(void *pvParameters)
     uint32_t api_delay = *((uint32_t *)pvParameters);
     for (;;)
     {
+        //vTaskSuspend(TaskOutput_h);
         GetIhdData();
+        //vTaskResume(TaskOutput_h);
         delay(api_delay);
     }
 }
@@ -318,7 +321,7 @@ void setup()
     uint32_t status_delay = 300 * 1000; // Five minutes
     xTaskCreate(TaskStatus, "Task Status", 5120, (void *)&status_delay, 2, NULL);
 
-    // Create the task to update the clock value
+    // Create the task to perform an NTP sync
     uint32_t ntp_delay = 86400 * 1000; // One day
     xTaskCreate(TaskNtp, "Task NTP", 2048, (void *)&ntp_delay, 2, NULL);
 
@@ -337,8 +340,8 @@ void setup()
     ui_init();
 
     // Task to update the display
-    uint32_t output_delay = 100;
-    xTaskCreate(TaskOutput, "Task Output", 5120, (void *)&output_delay, 2, NULL);
+    uint32_t output_delay = 10;
+    xTaskCreate(TaskOutput, "Task Output", 5120, (void *)&output_delay, 2, &TaskOutput_h);
 }
 
 void loop()
