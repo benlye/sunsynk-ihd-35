@@ -8,3 +8,6 @@
 # User configuration file
 **/Config.h
 
+# Squareline backups and autosaves
+gui_*/backup/*.zip
+gui_*/autosave/*
