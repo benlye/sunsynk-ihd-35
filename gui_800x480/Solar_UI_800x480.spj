@@ -69,7 +69,6 @@
               },
               {
                 "nid": 1408421866,
-                "flags": 1048576,
                 "strtype": "OBJECT/Flags",
                 "InheritedType": 1
               },
@@ -344,7 +343,7 @@
                     "flags": 17,
                     "strtype": "OBJECT/Position",
                     "intarray": [
-                      90,
+                      80,
                       0
                     ],
                     "InheritedType": 7
@@ -651,7 +650,6 @@
               },
               {
                 "nid": 992164975,
-                "flags": 1048576,
                 "strtype": "OBJECT/Flags",
                 "InheritedType": 1
               },
@@ -1599,7 +1597,7 @@
                     "flags": 17,
                     "strtype": "OBJECT/Position",
                     "intarray": [
-                      90,
+                      80,
                       0
                     ],
                     "InheritedType": 7
@@ -2831,7 +2829,7 @@
                     "flags": 17,
                     "strtype": "OBJECT/Position",
                     "intarray": [
-                      90,
+                      80,
                       0
                     ],
                     "InheritedType": 7
@@ -5629,7 +5627,7 @@
                     "flags": 17,
                     "strtype": "OBJECT/Position",
                     "intarray": [
-                      90,
+                      80,
                       0
                     ],
                     "InheritedType": 7
@@ -8730,7 +8728,7 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  300,
+                  320,
                   106
                 ],
                 "InheritedType": 7
@@ -9080,7 +9078,6 @@
                   },
                   {
                     "nid": 1181214120,
-                    "flags": 1048576,
                     "strtype": "OBJECT/Flags",
                     "InheritedType": 1
                   },
@@ -13527,7 +13524,7 @@
     "theme_color2": 0,
     "exportFolderPath": "C:\\Users\\blye\\GitHub\\sunsynk-ihd-35\\SunsynkIHD\\lib\\ui_800_480\\ui\\src",
     "projectExportFolderPath": "C:\\Users\\blye\\OneDrive\\Solar\\Solar IHD UI - 3.5\\template_large\\Test",
-    "backup_cnt": 548,
+    "backup_cnt": 553,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.6",
     "callfuncsexport": "C_FILE",

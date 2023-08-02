@@ -41,7 +41,7 @@ void ui_home_screen_init(void)
     ui_pvWattsUnit = lv_label_create(ui_pvWatts);
     lv_obj_set_width(ui_pvWattsUnit, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_pvWattsUnit, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_pvWattsUnit, 90);
+    lv_obj_set_x(ui_pvWattsUnit, 80);
     lv_obj_set_y(ui_pvWattsUnit, 0);
     lv_obj_set_align(ui_pvWattsUnit, LV_ALIGN_RIGHT_MID);
     lv_label_set_text(ui_pvWattsUnit, "W");
@@ -91,7 +91,7 @@ void ui_home_screen_init(void)
     ui_loadWattsUnit = lv_label_create(ui_loadWatts);
     lv_obj_set_width(ui_loadWattsUnit, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_loadWattsUnit, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_loadWattsUnit, 90);
+    lv_obj_set_x(ui_loadWattsUnit, 80);
     lv_obj_set_y(ui_loadWattsUnit, 0);
     lv_obj_set_align(ui_loadWattsUnit, LV_ALIGN_RIGHT_MID);
     lv_label_set_text(ui_loadWattsUnit, "W");
@@ -138,7 +138,7 @@ void ui_home_screen_init(void)
     ui_battWattsUnit = lv_label_create(ui_battWatts);
     lv_obj_set_width(ui_battWattsUnit, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_battWattsUnit, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_battWattsUnit, 90);
+    lv_obj_set_x(ui_battWattsUnit, 80);
     lv_obj_set_y(ui_battWattsUnit, 0);
     lv_obj_set_align(ui_battWattsUnit, LV_ALIGN_RIGHT_MID);
     lv_label_set_text(ui_battWattsUnit, "W");
@@ -243,7 +243,7 @@ void ui_home_screen_init(void)
     ui_gridWattsUnit = lv_label_create(ui_gridWatts);
     lv_obj_set_width(ui_gridWattsUnit, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_gridWattsUnit, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_gridWattsUnit, 90);
+    lv_obj_set_x(ui_gridWattsUnit, 80);
     lv_obj_set_y(ui_gridWattsUnit, 0);
     lv_obj_set_align(ui_gridWattsUnit, LV_ALIGN_RIGHT_MID);
     lv_label_set_text(ui_gridWattsUnit, "W");
@@ -331,7 +331,7 @@ void ui_home_screen_init(void)
     ui_loadTotal = lv_label_create(ui_home);
     lv_obj_set_width(ui_loadTotal, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_loadTotal, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_loadTotal, 300);
+    lv_obj_set_x(ui_loadTotal, 320);
     lv_obj_set_y(ui_loadTotal, 106);
     lv_obj_set_align(ui_loadTotal, LV_ALIGN_CENTER);
     lv_label_set_text(ui_loadTotal, " - ");
