@@ -163,16 +163,12 @@ void UpdateDisplayFields()
 }
 
 /* Display flushing */
-void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p)
-{
-    if (gfx->getStartCount() == 0)
-    {   
-        gfx->startWrite();
-    }
-    gfx->pushImageDMA( area->x1
-                    , area->y1
-                    , area->x2 - area->x1 + 1
-                    , area->y2 - area->y1 + 1
-                    , ( lgfx::rgb565_t* )&color_p->full);
-    lv_disp_flush_ready( disp );
+void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p) {
+    int w = (area->x2 - area->x1 + 1);
+    int h = (area->y2 - area->y1 + 1);
+    gfx->startWrite();
+    gfx->setAddrWindow(area->x1, area->y1, w, h);
+    gfx->writePixels((lgfx::rgb565_t*)&color_p->full, w*h);
+    gfx->endWrite();
+    lv_disp_flush_ready(disp);
 }
