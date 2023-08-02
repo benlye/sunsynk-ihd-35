@@ -3086,7 +3086,7 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  152,
+                  312,
                   74
                 ],
                 "InheritedType": 7
@@ -4023,7 +4023,7 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  -413,
+                  -573,
                   86
                 ],
                 "InheritedType": 7
@@ -4335,7 +4335,7 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  -381,
+                  -541,
                   66
                 ],
                 "InheritedType": 7
@@ -4647,7 +4647,7 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  -413,
+                  -573,
                   64
                 ],
                 "InheritedType": 7
@@ -4960,7 +4960,7 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  -381,
+                  -541,
                   88
                 ],
                 "InheritedType": 7
@@ -7114,7 +7114,7 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  -51,
+                  -211,
                   -82
                 ],
                 "InheritedType": 7
@@ -7426,7 +7426,7 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  -19,
+                  -179,
                   -80
                 ],
                 "InheritedType": 7
@@ -7738,7 +7738,7 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  -51,
+                  -211,
                   -60
                 ],
                 "InheritedType": 7
@@ -8051,7 +8051,7 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  -19,
+                  -179,
                   -58
                 ],
                 "InheritedType": 7
@@ -13484,8 +13484,8 @@
   "info": {
     "name": "Test.spj",
     "depth": 1,
-    "width": 480,
-    "height": 320,
+    "width": 800,
+    "height": 480,
     "rotation": 0,
     "offset_x": 0,
     "offset_y": 0,
