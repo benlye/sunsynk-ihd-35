@@ -25,7 +25,7 @@ struct IhdData {
   double loadDailyTotal = 0;
   bool toBatt = false;
   bool toGrid = false;
-  String time = "00:00";
+  String time = "--:--";
 };
 extern IhdData ihdData;
 

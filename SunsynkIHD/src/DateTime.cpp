@@ -76,7 +76,7 @@ String getTimeString()
     if (!getLocalTime(&timeinfo))
     {
         Serial.println("Failed to obtain time");
-        return "00:00";
+        return "--:--";
     }
     sprintf(timeString, "%02d:%02d", timeinfo.tm_hour, timeinfo.tm_min);
     return String(timeString);

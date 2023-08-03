@@ -380,7 +380,7 @@ void ui_home_screen_init(void)
     lv_obj_set_x(ui_time, 0);
     lv_obj_set_y(ui_time, -5);
     lv_obj_set_align(ui_time, LV_ALIGN_BOTTOM_MID);
-    lv_label_set_text(ui_time, "00:00");
+    lv_label_set_text(ui_time, "--:--");
     lv_obj_set_style_text_color(ui_time, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_time, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_time, &lv_font_montserrat_36, LV_PART_MAIN | LV_STATE_DEFAULT);

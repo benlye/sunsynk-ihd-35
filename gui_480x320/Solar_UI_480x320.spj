@@ -11039,7 +11039,7 @@
               {
                 "nid": 623650658,
                 "strtype": "LABEL/Text",
-                "strval": "00:00",
+                "strval": "--:--",
                 "InheritedType": 10
               },
               {
