@@ -67,8 +67,9 @@ extern lv_obj_t * ui_syncing;
 extern lv_obj_t * ui_wifiHigh;
 extern lv_obj_t * ui_wifiMed;
 extern lv_obj_t * ui_wifiLow;
-extern lv_obj_t * ui_noData;
-extern lv_obj_t * ui_noDataLabel;
+extern lv_obj_t * ui_infoPanel;
+extern lv_obj_t * ui_infoBox;
+extern lv_obj_t * ui_infoText;
 extern lv_obj_t * ui_settingsIcon;
 extern lv_obj_t * ui____initial_actions0;
 

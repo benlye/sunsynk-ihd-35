@@ -11,10 +11,11 @@
 #define UI_WHITE    0x000000    // White
 
 void UpdateDisplayFields(void);
-
 boolean IsNightMode(void);
-
 void SetNightMode(void);
+
+extern boolean showInfoMessage;
+extern const char* infoMessage;
 
 void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p);
 

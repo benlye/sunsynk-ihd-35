@@ -1,13 +1,23 @@
 #include <Arduino.h>
 #include <Time.h>
 #include <TimeLib.h>
+#include "esp_sntp.h"
 
 #include "Config.h"
 #include "DateTime.h"
 
-// Use NTP to set the clock
-void setClock()
+void timeSyncCallback(struct timeval *tv)
 {
+    Serial.println("\nTime Sync:");
+    Serial.println(tv->tv_sec);
+    Serial.println(ctime(&tv->tv_sec));
+}
+
+// Use NTP to set the clock
+void configureNtpAndSetClock()
+{
+    sntp_set_sync_interval(86400 * 1000U);
+    sntp_set_time_sync_notification_cb(timeSyncCallback);
     configTzTime(TZ_INFO, NTP_SERVER_1, NTP_SERVER_2, NTP_SERVER_3);
 
     Serial.print(F(" - Waiting for NTP time sync ..."));
@@ -20,6 +30,7 @@ void setClock()
         nowSecs = time(nullptr);
     }
     Serial.println(" synced");
+    
 }
 
 // Get current epoch time

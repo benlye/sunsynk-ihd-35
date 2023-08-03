@@ -3,7 +3,8 @@
 
 #include <Arduino.h>
 
-void setClock(void);
+void configureNtpAndSetClock(void);
+void timeSyncCallback(struct timeval *tv);
 unsigned long getTime(void);
 String getDateTimeString(void);
 String getDateTimeString(unsigned long val);

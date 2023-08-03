@@ -5,6 +5,7 @@
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <WiFiMulti.h>
+#include "esp_sntp.h"
 
 #include "Config.h"
 #include "DateTime.h"
@@ -22,11 +23,9 @@
 #error Configuration file is missing!
 #endif
 
-void TaskNtp(void *pvParameters);
 void TaskClock(void *pvParameters);
 void TaskSunsynkApi(void *pvParameters);
 void TaskOutput(void *pvParameters);
-void TaskStatus(void *pvParameters);
 
 TaskHandle_t TaskSunsynkApi_h;
 TaskHandle_t TaskOutput_h;
@@ -39,6 +38,8 @@ boolean ihdDataReady = false;
 boolean ihdScreenRefreshed = false;
 unsigned long lastTouchTime = 0;
 boolean backlightOn = true;
+boolean showInfoMessage = false;
+const char* infoMessage = "";
 
 // Connect to WiFi
 void connectWifI()
@@ -65,23 +66,14 @@ void getVersion(char const *date, char const *time, char *buff)
     sprintf(buff, "v%d.%02d%02d-%02d%02d", year, month, day, hour, min);
 }
 
-void printStatus()
-{
-    unsigned long uptimeSecs = millis() / 1000;
-    uint16_t hrs = uptimeSecs / 3600;
-    uint8_t mins = (uptimeSecs / 60) % 60;
-    uint8_t secs = uptimeSecs % 60;
-    Serial.println();
-    Serial.printf("Time:                %s\n", getDateTimeString(getTime()).c_str());
-    Serial.printf("Uptime:              %d:%02d:%02d\n", hrs, mins, secs);
-    Serial.printf("Wifi RSSI:           %d\n", WiFi.RSSI());
-    Serial.printf("Free memory (bytes): %d\n", esp_get_free_heap_size());
-    Serial.println();
-}
-
 // Check if night mode should be enabled.
 boolean IsNightMode()
 {
+    if (sntp_get_sync_status() != SNTP_SYNC_STATUS_COMPLETED)
+    {
+        return false;
+    }
+
     String timeNow = getTimeString();
     uint16_t timeNowInt = (timeNow.substring(0, 2).toInt() * 60) + timeNow.substring(3, 5).toInt();
     uint16_t timeOffInt = (String(SCREEN_OFF_TIME).substring(0, 2).toInt() * 60) + String(SCREEN_OFF_TIME).substring(3, 5).toInt();
@@ -121,7 +113,7 @@ void SetNightMode()
             backlightOn = false;
         }
 
-        if (LCD_BRIGHTNESS_NIGHT == 0)
+        if (LCD_BRIGHTNESS_NIGHT == 0 && TaskSunsynkApi_h != NULL)
         {
             // Get the API task state, disable it if it's enabled
             eTaskState state = eTaskGetState(TaskSunsynkApi_h);
@@ -133,11 +125,14 @@ void SetNightMode()
         }
     } else {
         // Get the API task state, enable it if it's disabled
-        eTaskState state = eTaskGetState(TaskSunsynkApi_h);
-        if (state == eSuspended)
+        if (TaskSunsynkApi_h != NULL)
         {
-            Serial.println("Resuming API polling task.");
-            vTaskResume(TaskSunsynkApi_h);
+            eTaskState state = eTaskGetState(TaskSunsynkApi_h);
+            if (state == eSuspended)
+            {
+                Serial.println("Resuming API polling task.");
+                vTaskResume(TaskSunsynkApi_h);
+            }
         }
 
         // Get the backlight state, turn it on if it's off
@@ -147,16 +142,6 @@ void SetNightMode()
             gfx->setBrightness(LCD_BRIGHTNESS_DAY);
             backlightOn = true;
         }
-    }
-}
-
-void TaskNtp(void *pvParameters)
-{
-    uint32_t ntp_delay = *((uint32_t *)pvParameters);
-    for (;;)
-    {
-        setClock();
-        delay(ntp_delay);
     }
 }
 
@@ -175,9 +160,7 @@ void TaskSunsynkApi(void *pvParameters)
     uint32_t api_delay = *((uint32_t *)pvParameters);
     for (;;)
     {
-        //vTaskSuspend(TaskOutput_h);
         GetIhdData();
-        //vTaskResume(TaskOutput_h);
         delay(api_delay);
     }
 }
@@ -192,16 +175,6 @@ void TaskOutput(void *pvParameters)
 #endif
         UpdateDisplayFields();
         lv_timer_handler();
-        delay(output_delay);
-    }
-}
-
-void TaskStatus(void *pvParameters)
-{
-    uint32_t output_delay = *((uint32_t *)pvParameters);
-    for (;;)
-    {
-        printStatus();
         delay(output_delay);
     }
 }
@@ -264,70 +237,30 @@ void setup()
         lv_indev_drv_register(&indev_drv);
     }
 
-    // Print the heading
-    gfx->setTextColor(TFT_CYAN);
-    gfx->drawCentreString("3.5\" IHD for Sunsynk", gfx->width() / 2, 15, &fonts::Font4);
+    // Initialize the LVGL UI
+    ui_init();
+    showInfoMessage = true;
 
-    // Print the version
-    gfx->setTextColor(TFT_LIGHTGREY);
-    gfx->drawCentreString(version, gfx->width() / 2, 55, &fonts::Font0);
-
-    // Print the Git URL
-    gfx->drawCentreString("https://github.com/benlye/sunsynk-ihd-35", gfx->width() / 2, 80, &fonts::Font0);
+    // Create the task to update the display
+    uint32_t output_delay = 10;
+    xTaskCreate(TaskOutput, "Task Output", 5120, (void *)&output_delay, 2, &TaskOutput_h);  
 
     // Connect to WiFi
-    gfx->setTextColor(TFT_YELLOW);
-    gfx->drawCentreString("Connecting to wireless network ...", gfx->width() / 2, gfx->height() / 2, &fonts::Font0);
+    infoMessage = "Connecting to WiFi ...";
     connectWifI();
 
-    // Print the IP address
-    gfx->setTextColor(TFT_GREEN);
-    gfx->setTextDatum(textdatum_t::bottom_right);
-    gfx->drawString(WiFi.localIP().toString().c_str(), gfx->width() - 20, gfx->height() - 10, &fonts::Font0);
+    // Connect to WiFi
+    infoMessage = "Setting the time ...";
+    configureNtpAndSetClock();
 
-    // Set the clock
-    gfx->fillRect(0, (gfx->height() / 2) - 35, gfx->width(), 50, TFT_BLACK);
-    gfx->setTextColor(TFT_YELLOW);
-    gfx->drawCentreString("Synchronizing the clock ...", gfx->width() / 2, gfx->height() / 2, &fonts::Font0);
-    setClock();
-
-    // Print the time
-    gfx->setTextColor(TFT_GREEN);
-    gfx->setTextDatum(textdatum_t::bottom_left);
-    gfx->drawString(getDateTimeString().c_str(), 20, gfx->height() - 10, &fonts::Font0);
-
-    // Get an API access token
-    gfx->fillRect(0, (gfx->height() / 2) - 35, gfx->width(), 50, TFT_BLACK);
-    gfx->setTextColor(TFT_YELLOW);
-    gfx->drawCentreString("Authenticating with Sunsynk ...", gfx->width() / 2, gfx->height() / 2, &fonts::Font0);
+    // Authenticate
+    infoMessage = "Authenticating ...";
     GetSunsynkAuthToken();
 
-    // Get the initial data
-    gfx->fillRect(0, (gfx->height() / 2) - 35, gfx->width(), 50, TFT_BLACK);
-    gfx->setTextColor(TFT_YELLOW);
-    gfx->drawCentreString("Getting data from Sunsynk ...", gfx->width() / 2, gfx->height() / 2, &fonts::Font0);
-
-    // Create the task to call the API to get the data
+    // Create the task to get API data
+    infoMessage = "Fetching data ...";
     uint32_t api_delay = 30000; // 30 seconds
     xTaskCreate(TaskSunsynkApi, "Task API", 20480, (void *)&api_delay, 2, &TaskSunsynkApi_h);
-
-    // Send status update to serial
-    Serial.printf("\nNetwork SSID: %s\n", WIFI_SSID);
-    Serial.printf("IP Address:   %s\n", WiFi.localIP().toString().c_str());
-    Serial.printf("\nUTC Time:     %s\n", getDateTimeString(getTime()).c_str());
-    Serial.println("\nReady.\n");
-
-    // Task to print the status
-    uint32_t status_delay = 300 * 1000; // Five minutes
-    xTaskCreate(TaskStatus, "Task Status", 5120, (void *)&status_delay, 2, NULL);
-
-    // Create the task to perform an NTP sync
-    uint32_t ntp_delay = 86400 * 1000; // One day
-    xTaskCreate(TaskNtp, "Task NTP", 2048, (void *)&ntp_delay, 2, NULL);
-
-    // Create the task to update the time on the IHD
-    uint32_t time_delay = 1000; // One second
-    xTaskCreate(TaskClock, "Task Clock", 2048, (void *)&time_delay, 2, NULL);
 
     // Wait up to 10s for API data
     int delayEnd = millis() + (10 * 1000);
@@ -336,12 +269,13 @@ void setup()
         delay(100);
     }
 
-    // Initialize the LVGL UI
-    ui_init();
+    // Create the task to update the time displayed on the IHD
+    uint32_t time_delay = 1000; // One second
+    xTaskCreate(TaskClock, "Task Clock", 2048, (void *)&time_delay, 2, NULL);
 
-    // Task to update the display
-    uint32_t output_delay = 10;
-    xTaskCreate(TaskOutput, "Task Output", 5120, (void *)&output_delay, 2, &TaskOutput_h);
+    // Hide the info panel
+    infoMessage = "";
+    showInfoMessage = false;
 }
 
 void loop()

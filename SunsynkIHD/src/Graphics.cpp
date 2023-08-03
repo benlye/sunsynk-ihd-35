@@ -57,6 +57,15 @@ void UpdateDisplayFields()
         lv_obj_clear_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN);
     }
 
+    if (showInfoMessage)
+    {
+        lv_label_set_text(ui_infoText, infoMessage);
+        lv_obj_clear_flag(ui_infoPanel, LV_OBJ_FLAG_HIDDEN);
+    } else
+    {
+        lv_obj_add_flag(ui_infoPanel, LV_OBJ_FLAG_HIDDEN);
+    }
+
     if (ihdDataReady &! ihdScreenRefreshed)
     {
         // Hide the syncing icon

@@ -63,13 +63,14 @@ extern lv_obj_t * ui_syncing;
 extern lv_obj_t * ui_wifiHigh;
 extern lv_obj_t * ui_wifiMed;
 extern lv_obj_t * ui_wifiLow;
-extern lv_obj_t * ui_noData;
-extern lv_obj_t * ui_noDataLabel;
 extern lv_obj_t * ui_settingsIcon;
 extern lv_obj_t * ui_Image3;
 extern lv_obj_t * ui_Image1;
 extern lv_obj_t * ui_Image4;
 extern lv_obj_t * ui_Image2;
+extern lv_obj_t * ui_infoPanel;
+extern lv_obj_t * ui_infoBox;
+extern lv_obj_t * ui_infoText;
 extern lv_obj_t * ui____initial_actions0;
 
 LV_IMG_DECLARE(ui_img_1549501229);    // assets\icons8-solar-panel-100.png
