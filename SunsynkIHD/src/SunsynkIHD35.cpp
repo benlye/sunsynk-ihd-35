@@ -69,12 +69,13 @@ void getVersion(char const *date, char const *time, char *buff)
 // Check if night mode should be enabled.
 boolean IsNightMode()
 {
-    if (sntp_get_sync_status() != SNTP_SYNC_STATUS_COMPLETED)
-    {
+    String timeNow = getTimeString();
+
+    if (timeNow == "--:--")
+    {   
         return false;
     }
 
-    String timeNow = getTimeString();
     uint16_t timeNowInt = (timeNow.substring(0, 2).toInt() * 60) + timeNow.substring(3, 5).toInt();
     uint16_t timeOffInt = (String(SCREEN_OFF_TIME).substring(0, 2).toInt() * 60) + String(SCREEN_OFF_TIME).substring(3, 5).toInt();
     uint16_t timeOnInt = (String(SCREEN_ON_TIME).substring(0, 2).toInt() * 60) + String(SCREEN_ON_TIME).substring(3, 5).toInt();
@@ -273,7 +274,7 @@ void setup()
     delay(500);
 
     // Create the task to update the time displayed on the IHD
-    uint32_t time_delay = 1000; // One second
+    uint32_t time_delay = 500; // One second
     xTaskCreate(TaskClock, "Task Clock", 2048, (void *)&time_delay, 2, NULL);
 
     // Hide the info panel
