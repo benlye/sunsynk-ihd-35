@@ -30,31 +30,40 @@ int8_t lastRssi = 0;
 
 void UpdateDisplayFields()
 {
-    // Prevent Wi-Fi symbol hysteresis
-    if (WiFi.RSSI() > lastRssi + 2 || WiFi.RSSI() < lastRssi - 2)
+    if (WiFi.status() == WL_CONNECTED)
     {
-        lastRssi = rssi;
-        rssi = WiFi.RSSI();
-    }
+        // Prevent Wi-Fi symbol hysteresis
+        if (WiFi.RSSI() > lastRssi + 2 || WiFi.RSSI() < lastRssi - 2)
+        {
+            lastRssi = rssi;
+            rssi = WiFi.RSSI();
+        }
 
-    // Show the appropriate WiFi symbol
-    if (rssi < -80) // Poor signal
-    {
-        lv_obj_clear_flag(ui_wifiLow, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_add_flag(ui_wifiMed, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_add_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN);
+        // Show the appropriate WiFi symbol
+        if (rssi < -80) // Poor signal
+        {
+            lv_obj_clear_flag(ui_wifiLow, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_add_flag(ui_wifiMed, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_add_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN);
+        }
+        else if (rssi < -67) // Moderate signal
+        {
+            lv_obj_add_flag(ui_wifiLow, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(ui_wifiMed, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_add_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN);
+        }
+        else // Good signal
+        {
+            lv_obj_add_flag(ui_wifiLow, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_add_flag(ui_wifiMed, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN);
+        }
     }
-    else if (rssi < -67) // Moderate signal
+    else
     {
         lv_obj_add_flag(ui_wifiLow, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_clear_flag(ui_wifiMed, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_add_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN);
-    }
-    else // Good signal
-    {
-        lv_obj_add_flag(ui_wifiLow, LV_OBJ_FLAG_HIDDEN);
         lv_obj_add_flag(ui_wifiMed, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_clear_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN);
     }
 
     if (showInfoMessage)
@@ -161,10 +170,15 @@ void UpdateDisplayFields()
 
         ihdScreenRefreshed = true;
     }
-    else if (!ihdDataReady)
+    else if (!ihdDataReady && ihdScreenRefreshed)
     {
         // Show the syncing icon
         lv_obj_clear_flag(ui_syncing, LV_OBJ_FLAG_HIDDEN);
+    }
+    else
+    {
+        // Hide the syncing icon
+        lv_obj_add_flag(ui_syncing, LV_OBJ_FLAG_HIDDEN);
     }
 
     // Update time

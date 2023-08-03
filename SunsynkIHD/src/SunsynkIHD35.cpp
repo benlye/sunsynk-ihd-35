@@ -202,7 +202,7 @@ void setup()
     {
         Serial.println("gfx->begin() failed!");
     }
-    delay(500);
+    //delay(500);
     gfx->fillScreen(TFT_BLACK);
 
     // Turn on the LCD backlight
@@ -245,8 +245,8 @@ void setup()
     uint32_t output_delay = 10;
     xTaskCreate(TaskOutput, "Task Output", 5120, (void *)&output_delay, 2, &TaskOutput_h);  
 
-    // Connect to WiFi
-    infoMessage = "Connecting to WiFi ...";
+    // Connect to Wi-Fi
+    infoMessage = "Connecting to Wi-Fi ...";
     connectWifI();
 
     // Connect to WiFi
@@ -268,6 +268,9 @@ void setup()
     {
         delay(100);
     }
+
+    infoMessage = "Ready!";
+    delay(500);
 
     // Create the task to update the time displayed on the IHD
     uint32_t time_delay = 1000; // One second
