@@ -150,6 +150,9 @@ void TaskClock(void *pvParameters)
     uint32_t time_delay = *((uint32_t *)pvParameters);
     for (;;)
     {
+#ifdef TFT_BL
+        SetNightMode();
+#endif
         ihdData.time = getTimeString();
         delay(time_delay);
     }
@@ -170,9 +173,6 @@ void TaskOutput(void *pvParameters)
     uint32_t output_delay = *((uint32_t *)pvParameters);
     for (;;)
     {
-#ifdef TFT_BL
-        SetNightMode();
-#endif
         UpdateDisplayFields();
         lv_timer_handler();
         delay(output_delay);
