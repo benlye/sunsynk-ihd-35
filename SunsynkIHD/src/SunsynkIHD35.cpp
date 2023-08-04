@@ -76,9 +76,9 @@ boolean IsNightMode()
         return false;
     }
 
-    uint16_t timeNowInt = (timeNow.substring(0, 2).toInt() * 60) + timeNow.substring(3, 5).toInt();
-    uint16_t timeOffInt = (String(SCREEN_OFF_TIME).substring(0, 2).toInt() * 60) + String(SCREEN_OFF_TIME).substring(3, 5).toInt();
-    uint16_t timeOnInt = (String(SCREEN_ON_TIME).substring(0, 2).toInt() * 60) + String(SCREEN_ON_TIME).substring(3, 5).toInt();
+    uint16_t timeNowInt = timeToMinutes(timeNow);
+    uint16_t timeOffInt = timeToMinutes(SCREEN_OFF_TIME);
+    uint16_t timeOnInt = timeToMinutes(SCREEN_ON_TIME);
 
     if (lastTouchTime + SCREEN_OFF_TIMEOUT < getTime())
     {

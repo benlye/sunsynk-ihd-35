@@ -11,5 +11,6 @@ String getDateTimeString(unsigned long val);
 String getTimeString(void);
 String getDateString(void);
 String getMonthString(void);
+uint16_t timeToMinutes(String time);
 
 #endif // __DATETIME_H

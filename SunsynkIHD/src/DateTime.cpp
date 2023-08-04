@@ -109,3 +109,19 @@ String getMonthString()
     sprintf(dateString, "%d-%02d", timeinfo.tm_year + 1900, timeinfo.tm_mon + 1);
     return String(dateString);
 }
+
+// Converts a time string in 24hr format (e.g. 00:00 to 23:59) to the number of minutes since midnight
+uint16_t timeToMinutes(String s)
+{
+    if (s.length() != 5 || s[0] > '9' || s[0] < '0' || s[1] > '9' || s[1] < '0' || s[2] != ':' || s[3] > '9' || s[3] < '0' || s[4] > '9' || s[4] < '0')
+        return 0;
+
+    uint8_t h_int = s.substring(0, 2).toInt();
+    uint8_t m_int = s.substring(3, 5).toInt();
+
+    if (h_int > 23 || m_int > 59)
+        return 0;
+
+    uint16_t t = (h_int * 60) + m_int;
+    return t;
+}
