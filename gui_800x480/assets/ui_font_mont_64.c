@@ -1,16 +1,16 @@
 /*******************************************************************************
  * Size: 64 px
  * Bpp: 4
- * Opts: --bpp 4 --size 64 --font C:\Users\blye\GitHub\sunsynk-ihd-35\gui_800x480\assets\Montserrat-Medium.ttf -o C:\Users\blye\GitHub\sunsynk-ihd-35\gui_800x480\assets\ui_font_montserrat_64.c --format lvgl -r 0x20-0x7f --no-compress --no-prefilter
+ * Opts: --bpp 4 --size 64 --font C:\Users\blye\GitHub\sunsynk-ihd-35\gui_800x480\assets\Montserrat-Medium.ttf -o C:\Users\blye\GitHub\sunsynk-ihd-35\gui_800x480\assets\ui_font_mont_64.c --format lvgl -r 0x20-0x7f --no-compress --no-prefilter
  ******************************************************************************/
 
 #include "../ui.h"
 
-#ifndef UI_FONT_MONTSERRAT_64
-#define UI_FONT_MONTSERRAT_64 1
+#ifndef UI_FONT_MONT_64
+#define UI_FONT_MONT_64 1
 #endif
 
-#if UI_FONT_MONTSERRAT_64
+#if UI_FONT_MONT_64
 
 /*-----------------
  *    BITMAPS
@@ -8784,9 +8784,9 @@ static lv_font_fmt_txt_dsc_t font_dsc = {
 
 /*Initialize a public general font descriptor*/
 #if LV_VERSION_CHECK(8, 0, 0)
-const lv_font_t ui_font_montserrat_64 = {
+const lv_font_t ui_font_mont_64 = {
 #else
-lv_font_t ui_font_montserrat_64 = {
+lv_font_t ui_font_mont_64 = {
 #endif
     .get_glyph_dsc = lv_font_get_glyph_dsc_fmt_txt,    /*Function pointer to get glyph's data*/
     .get_glyph_bitmap = lv_font_get_bitmap_fmt_txt,    /*Function pointer to get glyph's bitmap*/
@@ -8804,5 +8804,5 @@ lv_font_t ui_font_montserrat_64 = {
 
 
 
-#endif /*#if UI_FONT_MONTSERRAT_64*/
+#endif /*#if UI_FONT_MONT_64*/
 

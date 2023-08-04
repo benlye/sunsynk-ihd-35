@@ -885,7 +885,7 @@
                       {
                         "nid": -1428049622,
                         "strtype": "_style/Text_Font",
-                        "strval": "montserrat_64",
+                        "strval": "mont_64",
                         "InheritedType": 3
                       },
                       {
@@ -2141,7 +2141,7 @@
                       {
                         "nid": 1462357294,
                         "strtype": "_style/Text_Font",
-                        "strval": "montserrat_64",
+                        "strval": "mont_64",
                         "InheritedType": 3
                       },
                       {
@@ -3373,7 +3373,7 @@
                       {
                         "nid": 571661095,
                         "strtype": "_style/Text_Font",
-                        "strval": "montserrat_64",
+                        "strval": "mont_64",
                         "InheritedType": 3
                       },
                       {
@@ -6170,7 +6170,7 @@
                       {
                         "nid": -654004431,
                         "strtype": "_style/Text_Font",
-                        "strval": "montserrat_64",
+                        "strval": "mont_64",
                         "InheritedType": 3
                       },
                       {

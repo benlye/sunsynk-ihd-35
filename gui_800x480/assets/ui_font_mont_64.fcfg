@@ -1,9 +1,9 @@
 {
-  "codename": "montserrat_64",
+  "codename": "mont_64",
   "ttf_path": "\\assets\\Montserrat-Medium.ttf",
-  "bin_path": "\\assets\\ui_font_montserrat_64.bin",
-  "c_path": "\\assets\\ui_font_montserrat_64.c",
-  "cfg_path": "\\assets\\ui_font_montserrat_64.fcfg",
+  "bin_path": "\\assets\\ui_font_mont_64.bin",
+  "c_path": "\\assets\\ui_font_mont_64.c",
+  "cfg_path": "\\assets\\ui_font_mont_64.fcfg",
   "size": 64,
   "bpp": 4,
   "letters": 0,

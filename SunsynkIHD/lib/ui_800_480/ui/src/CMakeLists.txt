@@ -15,6 +15,6 @@ SET(SOURCES screens/ui_home.c
     images/ui_img_226794803.c
     images/ui_img_207095971.c
     images/ui_img_1192762099.c
-    fonts/ui_font_montserrat_64.c)
+    fonts/ui_font_mont_64.c)
 
 add_library(ui ${SOURCES})
