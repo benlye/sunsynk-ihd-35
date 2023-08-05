@@ -56,13 +56,10 @@ const char* infoMessage = "";
 String ihdTime = "--:--";
 
 void configureNtpAndSetClock(void);
-void timeSyncCallback(struct timeval *tv);
 unsigned long getTime(void);
 String getDateTimeString(void);
 String getDateTimeString(unsigned long val);
 String getTimeString(void);
-String getDateString(void);
-String getMonthString(void);
 uint16_t timeToMinutes(String time);
 
 void connectWiFi(void);
@@ -361,19 +358,10 @@ void TaskUpdateIhd(void *pvParameters)
     }
 }
 
-
-void timeSyncCallback(struct timeval *tv)
-{
-    Serial.println("\nTime Sync:");
-    Serial.println(tv->tv_sec);
-    Serial.println(ctime(&tv->tv_sec));
-}
-
 // Use NTP to set the clock
 void configureNtpAndSetClock()
 {
     sntp_set_sync_interval(86400 * 1000U);
-    sntp_set_time_sync_notification_cb(timeSyncCallback);
     configTzTime(TZ_INFO, NTP_SERVER_1, NTP_SERVER_2, NTP_SERVER_3);
 
     Serial.print(F(" - Waiting for NTP time sync ..."));
@@ -434,32 +422,6 @@ String getTimeString()
     }
     sprintf(timeString, "%02d:%02d", timeinfo.tm_hour, timeinfo.tm_min);
     return String(timeString);
-}
-
-// Gets a date string in the format YYYY-MM-DD
-String getDateString()
-{
-    struct tm timeinfo;
-    char dateString[20];
-    if (!getLocalTime(&timeinfo))
-    {
-        return "1970-01-01";
-    }
-    sprintf(dateString, "%d-%02d-%02d", timeinfo.tm_year + 1900, timeinfo.tm_mon + 1, timeinfo.tm_mday);
-    return String(dateString);
-}
-
-// Gets a date string in the format YYYY-MM
-String getMonthString()
-{
-    struct tm timeinfo;
-    char dateString[20];
-    if (!getLocalTime(&timeinfo))
-    {
-        return "1970-01-01";
-    }
-    sprintf(dateString, "%d-%02d", timeinfo.tm_year + 1900, timeinfo.tm_mon + 1);
-    return String(dateString);
 }
 
 // Converts a time string in 24hr format (e.g. 00:00 to 23:59) to the number of minutes since midnight
@@ -649,7 +611,7 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
 
 int16_t touch_last_x = 0, touch_last_y = 0;
 
-void my_touchpad_read( lv_indev_drv_t * indev_driver, lv_indev_data_t * data )
+void my_touchpad_read(lv_indev_drv_t * indev_driver, lv_indev_data_t * data)
 {
     uint16_t touchX, touchY;
     data->state = LV_INDEV_STATE_REL;
