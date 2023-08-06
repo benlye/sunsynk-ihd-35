@@ -37,19 +37,37 @@
 #define SCREEN_OFF_TIMEOUT  30                                      // Number of seconds to keep LCD backlight on after it has been touched (default is 30)
 
 /*
+ * Screen brightness settings for day and night modes
+*/
+#define LCD_BRIGHTNESS_DAY      255                                 // Day setting (0-255)
+#define LCD_BRIGHTNESS_NIGHT    0                                   // Night setting (0-255). At 0 the API polling will be suspended while night mode is enabled.
+
+/*
+ * Colours for PV, grid, battery, and load Watts
+ */
+#define UI_GREEN    0x00E05A    // Color used for generating, charging, exporting
+#define UI_RED      0xE00000    // Color used for consuming, discharging, importing
+#define UI_GREY     0xA2A2A2    // Color used for no activity
+#define UI_WHITE    0x000000    // White
+
+
+/*
+ * Settings for the DIY ESP32S3 DevKit with ILI9488 3.5" touchscreen
+ * If you are have built your own DIY IHF then adapt to suit your own implementation.
+ * If you are using an Elecrow display you can ignore the remainder of this file.
+*/
+#ifdef ESP32_ILI9488_SPI_TFT
+
+/*
  * Touchpad calibration data
  */
-#define TOUCH_CAL_X1        -1
-#define TOUCH_CAL_X2        -1
-#define TOUCH_CAL_Y1        -1
-#define TOUCH_CAL_Y2        -1
+#define TOUCH_MAP_X1         100
+#define TOUCH_MAP_X2        4000
+#define TOUCH_MAP_Y1         100
+#define TOUCH_MAP_Y2        4000
 
-#ifdef ESP32_ILI9488_SPI_TFT
 // LCD Rotation
 #define LCD_ROTATION        3
-
-// LCD Brightess
-#define LCD_BRIGHTNESS      255
 
 // LCD pins
 #define LCD_DC              0
@@ -67,21 +85,5 @@
 #define TOUCH_CS            21
 #define TOUCH_INT           27
 #endif // ESP32_ILI9488_SPI_TFT
-
-#ifdef ESP32S3_ELECROW_HMI_35
-// LCD Rotation
-#define LCD_ROTATION        3
-
-// LCD Brightess
-#define LCD_BRIGHTNESS      255
-#endif // ESP32S3_ELECROW_HMI_35
-
-#ifdef ESP32S3_ELECROW_HMI_70
-// LCD Rotation
-#define LCD_ROTATION        3
-
-// LCD Brightess
-#define LCD_BRIGHTNESS      255
-#endif // ESP32S3_ELECROW_HMI_70
 
 #endif // __CONFIG_H
