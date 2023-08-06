@@ -96,9 +96,9 @@ public:
       cfg.freq = 400000;
       
       cfg.x_min = 0;
-      cfg.x_max = 480;
+      cfg.x_max = 479;
       cfg.y_min = 0;
-      cfg.y_max = 320;
+      cfg.y_max = 319;
 
       _touch_instance.config(cfg);
       _panel_instance.setTouch(&_touch_instance);

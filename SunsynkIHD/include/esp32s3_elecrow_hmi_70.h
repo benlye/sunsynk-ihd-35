@@ -97,9 +97,9 @@ public:
         {
             auto cfg = _touch_instance.config();
             cfg.x_min      = 0;
-            cfg.x_max      = 800;
+            cfg.x_max      = 799;
             cfg.y_min      = 0;
-            cfg.y_max      = 480;
+            cfg.y_max      = 479;
             cfg.pin_int    = -1;
             cfg.pin_rst    = -1;
             cfg.bus_shared = false;
