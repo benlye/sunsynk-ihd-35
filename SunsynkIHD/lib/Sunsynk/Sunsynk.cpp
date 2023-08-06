@@ -1,52 +1,70 @@
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
-#include <WiFiClientSecure.h>
-#include <esp_http_client.h>
-#include "Config.h"
-#include "DateTime.h"
-#include "SunsynkApi.h"
+#include "Sunsynk.h"
 
-struct ApiToken apiToken;
-
-void ClearSunsynkAuthToken()
+Sunsynk::Sunsynk()
 {
-    apiToken.accessToken = "";
-    apiToken.refreshToken = "";
-    apiToken.expiresAt = 0;
-    apiToken.expiresIn = 0;
 }
 
-boolean CheckSunsynkAuthToken()
+// Set a CA root certificate for the API calls.
+void Sunsynk::SetCaCert(const char* cert)
 {
-    if (apiToken.accessToken == "" || apiToken.expiresAt < getTime()) {
-        ClearSunsynkAuthToken();
-        return false;
-    }
-    return true;
+    _rootCert = cert;
 }
 
-boolean GetSunsynkAuthToken()
+// Set a CA root certificate bundle for the API calls.
+void Sunsynk::SetCaCertBundle(const uint8_t *bundle)
 {
-    apiToken.accessToken = "";
-    apiToken.refreshToken = "";
-    apiToken.expiresIn = 0;
-    apiToken.expiresAt = 0;
-    boolean gotToken = false;
+    _rootCertBundle = bundle;
+}
 
+// Disable validation of the API endpoint's SSL certificate.
+void Sunsynk::SetInsecure(bool b)
+{
+    _insecure = b;
+}
+
+// Set the timeout for API calls.
+void Sunsynk::SetTimeout(uint16_t t)
+{
+    _apiTimeout = t;
+}
+
+// Authenticate with the API and store an access token
+bool Sunsynk::Authenticate(const char * username, const char * password)
+{
+    ClearAuth();
     Serial.println("Fetching API auth token ...");
     DynamicJsonDocument authResponseJson(384);
     WiFiClientSecure *client = new WiFiClientSecure;
 
     if (client)
     {
-        Serial.println(SUNSYNK_LOGIN_URL);
-        client->setCACertBundle(certBundle);
+        Serial.println(_authEndpoint);
+        
+        if (_insecure)
+        {
+            Serial.println("WARNING: Not validating API endpoint certificate!");
+            client->setInsecure();
+        }
+        else
+        {
+            if (_rootCertBundle != NULL)
+            {
+                client->setCACertBundle(_rootCertBundle);
+            }
+            else
+            {
+                client->setCACert(_rootCert);
+            }
+        }
+
         {
             // Add a scoping block for HTTPClient https to make sure it is destroyed before WiFiClientSecure *client is
             HTTPClient https;
             https.useHTTP10(true);
-            https.setTimeout(API_READ_TIMEOUT);
-            if (https.begin(*client, SUNSYNK_LOGIN_URL))
+            https.setTimeout(_apiTimeout);
+            if (https.begin(*client, _authEndpoint))
             { // HTTPS
 
                 // start connection and send HTTP header
@@ -54,7 +72,7 @@ boolean GetSunsynkAuthToken()
                 https.addHeader("Accept", "application/json");
 
                 char authPayload[1024];
-                sprintf(authPayload, "{\"username\": \"%s\", \"password\": \"%s\", \"grant_type\": \"password\", \"client_id\":\"csp_web\"}", SUNSYNK_USERNAME, SUNSYNK_PASSWORD);
+                sprintf(authPayload, "{\"username\": \"%s\", \"password\": \"%s\", \"grant_type\": \"password\", \"client_id\":\"csp_web\"}", username, password);
 
                 int httpCode = https.POST(authPayload);
 
@@ -78,15 +96,12 @@ boolean GetSunsynkAuthToken()
                             const char *accessToken = authResponseJson["data"]["access_token"];
                             const char *refreshToken = authResponseJson["data"]["refresh_token"];
                             unsigned long expiresIn = authResponseJson["data"]["expires_in"];
-                            unsigned long expiresAt = getTime() + expiresIn;
-                            //Serial.printf("Token Expires: %s\n\n", getDateTimeString(expiresAt).c_str());
 
-                            apiToken.accessToken = String(accessToken);
-                            apiToken.refreshToken = String(refreshToken);
-                            apiToken.expiresIn = expiresIn;
-                            apiToken.expiresAt = expiresAt;
-
-                            gotToken = true;
+                            _accessToken = accessToken;
+                            _refreshToken = refreshToken;
+                            _acquiredAt = millis() / 1000;
+                            _expiresIn = expiresIn;
+                            _expiresAt = _expiresIn + _acquiredAt;
                         }
                     }
                 }
@@ -112,26 +127,67 @@ boolean GetSunsynkAuthToken()
         Serial.println("Unable to create client");
     }
     Serial.println();
-    return gotToken;
+    return (_accessToken != "" && _refreshToken != "" && _acquiredAt != 0 && _expiresIn != 0 && _expiresAt != 0);
 }
 
-DynamicJsonDocument CallSunsynkApi(String uri, int size, DeserializationOption::Filter(filter))
+// Check that the stored access token is still valid based on its expiry, discard it if not.
+bool Sunsynk::CheckAccessToken()
+{
+    unsigned long now = millis() / 1000;
+    if (now < _acquiredAt)
+    {
+        return false;
+    }
+    else
+    {
+        return (_accessToken != "" && _refreshToken != "" && _acquiredAt != 0 && _expiresIn != 0 && _expiresAt != 0 && _expiresAt > now);
+    }
+}
+
+// Clear the stored authentication token.
+void Sunsynk::ClearAuth()
+{
+    _accessToken = "";
+    _refreshToken = "";
+    _acquiredAt = 0;
+    _expiresIn = 0;
+    _expiresAt = 0;
+}
+
+// Call the API and return a JSON document containing the response.
+DynamicJsonDocument Sunsynk::CallApi(String uri, int size, DeserializationOption::Filter(filter))
 {
     Serial.println(uri);
     DynamicJsonDocument doc(size);
     WiFiClientSecure *client = new WiFiClientSecure;
     if (client)
     {
-        client->setCACertBundle(certBundle);
+        if (_insecure)
+        {
+            Serial.println("WARNING: Not validating API endpoint certificate!");
+            client->setInsecure();
+        }
+        else
+        {
+            if (_rootCertBundle != NULL)
+            {
+                client->setCACertBundle(_rootCertBundle);
+            }
+            else
+            {
+                client->setCACert(_rootCert);
+            }
+        }
+
         {
             // Add a scoping block for HTTPClient https to make sure it is destroyed before WiFiClientSecure *client is
             HTTPClient https;
             https.useHTTP10(true);
-            https.setTimeout(API_READ_TIMEOUT);
+            https.setTimeout(_apiTimeout);
             if (https.begin(*client, uri))
             { // HTTPS
                 // start connection and send HTTP header
-                https.addHeader("Authorization", "Bearer " + apiToken.accessToken);
+                https.addHeader("Authorization", "Bearer " + _accessToken);
                 https.addHeader("Content-Type", "application/json");
                 https.addHeader("Accept", "application/json");
 
@@ -150,7 +206,7 @@ DynamicJsonDocument CallSunsynkApi(String uri, int size, DeserializationOption::
                     }
                     else if (httpCode == HTTP_CODE_UNAUTHORIZED)
                     {
-                        ClearSunsynkAuthToken();
+                        ClearAuth();
                     }
                 }
                 else
@@ -176,11 +232,12 @@ DynamicJsonDocument CallSunsynkApi(String uri, int size, DeserializationOption::
     return doc;
 }
 
-void GetPlantFlow()
+// Get the plant's realtime flow data.
+void Sunsynk::GetPlantFlow(uint32_t plant, PlantFlowData_t &data)
 {
     Serial.println("Getting plant flow data ...");
     char apiUri[128];
-    sprintf(apiUri, "%s/plant/energy/%s/flow", SUNSYNK_API_URL, SUNSYNK_PLANT_ID);
+    sprintf(apiUri, "%s/plant/energy/%d/flow", _apiEndoint, plant);
 
     StaticJsonDocument<200> filter;
     filter["code"] = true;
@@ -195,39 +252,35 @@ void GetPlantFlow()
 
     int docSize = 512;
     DynamicJsonDocument responseJson(docSize);
-    responseJson = CallSunsynkApi(apiUri, docSize, DeserializationOption::Filter(filter));
+    responseJson = CallApi(apiUri, docSize, DeserializationOption::Filter(filter));
 
     if (responseJson["code"] == 0 && responseJson["msg"] == "Success")
     {
-        ihdData.pvWatts = responseJson["data"]["pvPower"];
-        ihdData.battWatts = responseJson["data"]["battPower"];
-        ihdData.gridWatts = responseJson["data"]["gridOrMeterPower"];
-        ihdData.loadWatts =  responseJson["data"]["loadOrEpsPower"]; 
-        ihdData.battSoc = responseJson["data"]["soc"];
-        ihdData.toBatt = responseJson["data"]["toBat"]; 
-        ihdData.toGrid = responseJson["data"]["toGrid"];
+        data.pvWatts = responseJson["data"]["pvPower"];
+        data.battWatts = responseJson["data"]["battPower"];
+        data.gridWatts = responseJson["data"]["gridOrMeterPower"];
+        data.loadWatts =  responseJson["data"]["loadOrEpsPower"]; 
+        data.battSoc = responseJson["data"]["soc"];
+        data.toBatt = responseJson["data"]["toBat"]; 
+        data.toGrid = responseJson["data"]["toGrid"];
 
-        /*
-        Serial.println();
-        Serial.printf("PV:      %6d W\n", ihdData.pvWatts);
-        Serial.printf("Battery: %6d W\n", ihdData.battWatts);
-        Serial.printf("Grid:    %6d W\n", ihdData.gridWatts);
-        Serial.printf("Load:    %6d W\n", ihdData.loadWatts);
-        Serial.printf("SOC:     %6d %%\n", ihdData.battSoc);
-        Serial.println();
-        */
     }
     Serial.println();
 }
 
-void GetDailyTotals()
+// Get the daily totals for a given date.
+void Sunsynk::GetDailyTotals(uint32_t plant, tm date, PlantTotals_t &data)
 {
     Serial.println("Getting daily total data ...");
-    String month = getMonthString();
-    String today = getDateString();
+
+    char month_s[20];
+    char date_s[20];
+
+    sprintf(month_s, "%d-%02d", date.tm_year + 1900, date.tm_mon + 1);
+    sprintf(date_s, "%d-%02d-%02d", date.tm_year + 1900, date.tm_mon + 1, date.tm_mday);
 
     char apiUri[128];
-    sprintf(apiUri, "%s/plant/energy/%s/month?lan=en&date=%s&id=%s", SUNSYNK_API_URL, SUNSYNK_PLANT_ID, month, SUNSYNK_PLANT_ID);
+    sprintf(apiUri, "%s/plant/energy/%d/month?lan=en&date=%s&id=%d", _apiEndoint, plant, month_s, plant);
 
     StaticJsonDocument<200> filter;
     filter = true;
@@ -239,68 +292,46 @@ void GetDailyTotals()
 
     int docSize = 16384;
     DynamicJsonDocument responseJson(docSize);
-    responseJson = CallSunsynkApi(apiUri, docSize, DeserializationOption::Filter(filter));
+    responseJson = CallApi(apiUri, docSize, DeserializationOption::Filter(filter));
 
     int numElements = responseJson["data"]["infos"].size();
-    //Serial.println();
     for (int i = 0; i < numElements; i++)
     {
         String label = responseJson["data"]["infos"][i]["label"];
         int lastRecord = responseJson["data"]["infos"][i]["records"].size() - 1;
-        String date = responseJson["data"]["infos"][i]["records"][lastRecord]["time"];
+        String recordDate = responseJson["data"]["infos"][i]["records"][lastRecord]["time"];
         double value = responseJson["data"]["infos"][i]["records"][lastRecord]["value"];
 
-        if (today == date)
+        if (String(date_s) == recordDate)
         {
             char valStr[8];
             dtostrf(value, 3, 1, valStr);
 
-            /*
-            String labelStr = label + ":";
-            while (labelStr.length() < 10) {
-                labelStr = labelStr + " ";
-            }
-            Serial.printf("%s % 5s kWh\n", labelStr.c_str(), valStr);
-            */
-
             if (label == "PV")
             {
-                ihdData.pvDailyTotal = value;
+                data.pv = value;
             }
             else if (label == "Load")
             {
-                ihdData.loadDailyTotal = value;
+                data.load = value;
             }
             else if (label == "Export")
             {
-                ihdData.gridDailyExport = value;
+                data.gridExport = value;
             }
             else if (label == "Import")
             {
-                ihdData.gridDailyImport = value;
+                data.gridImport = value;
             }
             else if (label == "Discharge")
             {
-                ihdData.battDailyDischarge = value;
+                data.battDischarge = value;
             }
             else if (label == "Charge")
             {
-                ihdData.battDailyCharge = value;
+                data.battCharge = value;
             }
         }
     }
     Serial.println();
-}
-
-void GetIhdData()
-{
-    ihdDataReady = false;
-    if (!CheckSunsynkAuthToken())
-    {
-        GetSunsynkAuthToken();
-    }
-    GetPlantFlow();
-    GetDailyTotals();
-    ihdDataReady = true;
-    ihdScreenRefreshed = false;
 }
