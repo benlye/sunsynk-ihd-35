@@ -5,8 +5,6 @@
 #include <WiFi.h>
 #include <Time.h>
 #include <TimeLib.h>
-#include <WiFiClientSecure.h>
-#include <WiFiMulti.h>
 #include "esp_sntp.h"
 
 #include <Sunsynk.h>
@@ -26,80 +24,96 @@
 #error Configuration file is missing!
 #endif
 
-// Task to make API calls.
+// Task to make API calls. Should run every 30s as the API will have new data at most every 60s (but could be 300s).
 void TaskCallApi(void *pvParameters);
 
-// Task to update the clock time.
+// Task to update the clock time. Should run every 0.5s.
 void TaskClock(void *pvParameters);
 
-// Task to update the LVGL UI widget values.
+// Task to update the LVGL UI widget values. Should run every 0.1s.
 void TaskUpdateIhd(void *pvParameters);
 
-TaskHandle_t TaskCallApi_h;
-TaskHandle_t TaskUpdateIhd_h;
-TaskHandle_t TaskNightMode_h;
+// Handles for the tasks
+TaskHandle_t TaskCallApi_h;     // Api call task handle
+TaskHandle_t TaskUpdateIhd_h;   // Api IHD update task handle
+TaskHandle_t TaskNightMode_h;   // Api night mode toggle task handle
 
-// Global instance of Wi-Fi client
-WiFiMulti wiFiMulti;
+// Instance of Lovyan panel device for display output
+LGFX *gfx = new LGFX;
 
+// Global instance for the Sunsynk API.
 Sunsynk sunsynk;
+
+// Struct for storing the realtime flow data.
 PlantFlowData_t flowData;
+
+// Struct for storing the daily totals.
 PlantTotals_t dailyTotals;
 
+// Flag to indicate that all API calls are complete and the data is ready to be transferred to the display.
 boolean ihdDataReady = false;
+
+// Flag to indicate that the most recent API data has been displayed.
 boolean ihdScreenRefreshed = false;
 
+// Stores the last clock time that the screen was touched so we can time it out in night mode.
 unsigned long lastTouchTime = 0;
+
+// Keep track of whether the backlight is on or off in night mode.
 boolean backlightOn = true;
+
+// Flag for whether or not the info text panel should be displayed on the IHD.
 boolean showInfoMessage = false;
+
+// Holds the message that should be displayed in the info text panel.
 const char* infoMessage = "";
+
+// Holds the current clock time to be displayed on the IHD.
 String ihdTime = "--:--";
 
-void configureNtpAndSetClock(void);
-unsigned long getTime(void);
-String getDateTimeString(void);
-String getDateTimeString(unsigned long val);
-String getTimeString(void);
-uint16_t timeToMinutes(String time);
+// Holds the previous Wi-Fi RSSI so we can smooth the Wi-Fi icon display.
+int8_t lastRssi = 0;
 
-void connectWiFi(void);
-void getVersion(char const *date, char const *time, char *buff);
-
-
-#define UI_GREEN    0x00E05A    // Color used for generating, charging, exporting
-#define UI_RED      0xE00000    // Color used for consuming, discharging, importing
-#define UI_GREY     0xA2A2A2    // Color used for no activity
-#define UI_WHITE    0x000000    // White
-
-void UpdateDisplayFields(PlantFlowData_t &flow, PlantTotals_t &totals, bool &ready, bool &refreshed);
-boolean IsNightMode(void);
-void SetNightMode(void);
-
-extern boolean showInfoMessage;
-extern const char* infoMessage;
-
-void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p);
-
+// LVGL structs
 static lv_disp_draw_buf_t draw_buf;
 static lv_color_t *disp_draw_buf;
 static lv_disp_drv_t disp_drv;
 
-static uint32_t screenWidth = SCREEN_WIDTH;
-static uint32_t screenHeight = SCREEN_HEIGHT;
+// Connects to the Wi-Fi network.
+void connectWiFi(void);
 
+// Configures NTP and syncs the time.
+void configureNtp(void);
+
+// Builds a version string from the date and time.
+void getVersion(char *buff);
+
+// Determines if night mode should be enabled or not. Returns true (night mode) or false (day mode).
+boolean IsNightMode(void);
+
+// Toggles night mode on or off. Night mode dims the screen and disables API polling.
+void SetNightMode(void);
+
+// Updates the widget values in the UI with the data pulled from the APIs.
+void UpdateDisplayFields(PlantFlowData_t &flow, PlantTotals_t &totals, bool &ready, bool &refreshed);
+
+// Returns the current (non-localized) epoch time
+unsigned long getTime(void);
+
+// Returns the current local time as a 24hr clock time string for the IHD UI.
+String getTimeString(void);
+
+// Returns the current local time as number of minutes since midnight.
+int16_t getTimeMinutes(void);
+
+// Convert a clock time to minutes since midnight.
+int16_t timeToMinutes(String time);
+
+// LVGL touchpad read callback.
 void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data);
 
-extern unsigned long lastTouchTime;
-
-
-LGFX *gfx = new LGFX;
-
-int16_t gfx_x1, gfx_y1;
-uint16_t gfx_w, gfx_h;
-
-int8_t rssi;
-int8_t lastRssi = 0;
-
+// LVGL display flushing callback.
+void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p);
 
 void setup()
 {
@@ -112,7 +126,7 @@ void setup()
 #endif
 
     char version[24];
-    getVersion(__DATE__, __TIME__, version);
+    getVersion(version);
 
     // Initialize the serial port
     Serial.begin(115200);
@@ -133,19 +147,19 @@ void setup()
     lv_init();
 
     // Allocate the LVGL display buffer
-    disp_draw_buf = (lv_color_t *)heap_caps_malloc(sizeof(lv_color_t) * screenWidth * 40, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
+    disp_draw_buf = (lv_color_t *)heap_caps_malloc(sizeof(lv_color_t) * SCREEN_WIDTH * 40, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
     if (!disp_draw_buf)
     {
         Serial.println("LVGL disp_draw_buf allocate failed!");
     }
     else
     {
-        lv_disp_draw_buf_init(&draw_buf, disp_draw_buf, NULL, screenWidth * 40);
+        lv_disp_draw_buf_init(&draw_buf, disp_draw_buf, NULL, SCREEN_WIDTH * 40);
 
         /* Initialize the display */
         lv_disp_drv_init(&disp_drv);
-        disp_drv.hor_res = screenWidth;
-        disp_drv.ver_res = screenHeight;
+        disp_drv.hor_res = SCREEN_WIDTH;
+        disp_drv.ver_res = SCREEN_HEIGHT;
         disp_drv.flush_cb = my_disp_flush;
         disp_drv.draw_buf = &draw_buf;
         lv_disp_drv_register(&disp_drv);
@@ -172,7 +186,7 @@ void setup()
 
     // Connect to WiFi
     infoMessage = "Setting the time ...";
-    configureNtpAndSetClock();
+    configureNtp();
 
     // Authenticate
     infoMessage = "Authenticating ...";
@@ -207,44 +221,136 @@ void loop()
     // Nothing to do here as all the work is done by the tasks
 }
 
+// Task to make API calls. Should run every 30s as the API will have new data at most every 60s (but could be 300s).
+void TaskCallApi(void *pvParameters)
+{
+    uint32_t api_delay = *((uint32_t *)pvParameters);
+    for (;;)
+    {
+        // Signal that data isn't ready
+        ihdDataReady = false;
+
+        // Check if the access token is still valid, renew it if now
+        if (!sunsynk.CheckAccessToken())
+        {
+            sunsynk.Authenticate(SUNSYNK_USERNAME, SUNSYNK_PASSWORD);
+        }
+
+        // Get the plant flow data
+        sunsynk.GetPlantFlow(SUNSYNK_PLANT_ID, flowData);
+
+        // Get the date/time so we can pull today's totals
+        struct tm timeinfo;
+        if (getLocalTime(&timeinfo))
+        {
+            // Get the daily totals
+            sunsynk.GetDailyTotals(SUNSYNK_PLANT_ID, timeinfo, dailyTotals);
+        }
+
+        // Signal that data is ready
+        ihdDataReady = true;
+
+        // Signal tha the IHD has not been refreshed with this data
+        ihdScreenRefreshed = false;
+
+        // Wait until this task should run again
+        delay(api_delay);
+    }
+}
+
+// Task to update the clock time. Should run every 0.5s.
+void TaskClock(void *pvParameters)
+{
+    uint32_t time_delay = *((uint32_t *)pvParameters);
+    for (;;)
+    {
+        // Store the current local time
+        ihdTime = getTimeString();
+
+        // Check if we need to toggle night mode
+        SetNightMode();
+
+        // Wait until this task should run again
+        delay(time_delay);
+    }
+}
+
+// Task to update the LVGL UI widget values. Should run every 0.1s.
+void TaskUpdateIhd(void *pvParameters)
+{
+    uint32_t output_delay = *((uint32_t *)pvParameters);
+    for (;;)
+    {
+        // Call the function to update the IHD UI widgets
+        UpdateDisplayFields(flowData, dailyTotals, ihdDataReady, ihdScreenRefreshed);
+
+        // Call the LVGL timer handler
+        lv_timer_handler();
+
+        // Wait until this task should run again
+        delay(output_delay);
+    }
+}
 
 // Connect to WiFi
 void connectWiFi()
 {
     WiFi.mode(WIFI_STA);
-    wiFiMulti.addAP(WIFI_SSID, WIFI_PASSWORD);
-
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
     Serial.print(" - Waiting for WiFi to connect ...");
-    while ((wiFiMulti.run() != WL_CONNECTED))
-    {
-        // Serial.print(".");
-    }
+    while ((WiFi.status() != WL_CONNECTED))
+    {}
     Serial.println(" connected");
 }
 
-void getVersion(char const *date, char const *time, char *buff)
+// Use NTP to set the clock
+void configureNtp()
+{
+    sntp_set_sync_interval(86400 * 1000U);
+    configTzTime(TZ_INFO, NTP_SERVER_1, NTP_SERVER_2, NTP_SERVER_3);
+
+    Serial.print(F(" - Waiting for NTP time sync ..."));
+    time_t nowSecs = time(nullptr);
+    while (nowSecs < 8 * 3600 * 2)
+    {
+        delay(500);
+        Serial.print(F("."));
+        yield();
+        nowSecs = time(nullptr);
+    }
+    Serial.println(" synced");
+    
+}
+
+// Build a version string
+void getVersion(char *buff)
 {
     int month, day, year, hour, min, sec;
     static const char month_names[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
-    sscanf(date, "%s %d %d", buff, &day, &year);
+    sscanf(__DATE__, "%s %d %d", buff, &day, &year);
     month = (strstr(month_names, buff) - month_names) / 3 + 1;
     year = year % 100U;
-    sscanf(time, "%d:%d:%d", &hour, &min, &sec);
+    sscanf(__TIME__, "%d:%d:%d", &hour, &min, &sec);
     sprintf(buff, "v%d.%02d%02d-%02d%02d", year, month, day, hour, min);
 }
 
-// Check if night mode should be enabled.
+// Check if night mode should be enabled or disabled.
 boolean IsNightMode()
 {
-    String timeNow = getTimeString();
-    if (timeNow == "--:--")
+    int16_t timeNowInt = getTimeMinutes();
+
+    if (timeNowInt == -1)
     {
         return false;
     }
 
-    uint16_t timeNowInt = timeToMinutes(timeNow);
     uint16_t timeOffInt = timeToMinutes(SCREEN_OFF_TIME);
     uint16_t timeOnInt = timeToMinutes(SCREEN_ON_TIME);
+
+    if (timeOffInt == -1 || timeOnInt == -1)
+    {
+        return false;
+    }
 
     if (lastTouchTime + SCREEN_OFF_TIMEOUT < getTime())
     {
@@ -312,144 +418,19 @@ void SetNightMode()
     }
 }
 
-void TaskCallApi(void *pvParameters)
-{
-    uint32_t api_delay = *((uint32_t *)pvParameters);
-    for (;;)
-    {
-        ihdDataReady = false;
-        if (!sunsynk.CheckAccessToken())
-        {
-            sunsynk.Authenticate(SUNSYNK_USERNAME, SUNSYNK_PASSWORD);
-        }
-        sunsynk.GetPlantFlow(SUNSYNK_PLANT_ID2, flowData);
-        
-        struct tm timeinfo;
-        if (getLocalTime(&timeinfo))
-        {
-            char buff[6];
-            sunsynk.GetDailyTotals(SUNSYNK_PLANT_ID2, timeinfo, dailyTotals);
-        }
-        ihdDataReady = true;
-        ihdScreenRefreshed = false;
-        delay(api_delay);
-    }
-}
-
-void TaskClock(void *pvParameters)
-{
-    uint32_t time_delay = *((uint32_t *)pvParameters);
-    for (;;)
-    {
-        ihdTime = getTimeString();
-        SetNightMode();
-        delay(time_delay);
-    }
-}
-
-void TaskUpdateIhd(void *pvParameters)
-{
-    uint32_t output_delay = *((uint32_t *)pvParameters);
-    for (;;)
-    {
-        UpdateDisplayFields(flowData, dailyTotals, ihdDataReady, ihdScreenRefreshed);
-        lv_timer_handler();
-        delay(output_delay);
-    }
-}
-
-// Use NTP to set the clock
-void configureNtpAndSetClock()
-{
-    sntp_set_sync_interval(86400 * 1000U);
-    configTzTime(TZ_INFO, NTP_SERVER_1, NTP_SERVER_2, NTP_SERVER_3);
-
-    Serial.print(F(" - Waiting for NTP time sync ..."));
-    time_t nowSecs = time(nullptr);
-    while (nowSecs < 8 * 3600 * 2)
-    {
-        delay(500);
-        Serial.print(F("."));
-        yield();
-        nowSecs = time(nullptr);
-    }
-    Serial.println(" synced");
-    
-}
-
-// Get current epoch time
-unsigned long getTime()
-{
-    time_t now;
-    struct tm timeinfo;
-    if (!getLocalTime(&timeinfo))
-    {
-        return (0);
-    }
-    time(&now);
-    return now;
-}
-
-// Return a datetime string of the current localized time
-String getDateTimeString()
-{
-    struct tm timeinfo;
-    char timeString[32];
-    if (!getLocalTime(&timeinfo))
-    {
-        return "1970-01-01 00:00:00";
-    }
-    sprintf(timeString, "%04d-%02d-%02d %02d:%02d:%02d", timeinfo.tm_year + 1900, timeinfo.tm_mon + 1, timeinfo.tm_mday, timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
-    return String(timeString);
-}
-
-// Converts an epoch time to a datetime string
-String getDateTimeString(unsigned long val)
-{
-    char timeString[20];
-    sprintf(timeString, "%4d-%02d-%02d %02d:%02d:%02d", year(val), month(val), day(val), hour(val), minute(val), second(val));
-    return String(timeString);
-}
-
-// Gets a 24hr clock time string
-String getTimeString()
-{
-    struct tm timeinfo;
-    char timeString[20];
-    if (!getLocalTime(&timeinfo))
-    {
-        return "--:--";
-    }
-    sprintf(timeString, "%02d:%02d", timeinfo.tm_hour, timeinfo.tm_min);
-    return String(timeString);
-}
-
-// Converts a time string in 24hr format (e.g. 00:00 to 23:59) to the number of minutes since midnight
-uint16_t timeToMinutes(String s)
-{
-    if (s.length() != 5 || s[0] > '9' || s[0] < '0' || s[1] > '9' || s[1] < '0' || s[2] != ':' || s[3] > '9' || s[3] < '0' || s[4] > '9' || s[4] < '0')
-        return 0;
-
-    uint8_t h_int = s.substring(0, 2).toInt();
-    uint8_t m_int = s.substring(3, 5).toInt();
-
-    if (h_int > 23 || m_int > 59)
-        return 0;
-
-    uint16_t t = (h_int * 60) + m_int;
-    return t;
-}
-
+// Updates the widget values in the UI with the data pulled from the APIs.
 void UpdateDisplayFields(PlantFlowData_t &flowData, PlantTotals_t &dailyTotals, bool &ready, bool &refreshed)
 {
     if (WiFi.status() == WL_CONNECTED)
     {
         // Prevent Wi-Fi symbol hysteresis
-        if (WiFi.RSSI() > lastRssi + 2 || WiFi.RSSI() < lastRssi - 2)
+        int8_t rssi = WiFi.RSSI();
+        int8_t rssiTemp = rssi;
+        if (rssi < lastRssi + 2 && rssi > lastRssi - 2)
         {
-            lastRssi = rssi;
-            rssi = WiFi.RSSI();
+            rssi = lastRssi;
         }
+        lastRssi = rssiTemp;
 
         // Show the appropriate WiFi symbol
         if (rssi < -80) // Poor signal
@@ -597,7 +578,62 @@ void UpdateDisplayFields(PlantFlowData_t &flowData, PlantTotals_t &dailyTotals, 
     lv_label_set_text(ui_time, ihdTime.c_str());
 }
 
-/* Display flushing */
+// Returns the current (non-localized) epoch time
+unsigned long getTime()
+{
+    time_t now;
+    struct tm timeinfo;
+    if (!getLocalTime(&timeinfo))
+    {
+        return 0;
+    }
+    time(&now);
+    return now;
+}
+
+// Returns the current local time as a 24hr clock time string for the IHD UI
+String getTimeString()
+{
+    struct tm timeinfo;
+    char timeString[20];
+    if (!getLocalTime(&timeinfo))
+    {
+        return "--:--";
+    }
+    sprintf(timeString, "%02d:%02d", timeinfo.tm_hour, timeinfo.tm_min);
+    return String(timeString);
+}
+
+// Returns the current local time as number of minutes since midnight
+int16_t getTimeMinutes()
+{
+    struct tm timeinfo;
+    if (!getLocalTime(&timeinfo))
+    {
+        return -1;
+    }
+
+    uint16_t m = (timeinfo.tm_hour * 60) + timeinfo.tm_min;
+    return m;
+}
+
+// Converts a time string in 24hr format (e.g. 00:00 to 23:59) to the number of minutes since midnight
+int16_t timeToMinutes(String s)
+{
+    if (s.length() != 5 || s[0] > '9' || s[0] < '0' || s[1] > '9' || s[1] < '0' || s[2] != ':' || s[3] > '9' || s[3] < '0' || s[4] > '9' || s[4] < '0')
+        return -1;
+
+    uint8_t h_int = s.substring(0, 2).toInt();
+    uint8_t m_int = s.substring(3, 5).toInt();
+
+    if (h_int > 23 || m_int > 59)
+        return -1;
+
+    uint16_t t = (h_int * 60) + m_int;
+    return t;
+}
+
+// LVGL display flushing callback
 void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p) {
     int w = (area->x2 - area->x1 + 1);
     int h = (area->y2 - area->y1 + 1);
@@ -608,14 +644,14 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
     lv_disp_flush_ready(disp);
 }
 
-
-int16_t touch_last_x = 0, touch_last_y = 0;
-
+// LVGL touch callback
 void my_touchpad_read(lv_indev_drv_t * indev_driver, lv_indev_data_t * data)
 {
     uint16_t touchX, touchY;
+    int16_t touch_last_x = 0, touch_last_y = 0;
+
     data->state = LV_INDEV_STATE_REL;
-    if(gfx->getTouchRaw( &touchX, &touchY ))
+    if(gfx->getTouchRaw(&touchX, &touchY))
     {
         
 #if defined(TOUCH_SWAP_XY)
