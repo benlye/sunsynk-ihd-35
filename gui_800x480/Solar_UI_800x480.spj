@@ -5015,7 +5015,7 @@
                 "strtype": "OBJECT/Position",
                 "intarray": [
                   -373,
-                  126
+                  130
                 ],
                 "InheritedType": 7
               },
@@ -6553,7 +6553,7 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  -39,
+                  -37,
                   -113
                 ],
                 "InheritedType": 7
@@ -7178,7 +7178,7 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  -39,
+                  -37,
                   -79
                 ],
                 "InheritedType": 7
@@ -7490,7 +7490,7 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  373,
+                  375,
                   -120
                 ],
                 "InheritedType": 7
@@ -7805,8 +7805,8 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  372,
-                  -80
+                  374,
+                  -76
                 ],
                 "InheritedType": 7
               },
@@ -9907,7 +9907,7 @@
                       {
                         "nid": -290905092,
                         "strtype": "_style/Text_Font",
-                        "strval": "montserrat_36",
+                        "strval": "montserrat_42",
                         "InheritedType": 3
                       }
                     ],
@@ -13806,7 +13806,7 @@
     "theme_color2": 0,
     "exportFolderPath": "C:\\Users\\blye\\GitHub\\sunsynk-ihd-35\\SunsynkIHD\\lib\\ui_800_480\\ui\\src",
     "projectExportFolderPath": "C:\\Users\\blye\\OneDrive\\Solar\\Solar IHD UI - 3.5\\template_large\\Test",
-    "backup_cnt": 557,
+    "backup_cnt": 559,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.6",
     "callfuncsexport": "C_FILE",

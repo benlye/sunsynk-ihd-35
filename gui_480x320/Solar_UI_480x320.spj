@@ -10813,7 +10813,7 @@
                 "strtype": "OBJECT/Position",
                 "intarray": [
                   0,
-                  145
+                  -5
                 ],
                 "InheritedType": 7
               },
@@ -10830,7 +10830,7 @@
               {
                 "nid": 807698758,
                 "strtype": "OBJECT/Align",
-                "strval": "CENTER",
+                "strval": "BOTTOM_MID",
                 "InheritedType": 3
               },
               {
@@ -11064,7 +11064,7 @@
                       {
                         "nid": -290905092,
                         "strtype": "_style/Text_Font",
-                        "strval": "montserrat_22",
+                        "strval": "montserrat_24",
                         "InheritedType": 3
                       }
                     ],
@@ -13796,7 +13796,7 @@
     "theme_color2": 0,
     "exportFolderPath": "C:\\Users\\blye\\GitHub\\sunsynk-ihd-35\\SunsynkIHD\\lib\\ui_480_320\\ui\\src",
     "projectExportFolderPath": "C:\\Users\\blye\\OneDrive\\Solar\\Solar IHD UI - 3.5\\template\\Test",
-    "backup_cnt": 528,
+    "backup_cnt": 531,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.6",
     "callfuncsexport": "C_FILE",
