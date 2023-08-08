@@ -12,6 +12,7 @@
 #include "Config.h"
 #include "esp32_ili9488_spi.h"
 #include "esp32s3_elecrow_hmi_35.h"
+#include "esp32s3_elecrow_hmi_50.h"
 #include "esp32s3_elecrow_hmi_70.h"
 
 #if defined(SCREEN_800_480)
