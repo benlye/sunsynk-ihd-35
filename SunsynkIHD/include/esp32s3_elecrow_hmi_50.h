@@ -69,15 +69,15 @@ public:
             cfg.pin_pclk = GPIO_NUM_0;
             cfg.freq_write = 12000000;
 
-            cfg.hsync_polarity = 1;
+            cfg.hsync_polarity = 0;
             cfg.hsync_front_porch = 8;
-            cfg.hsync_pulse_width = 1;
-            cfg.hsync_back_porch = 32;
+            cfg.hsync_pulse_width = 4;
+            cfg.hsync_back_porch = 43;
 
-            cfg.vsync_polarity = 1;
+            cfg.vsync_polarity = 0;
             cfg.vsync_front_porch = 8;
-            cfg.vsync_pulse_width = 1;
-            cfg.vsync_back_porch = 8;
+            cfg.vsync_pulse_width = 4;
+            cfg.vsync_back_porch = 12;
 
             cfg.pclk_active_neg = 1;
             cfg.de_idle_high = 0;
