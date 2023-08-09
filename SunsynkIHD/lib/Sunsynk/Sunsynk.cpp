@@ -344,7 +344,7 @@ void Sunsynk::GetDailyPlotData(uint32_t plant, tm date, PlantDailyPlot_t &data)
     sprintf(date_s, "%d-%02d-%02d", date.tm_year + 1900, date.tm_mon + 1, date.tm_mday);
 
     char apiUri[128];
-    sprintf(apiUri, "%s/plant/energy/%s/day?lan=en&date=%s&id=%s", _apiEndoint, plant, date_s, plant);
+    sprintf(apiUri, "%s/plant/energy/%d/day?lan=en&date=%s&id=%d", _apiEndoint, plant, date_s, plant);
 
     StaticJsonDocument<200> filter;
     filter["code"] = true;
@@ -360,6 +360,75 @@ void Sunsynk::GetDailyPlotData(uint32_t plant, tm date, PlantDailyPlot_t &data)
 
     if (responseJson["code"] == 0 && responseJson["msg"] == "Success")
     {
-        // do something to parse the response
+        if (responseJson["data"]["infos"][0]["records"].size() > data.count)
+        {
+            data.count = responseJson["data"]["infos"][0]["records"].size();
+        }
+
+        int numElements = responseJson["data"]["infos"].size();
+        for (int i = 0; i < numElements; i++)
+        {
+            String label = responseJson["data"]["infos"][i]["label"];
+            int numRecords = responseJson["data"]["infos"][i]["records"].size();
+            Serial.printf("Num Records [%s]: %d\n", label, numRecords);
+
+            if (label == "PV")
+            {
+                for (int j = 0; j < numRecords; j++)
+                {
+                    data.pv[j] = responseJson["data"]["infos"][i]["records"][j]["value"];
+                    if (data.pv[j] > data.pri_y_max)
+                        data.pri_y_max = data.pv[j];
+                    if (data.pv[j] < data.pri_y_min)
+                        data.pri_y_min = data.pv[j];
+                }
+            }
+
+            if (label == "Battery")
+            {
+                for (int j = 0; j < numRecords; j++)
+                {
+                    data.battery[j] = responseJson["data"]["infos"][i]["records"][j]["value"];
+                    if (data.battery[j] > data.pri_y_max)
+                        data.pri_y_max = data.battery[j];
+                    if (data.battery[j] < data.pri_y_min)
+                        data.pri_y_min = data.battery[j];
+                }
+            }
+
+            if (label == "Grid")
+            {
+                for (int j = 0; j < numRecords; j++)
+                {
+                    data.grid[j] = responseJson["data"]["infos"][i]["records"][j]["value"];
+                    if (data.grid[j] > data.pri_y_max)
+                        data.pri_y_max = data.grid[j];
+                    if (data.grid[j] < data.pri_y_min)
+                        data.pri_y_min = data.grid[j];
+                }
+            }
+            if (label == "Load")
+            {
+                for (int j = 0; j < numRecords; j++)
+                {
+                    data.load[j] = responseJson["data"]["infos"][i]["records"][j]["value"];
+                    if (data.load[j] > data.pri_y_max)
+                        data.pri_y_max = data.load[j];
+                    if (data.load[j] < data.pri_y_min)
+                        data.pri_y_min = data.load[j];
+                }
+            }
+            if (label == "SOC")
+            {
+                for (int j = 0; j < numRecords; j++)
+                {
+                    data.soc[j] = responseJson["data"]["infos"][i]["records"][j]["value"];
+                    if (data.soc[j] > data.sec_y_max)
+                        data.sec_y_max = data.soc[j];
+                    if (data.soc[j] < data.sec_y_min)
+                        data.sec_y_min = data.soc[j];
+                }
+            }
+        }
     }
 }

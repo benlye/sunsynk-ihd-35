@@ -26,7 +26,16 @@ typedef struct
 
 typedef struct
 {
-
+    int16_t pv[288];
+    int16_t battery[288];
+    int16_t grid[288];
+    int16_t load[288];
+    int16_t soc[288];
+    int16_t count = 0;
+    int16_t pri_y_max = 0;
+    int16_t pri_y_min = 0;
+    int16_t sec_y_max = 0;
+    int16_t sec_y_min = 0;
 } PlantDailyPlot_t;
 
 class Sunsynk

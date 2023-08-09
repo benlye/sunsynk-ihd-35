@@ -50,6 +50,9 @@ PlantFlowData_t flowData;
 // Struct for storing the daily totals.
 PlantTotals_t dailyTotals;
 
+// Struct for storing the daily plot data.
+PlantDailyPlot_t dailyPlotData;
+
 // Flag to indicate that all API calls are complete and the data is ready to be transferred to the display.
 boolean ihdDataReady = false;
 
@@ -668,5 +671,34 @@ void my_touchpad_read(lv_indev_drv_t * indev_driver, lv_indev_data_t * data)
         //Serial.printf("Raw:   X:%d Y:%d\n", touchX, touchY);
         Serial.printf("Touch: X:%d Y:%d\n", data->point.x, data->point.y);
         lastTouchTime = getTime();
+    }
+}
+
+void updatePlotData(lv_event_t * e)
+{
+	// Your code here
+    struct tm timeinfo;
+    if (getLocalTime(&timeinfo))
+    {
+        sunsynk.GetDailyPlotData(SUNSYNK_PLANT_ID, timeinfo, dailyPlotData);
+
+        lv_obj_set_style_size(ui_dailyFlow, 0, LV_PART_INDICATOR);
+        lv_chart_set_range(ui_dailyFlow, LV_CHART_AXIS_PRIMARY_Y, dailyPlotData.pri_y_min, dailyPlotData.pri_y_max);
+
+        lv_chart_set_point_count(ui_dailyFlow, dailyPlotData.count);
+        lv_chart_series_t * ui_dailyFlow_pv = lv_chart_add_series(ui_dailyFlow, lv_color_hex(0x4CDB4C), LV_CHART_AXIS_PRIMARY_Y);
+        lv_chart_series_t * ui_dailyFlow_load = lv_chart_add_series(ui_dailyFlow, lv_color_hex(0xDE83A6), LV_CHART_AXIS_PRIMARY_Y);
+        lv_chart_series_t * ui_dailyFlow_grid = lv_chart_add_series(ui_dailyFlow, lv_color_hex(0xFFDB4C), LV_CHART_AXIS_PRIMARY_Y);
+        lv_chart_series_t * ui_dailyFlow_battery = lv_chart_add_series(ui_dailyFlow, lv_color_hex(0x908AFF), LV_CHART_AXIS_PRIMARY_Y);
+        lv_chart_series_t * ui_dailyFlow_soc = lv_chart_add_series(ui_dailyFlow, lv_color_hex(0x78E4DE), LV_CHART_AXIS_SECONDARY_Y);
+
+        for (int i=0; i < dailyPlotData.count; i++)
+        {
+            lv_chart_set_value_by_id(ui_dailyFlow, ui_dailyFlow_pv, i, dailyPlotData.pv[i]);
+            lv_chart_set_value_by_id(ui_dailyFlow, ui_dailyFlow_load, i, dailyPlotData.load[i]);
+            lv_chart_set_value_by_id(ui_dailyFlow, ui_dailyFlow_grid, i, dailyPlotData.grid[i]);
+            lv_chart_set_value_by_id(ui_dailyFlow, ui_dailyFlow_battery, i, dailyPlotData.battery[i]);
+            lv_chart_set_value_by_id(ui_dailyFlow, ui_dailyFlow_soc, i, dailyPlotData.soc[i]);
+        }
     }
 }
