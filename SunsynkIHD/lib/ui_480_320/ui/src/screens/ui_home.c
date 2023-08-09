@@ -517,4 +517,6 @@ void ui_home_screen_init(void)
     lv_obj_set_style_img_recolor(ui_settingsIcon, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_img_recolor_opa(ui_settingsIcon, 128, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    lv_obj_add_event_cb(ui_Inverter, ui_event_Inverter, LV_EVENT_ALL, NULL);
+
 }
