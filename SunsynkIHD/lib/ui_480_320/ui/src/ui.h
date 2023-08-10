@@ -76,7 +76,6 @@ extern lv_obj_t * ui_settingsIcon;
 void ui_plot_screen_init(void);
 void ui_event_plot(lv_event_t * e);
 extern lv_obj_t * ui_plot;
-void ui_event_dailyFlow(lv_event_t * e);
 extern lv_obj_t * ui_dailyFlow;
 extern lv_obj_t * ui____initial_actions0;
 

@@ -61,7 +61,6 @@ lv_obj_t * ui_settingsIcon;
 void ui_plot_screen_init(void);
 void ui_event_plot(lv_event_t * e);
 lv_obj_t * ui_plot;
-void ui_event_dailyFlow(lv_event_t * e);
 lv_obj_t * ui_dailyFlow;
 lv_obj_t * ui____initial_actions0;
 const lv_img_dsc_t * ui_imgset_867608463[1] = {&ui_img_705529016};
@@ -96,17 +95,11 @@ void ui_event_plot(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
-    if(event_code == LV_EVENT_SCREEN_LOAD_START) {
-        updatePlotData(e);
-        (e);
-    }
-}
-void ui_event_dailyFlow(lv_event_t * e)
-{
-    lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_CLICKED) {
         _ui_screen_change(&ui_home, LV_SCR_LOAD_ANIM_NONE, 500, 0, &ui_home_screen_init);
+    }
+    if(event_code == LV_EVENT_SCREEN_LOAD_START) {
+        updatePlotData(e);
     }
 }
 

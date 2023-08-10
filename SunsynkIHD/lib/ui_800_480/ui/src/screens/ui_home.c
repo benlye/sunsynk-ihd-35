@@ -516,4 +516,6 @@ void ui_home_screen_init(void)
     lv_obj_set_style_pad_top(ui_infoText, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(ui_infoText, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    lv_obj_add_event_cb(ui_Inverter, ui_event_Inverter, LV_EVENT_ALL, NULL);
+
 }
