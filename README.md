@@ -55,11 +55,11 @@ I've ordered several different ESP32 display devices from [elecrow.com](https://
 
 All three display devices have an ESP32-S3 with 8MB of PSRAM.
 
-The 3.5" display is very nice - bright, sharp and easy to look at. The 7" display is somewhat disappointing as it has a very narrow viewing angle and looks washed out at most angles. It does display everything at a good size though so I'll keep playing with it. I don't have the 5" display yet.
+The 3.5" display is very nice - bright, sharp and easy to look at. The 7" display is somewhat disappointing as it has a very narrow viewing angle and looks washed out at most angles. It does display everything at a good size though so I'll keep playing with it. The 5" display seems to be a good middle-ground option, with the data being easily readable.
 
 <p align="center"><img src="img/mockup.png" alt='3.5" IHD Mockup' width="400"/><br><i>3.5" IHD Mockup</i></p>
 
-The 3.5" package looks like a nice compact device which can display all the salient information. The larger interface of the %" 7" screen will allow displaying more data in additional screens.
+The 3.5" package looks like a nice compact device which can display all the salient information. The higher reolution of the 5" and 7" screens will potentially allow displaying more data in additional screens.
 
 ## How it works
 It's pretty simple. 
