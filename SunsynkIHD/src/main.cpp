@@ -657,17 +657,9 @@ void my_touchpad_read(lv_indev_drv_t * indev_driver, lv_indev_data_t * data)
     data->state = LV_INDEV_STATE_REL;
     if(gfx->getTouch(&touchX, &touchY))
     {
-
-#if defined(TOUCH_SWAP_XY)
-        touch_last_x = touchY;
-        touch_last_y = touchX;
-#else
-        touch_last_x = touchX;
-        touch_last_y = touchY;
-#endif
         data->state = LV_INDEV_STATE_PR;
-        data->point.x = touch_last_x;
-        data->point.y = touch_last_y;
+        data->point.x = touchX;
+        data->point.y = touchY;
 
         Serial.printf("Touch: X:%d Y:%d\n", data->point.x, data->point.y);
         lastTouchTime = getTime();
