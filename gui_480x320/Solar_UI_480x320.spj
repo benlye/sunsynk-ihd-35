@@ -10170,302 +10170,6 @@
           {
             "guid": "GUID17910791-456341S1492195",
             "deepid": -558950159,
-            "children": [
-              {
-                "guid": "GUID86842726-455874S1692195",
-                "deepid": -1278415038,
-                "locked": false,
-                "properties": [
-                  {
-                    "nid": 2070222569,
-                    "strtype": "OBJECT/Name",
-                    "strval": "SunsynkLogo",
-                    "InheritedType": 10
-                  },
-                  {
-                    "nid": -948079913,
-                    "strtype": "OBJECT/Layout",
-                    "InheritedType": 1
-                  },
-                  {
-                    "Flow": 0,
-                    "Wrap": false,
-                    "Reversed": false,
-                    "MainAlignment": 0,
-                    "CrossAlignment": 0,
-                    "TrackAlignment": 0,
-                    "LayoutType": 0,
-                    "nid": 1165359249,
-                    "strtype": "OBJECT/Layout_type",
-                    "strval": "No_layout",
-                    "InheritedType": 13
-                  },
-                  {
-                    "nid": 600103018,
-                    "strtype": "OBJECT/Transform",
-                    "InheritedType": 1
-                  },
-                  {
-                    "nid": -177581155,
-                    "flags": 17,
-                    "strtype": "OBJECT/Position",
-                    "intarray": [
-                      0,
-                      0
-                    ],
-                    "InheritedType": 7
-                  },
-                  {
-                    "nid": 1496758208,
-                    "flags": 51,
-                    "strtype": "OBJECT/Size",
-                    "intarray": [
-                      39,
-                      42
-                    ],
-                    "InheritedType": 7
-                  },
-                  {
-                    "nid": -648387724,
-                    "strtype": "OBJECT/Align",
-                    "strval": "CENTER",
-                    "InheritedType": 3
-                  },
-                  {
-                    "nid": 1181214120,
-                    "flags": 1048576,
-                    "strtype": "OBJECT/Flags",
-                    "InheritedType": 1
-                  },
-                  {
-                    "nid": -1051161497,
-                    "strtype": "OBJECT/Hidden",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": -1090576208,
-                    "strtype": "OBJECT/Clickable",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": 121544057,
-                    "strtype": "OBJECT/Checkable",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": 235106400,
-                    "strtype": "OBJECT/Press_lock",
-                    "strval": "True",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": 122766367,
-                    "strtype": "OBJECT/Click_focusable",
-                    "strval": "True",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": 456446373,
-                    "strtype": "OBJECT/Adv_hittest",
-                    "strval": "True",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": 302039595,
-                    "strtype": "OBJECT/Ignore_layout",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": 1312734651,
-                    "strtype": "OBJECT/Floating",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": 1388878954,
-                    "strtype": "OBJECT/Overflow_visible",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": -697091889,
-                    "strtype": "OBJECT/Flex_in_new_track",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": -1324906871,
-                    "strtype": "OBJECT/Event_bubble",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": 1293179329,
-                    "strtype": "OBJECT/Gesture_bubble",
-                    "strval": "True",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": -1617924278,
-                    "strtype": "OBJECT/Snappable",
-                    "strval": "True",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": -1264993147,
-                    "strtype": "OBJECT/Scrollable",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": 1340944350,
-                    "strtype": "OBJECT/Scroll_elastic",
-                    "strval": "True",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": -1441601875,
-                    "strtype": "OBJECT/Scroll_momentum",
-                    "strval": "True",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": 1216930219,
-                    "strtype": "OBJECT/Scroll_on_focus",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": 1241147021,
-                    "strtype": "OBJECT/Scroll_chain",
-                    "strval": "True",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": 788658544,
-                    "strtype": "OBJECT/Scroll_with_arrow",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": 2021152458,
-                    "strtype": "OBJECT/Scroll_one",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": 131602313,
-                    "strtype": "OBJECT/Scrollbar_mode",
-                    "strval": "AUTO",
-                    "InheritedType": 3
-                  },
-                  {
-                    "nid": -1919997270,
-                    "strtype": "OBJECT/Scroll_direction",
-                    "strval": "ALL",
-                    "InheritedType": 3
-                  },
-                  {
-                    "nid": -860075182,
-                    "flags": 1048576,
-                    "strtype": "OBJECT/States",
-                    "InheritedType": 1
-                  },
-                  {
-                    "nid": -1956270211,
-                    "strtype": "OBJECT/Checked",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": -1257193717,
-                    "strtype": "OBJECT/Disabled",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": 1983499415,
-                    "strtype": "OBJECT/Focused",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": 1065298928,
-                    "strtype": "OBJECT/Pressed",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": -397839055,
-                    "strtype": "OBJECT/User_1",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": -2032061986,
-                    "strtype": "OBJECT/User_2",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": 895024902,
-                    "strtype": "OBJECT/User_3",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": 2129071980,
-                    "strtype": "OBJECT/User_4",
-                    "strval": "False",
-                    "InheritedType": 2
-                  },
-                  {
-                    "nid": -710932882,
-                    "strtype": "IMAGE/Image",
-                    "InheritedType": 1
-                  },
-                  {
-                    "nid": 718762837,
-                    "strtype": "IMAGE/Asset",
-                    "strval": "assets\\sunsynk-logo-40px.png",
-                    "InheritedType": 5
-                  },
-                  {
-                    "nid": 1557313435,
-                    "strtype": "IMAGE/Pivot",
-                    "intarray": [
-                      0,
-                      0
-                    ],
-                    "InheritedType": 7
-                  },
-                  {
-                    "nid": -1781921509,
-                    "strtype": "IMAGE/Rotation",
-                    "InheritedType": 6
-                  },
-                  {
-                    "nid": -865931975,
-                    "strtype": "IMAGE/Scale",
-                    "integer": 256,
-                    "InheritedType": 6
-                  },
-                  {
-                    "part": "lv.PART.MAIN",
-                    "childs": [],
-                    "nid": -1974692353,
-                    "strtype": "IMAGE/Style_main",
-                    "strval": "lv.PART.MAIN, Rectangle, Image",
-                    "InheritedType": 11
-                  }
-                ],
-                "saved_objtypeKey": "IMAGE"
-              }
-            ],
             "locked": false,
             "properties": [
               {
@@ -10525,6 +10229,7 @@
               },
               {
                 "nid": -1766171293,
+                "flags": 1048576,
                 "strtype": "OBJECT/Flags",
                 "InheritedType": 1
               },
@@ -10726,12 +10431,18 @@
                         "nid": -856115457,
                         "strtype": "_style/Bg_Color",
                         "intarray": [
-                          255,
-                          255,
-                          255,
-                          0
+                          0,
+                          0,
+                          0,
+                          256
                         ],
                         "InheritedType": 7
+                      },
+                      {
+                        "nid": -1847781565,
+                        "strtype": "_style/Bg_Image",
+                        "strval": "assets\\sunsynk-logo-40px.png",
+                        "InheritedType": 5
                       },
                       {
                         "nid": -959601127,
@@ -10749,6 +10460,26 @@
                         "strtype": "_style/Border width",
                         "integer": 4,
                         "InheritedType": 6
+                      },
+                      {
+                        "nid": 1804243946,
+                        "strtype": "_style/Outline_Color",
+                        "intarray": [
+                          0,
+                          0,
+                          0,
+                          255
+                        ],
+                        "InheritedType": 7
+                      },
+                      {
+                        "nid": 838154074,
+                        "strtype": "_style/Outline_params",
+                        "intarray": [
+                          12,
+                          0
+                        ],
+                        "InheritedType": 7
                       }
                     ],
                     "InheritedType": 1
@@ -10770,7 +10501,7 @@
               {
                 "disabled": false,
                 "nid": -395257084,
-                "strtype": "PANEL/EventHandler",
+                "strtype": "_event/EventHandler",
                 "strval": "CLICKED",
                 "childs": [
                   {
@@ -10793,7 +10524,7 @@
                   },
                   {
                     "nid": -293861848,
-                    "strtype": "_custom/action",
+                    "strtype": "_event/action",
                     "strval": "CHANGE SCREEN",
                     "childs": [
                       {
@@ -14553,7 +14284,7 @@
           {
             "disabled": false,
             "nid": -975398123,
-            "strtype": "SCREEN/EventHandler",
+            "strtype": "_event/EventHandler",
             "strval": "CLICKED",
             "childs": [
               {
@@ -14576,7 +14307,7 @@
               },
               {
                 "nid": -835279637,
-                "strtype": "_custom/action",
+                "strtype": "_event/action",
                 "strval": "CHANGE SCREEN",
                 "childs": [
                   {
@@ -14629,7 +14360,7 @@
           {
             "disabled": false,
             "nid": 293163551,
-            "strtype": "SCREEN/EventHandler",
+            "strtype": "_event/EventHandler",
             "strval": "SCREEN_LOAD_START",
             "childs": [
               {
@@ -14652,7 +14383,7 @@
               },
               {
                 "nid": 611303936,
-                "strtype": "_custom/action",
+                "strtype": "_event/action",
                 "strval": "CALL FUNCTION",
                 "childs": [
                   {
@@ -14730,7 +14461,7 @@
     "theme_color2": 0,
     "exportFolderPath": "C:\\Users\\blye\\GitHub\\sunsynk-ihd-35\\SunsynkIHD\\lib\\ui_480_320\\ui\\src",
     "projectExportFolderPath": "C:\\Users\\blye\\OneDrive\\Solar\\Solar IHD UI - 3.5\\template\\Test",
-    "backup_cnt": 539,
+    "backup_cnt": 541,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.6",
     "callfuncsexport": "C_FILE",

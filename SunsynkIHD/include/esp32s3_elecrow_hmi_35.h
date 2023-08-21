@@ -14,12 +14,6 @@
 #define TFT_BL          46
 #define BUZZER_PIN      20
 
-#define TOUCH_SWAP_XY
-#define TOUCH_MAP_X1 SCREEN_WIDTH
-#define TOUCH_MAP_X2 0
-#define TOUCH_MAP_Y1 0
-#define TOUCH_MAP_Y2 SCREEN_HEIGHT
-
 class LGFX : public lgfx::LGFX_Device
 {
 public:
@@ -60,8 +54,8 @@ public:
 
     {
       auto cfg = _panel_instance.config();
-      cfg.panel_width     =   480;
       cfg.panel_width     =   320;
+      cfg.panel_height    =   480;
       cfg.offset_x        =     0;
       cfg.offset_y        =     0;
       cfg.pin_cs          =    -1;
@@ -93,12 +87,12 @@ public:
       cfg.pin_sda  = 38;
       cfg.pin_scl  = 39;
       cfg.pin_int  = -1;
-      cfg.freq = 400000;
-      
+      cfg.freq  = 400000;
       cfg.x_min = 0;
-      cfg.x_max = 479;
+      cfg.x_max = 319;
       cfg.y_min = 0;
-      cfg.y_max = 319;
+      cfg.y_max = 479;
+      cfg.offset_rotation = 0;
 
       _touch_instance.config(cfg);
       _panel_instance.setTouch(&_touch_instance);

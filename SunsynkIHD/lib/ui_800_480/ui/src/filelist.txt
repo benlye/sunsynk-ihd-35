@@ -8,7 +8,7 @@ images/ui_img_670870020.c
 images/ui_img_705529016.c
 images/ui_img_264836261.c
 images/ui_img_1076282785.c
-images/ui_img_1416811391.c
+images/ui_img_1230882528.c
 images/ui_img_1765460539.c
 images/ui_img_1683162281.c
 images/ui_img_1288183160.c

@@ -361,18 +361,10 @@ void ui_home_screen_init(void)
     lv_obj_clear_flag(ui_Inverter, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_bg_color(ui_Inverter, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_Inverter, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_img_src(ui_Inverter, &ui_img_1230882528, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_color(ui_Inverter, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(ui_Inverter, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui_Inverter, 6, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    ui_SunsynkLogo = lv_img_create(ui_Inverter);
-    lv_img_set_src(ui_SunsynkLogo, &ui_img_1416811391);
-    lv_obj_set_width(ui_SunsynkLogo, LV_SIZE_CONTENT);   /// 39
-    lv_obj_set_height(ui_SunsynkLogo, LV_SIZE_CONTENT);    /// 42
-    lv_obj_set_align(ui_SunsynkLogo, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_SunsynkLogo, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
-    lv_obj_clear_flag(ui_SunsynkLogo, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_img_set_zoom(ui_SunsynkLogo, 110);
 
     ui_time = lv_label_create(ui_home);
     lv_obj_set_width(ui_time, LV_SIZE_CONTENT);   /// 1

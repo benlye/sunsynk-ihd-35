@@ -58,7 +58,6 @@ extern lv_obj_t * ui_loadTotal;
 extern lv_obj_t * ui_loadTotalUnits;
 void ui_event_Inverter(lv_event_t * e);
 extern lv_obj_t * ui_Inverter;
-extern lv_obj_t * ui_SunsynkLogo;
 extern lv_obj_t * ui_time;
 extern lv_obj_t * ui_syncing;
 extern lv_obj_t * ui_wifiHigh;
@@ -84,7 +83,7 @@ LV_IMG_DECLARE(ui_img_670870020);    // assets\icons8-charging-battery-90.png
 LV_IMG_DECLARE(ui_img_705529016);    // assets\icons8-arrow-30.png
 LV_IMG_DECLARE(ui_img_264836261);    // assets\icons8-transmission-tower-100.png
 LV_IMG_DECLARE(ui_img_1076282785);    // assets\icons8-house-100.png
-LV_IMG_DECLARE(ui_img_1416811391);    // assets\sunsynk-logo-large.png
+LV_IMG_DECLARE(ui_img_1230882528);    // assets\sunsynk-logo-med.png
 LV_IMG_DECLARE(ui_img_1765460539);    // assets\icons8-transfer-24 (1).png
 LV_IMG_DECLARE(ui_img_1683162281);    // assets\icons8-wifi-26.png
 LV_IMG_DECLARE(ui_img_1288183160);    // assets\icons8-wifi-26-med.png

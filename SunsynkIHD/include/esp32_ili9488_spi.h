@@ -13,8 +13,6 @@
 #define SCREEN_HEIGHT   320
 #define TFT_BL          LCD_BL
 
-#define TOUCH_SWAP_XY
-
 class LGFX : public lgfx::LGFX_Device
 {
 public:
@@ -79,20 +77,20 @@ public:
     {
       auto cfg = _touch_instance.config();
 
-      cfg.x_min      = 300;
-      cfg.x_max      = 4000;
-      cfg.y_min      = 300;
-      cfg.y_max      = 4000;
+      cfg.x_min      = TOUCH_X_MIN;
+      cfg.x_max      = TOUCH_X_MAX;
+      cfg.y_min      = TOUCH_Y_MIN;
+      cfg.y_max      = TOUCH_Y_MAX;
       cfg.pin_int    = TOUCH_INT;
       cfg.bus_shared = true;
-      cfg.offset_rotation = 0;
+      cfg.offset_rotation = TOUCH_ROTATION;
 
       cfg.spi_host = SPI3_HOST;
       cfg.freq = 1000000;
       cfg.pin_sclk = TOUCH_SCK;
       cfg.pin_mosi = TOUCH_MOSI;
       cfg.pin_miso = TOUCH_MISO;
-      cfg.pin_cs   =  TOUCH_CS;
+      cfg.pin_cs   = TOUCH_CS;
 
       _touch_instance.config(cfg);
       _panel_instance.setTouch(&_touch_instance);
