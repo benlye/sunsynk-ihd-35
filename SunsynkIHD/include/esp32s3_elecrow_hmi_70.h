@@ -15,11 +15,6 @@
 #define SCREEN_HEIGHT   480
 #define TFT_BL          2
 
-#define TOUCH_MAP_X1 0
-#define TOUCH_MAP_X2 SCREEN_WIDTH
-#define TOUCH_MAP_Y1 0
-#define TOUCH_MAP_Y2 SCREEN_HEIGHT
-
 class LGFX : public lgfx::LGFX_Device
 {
 public:

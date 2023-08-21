@@ -7,7 +7,7 @@ Sunsynk::Sunsynk()
 }
 
 // Set a CA root certificate for the API calls.
-void Sunsynk::SetCaCert(const char* cert)
+void Sunsynk::SetCaCert(const char *cert)
 {
     _rootCert = cert;
 }
@@ -31,7 +31,7 @@ void Sunsynk::SetTimeout(uint16_t t)
 }
 
 // Authenticate with the API and store an access token
-bool Sunsynk::Authenticate(const char * username, const char * password)
+bool Sunsynk::Authenticate(const char *username, const char *password)
 {
     ClearAuth();
     Serial.println("Fetching API auth token ...");
@@ -41,7 +41,7 @@ bool Sunsynk::Authenticate(const char * username, const char * password)
     if (client)
     {
         Serial.println(_authEndpoint);
-        
+
         if (_insecure)
         {
             Serial.println("WARNING: Not validating API endpoint certificate!");
@@ -259,11 +259,10 @@ void Sunsynk::GetPlantFlow(uint32_t plant, PlantFlowData_t &data)
         data.pvWatts = responseJson["data"]["pvPower"];
         data.battWatts = responseJson["data"]["battPower"];
         data.gridWatts = responseJson["data"]["gridOrMeterPower"];
-        data.loadWatts =  responseJson["data"]["loadOrEpsPower"]; 
+        data.loadWatts = responseJson["data"]["loadOrEpsPower"];
         data.battSoc = responseJson["data"]["soc"];
-        data.toBatt = responseJson["data"]["toBat"]; 
+        data.toBatt = responseJson["data"]["toBat"];
         data.toGrid = responseJson["data"]["toGrid"];
-
     }
     Serial.println();
 }
@@ -334,4 +333,81 @@ void Sunsynk::GetDailyTotals(uint32_t plant, tm date, PlantTotals_t &data)
         }
     }
     Serial.println();
+}
+
+// Get the daily plot data for a given date.
+void Sunsynk::GetDailyPlotData(uint32_t plant, tm date, PlantDailyPlot_t &data)
+{
+    Serial.println("Getting daily plot data ...");
+
+    char date_s[20];
+    sprintf(date_s, "%d-%02d-%02d", date.tm_year + 1900, date.tm_mon + 1, date.tm_mday);
+
+    char apiUri[128];
+    sprintf(apiUri, "%s/plant/energy/%d/day?lan=en&date=%s&id=%d", _apiEndoint, plant, date_s, plant);
+
+    StaticJsonDocument<200> filter;
+    filter["code"] = true;
+    filter["msg"] = true;
+    filter["data"]["infos"][0]["unit"] = true;
+    filter["data"]["infos"][0]["label"] = true;
+    filter["data"]["infos"][0]["records"][0]["time"] = true;
+    filter["data"]["infos"][0]["records"][0]["value"] = true;
+
+    int docSize = 98304;
+    DynamicJsonDocument responseJson(docSize);
+    responseJson = CallApi(apiUri, docSize, DeserializationOption::Filter(filter));
+
+    if (responseJson["code"] == 0 && responseJson["msg"] == "Success")
+    {
+        if (responseJson["data"]["infos"][0]["records"].size() > data.count)
+        {
+            data.count = responseJson["data"]["infos"][0]["records"].size();
+        }
+
+        int numElements = responseJson["data"]["infos"].size();
+        for (int i = 0; i < numElements; i++)
+        {
+            String label = responseJson["data"]["infos"][i]["label"];
+            int numRecords = responseJson["data"]["infos"][i]["records"].size();
+
+            if (label == "PV")
+            {
+                for (int j = 0; j < numRecords; j++)
+                {
+                    data.pv[j] = responseJson["data"]["infos"][i]["records"][j]["value"];
+                }
+            }
+
+            if (label == "Battery")
+            {
+                for (int j = 0; j < numRecords; j++)
+                {
+                    data.battery[j] = responseJson["data"]["infos"][i]["records"][j]["value"];
+                }
+            }
+
+            if (label == "Grid")
+            {
+                for (int j = 0; j < numRecords; j++)
+                {
+                    data.grid[j] = responseJson["data"]["infos"][i]["records"][j]["value"];
+                }
+            }
+            if (label == "Load")
+            {
+                for (int j = 0; j < numRecords; j++)
+                {
+                    data.load[j] = responseJson["data"]["infos"][i]["records"][j]["value"];
+                }
+            }
+            if (label == "SOC")
+            {
+                for (int j = 0; j < numRecords; j++)
+                {
+                    data.soc[j] = responseJson["data"]["infos"][i]["records"][j]["value"];
+                }
+            }
+        }
+    }
 }

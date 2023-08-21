@@ -60,8 +60,8 @@ extern lv_obj_t * ui_loadIcon;
 extern lv_obj_t * ui_loadLine;
 extern lv_obj_t * ui_loadTotal;
 extern lv_obj_t * ui_loadTotalUnits;
+void ui_event_Inverter(lv_event_t * e);
 extern lv_obj_t * ui_Inverter;
-extern lv_obj_t * ui_SunsynkLogo;
 extern lv_obj_t * ui_time;
 extern lv_obj_t * ui_syncing;
 extern lv_obj_t * ui_wifiHigh;
@@ -71,6 +71,11 @@ extern lv_obj_t * ui_infoPanel;
 extern lv_obj_t * ui_infoBox;
 extern lv_obj_t * ui_infoText;
 extern lv_obj_t * ui_settingsIcon;
+// SCREEN: ui_plot
+void ui_plot_screen_init(void);
+void ui_event_plot(lv_event_t * e);
+extern lv_obj_t * ui_plot;
+extern lv_obj_t * ui_dailyFlow;
 extern lv_obj_t * ui____initial_actions0;
 
 LV_IMG_DECLARE(ui_img_1549501229);    // assets\icons8-solar-panel-100.png

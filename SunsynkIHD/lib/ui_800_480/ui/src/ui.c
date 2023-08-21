@@ -40,8 +40,8 @@ lv_obj_t * ui_gridImportArrow;
 lv_obj_t * ui_loadIcon;
 lv_obj_t * ui_loadTotal;
 lv_obj_t * ui_loadTotalUnits;
+void ui_event_Inverter(lv_event_t * e);
 lv_obj_t * ui_Inverter;
-lv_obj_t * ui_SunsynkLogo;
 lv_obj_t * ui_time;
 lv_obj_t * ui_syncing;
 lv_obj_t * ui_wifiHigh;
@@ -55,6 +55,12 @@ lv_obj_t * ui_Image2;
 lv_obj_t * ui_infoPanel;
 lv_obj_t * ui_infoBox;
 lv_obj_t * ui_infoText;
+
+// SCREEN: ui_plot
+void ui_plot_screen_init(void);
+void ui_event_plot(lv_event_t * e);
+lv_obj_t * ui_plot;
+lv_obj_t * ui_dailyFlow;
 lv_obj_t * ui____initial_actions0;
 const lv_img_dsc_t * ui_imgset_867608463[1] = {&ui_img_705529016};
 const lv_img_dsc_t * ui_imgset_1070557679[1] = {&ui_img_670870020};
@@ -76,6 +82,25 @@ const lv_img_dsc_t * ui_imgset_1912930371[1] = {&ui_img_207095971};
 ///////////////////// ANIMATIONS ////////////////////
 
 ///////////////////// FUNCTIONS ////////////////////
+void ui_event_Inverter(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        _ui_screen_change(&ui_plot, LV_SCR_LOAD_ANIM_NONE, 500, 0, &ui_plot_screen_init);
+    }
+}
+void ui_event_plot(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        _ui_screen_change(&ui_home, LV_SCR_LOAD_ANIM_NONE, 500, 0, &ui_home_screen_init);
+    }
+    if(event_code == LV_EVENT_SCREEN_LOAD_START) {
+        updatePlotData(e);
+    }
+}
 
 ///////////////////// SCREENS ////////////////////
 
@@ -86,6 +111,7 @@ void ui_init(void)
                                                false, LV_FONT_DEFAULT);
     lv_disp_set_theme(dispp, theme);
     ui_home_screen_init();
+    ui_plot_screen_init();
     ui____initial_actions0 = lv_obj_create(NULL);
     lv_disp_load_scr(ui_home);
 }

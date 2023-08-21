@@ -401,19 +401,16 @@ void ui_home_screen_init(void)
     lv_obj_set_height(ui_Inverter, 64);
     lv_obj_set_align(ui_Inverter, LV_ALIGN_CENTER);
     lv_obj_clear_flag(ui_Inverter, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_bg_color(ui_Inverter, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_Inverter, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_Inverter, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_Inverter, 256, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_img_src(ui_Inverter, &ui_img_1551709364, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_color(ui_Inverter, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(ui_Inverter, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui_Inverter, 4, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    ui_SunsynkLogo = lv_img_create(ui_Inverter);
-    lv_img_set_src(ui_SunsynkLogo, &ui_img_1551709364);
-    lv_obj_set_width(ui_SunsynkLogo, LV_SIZE_CONTENT);   /// 39
-    lv_obj_set_height(ui_SunsynkLogo, LV_SIZE_CONTENT);    /// 42
-    lv_obj_set_align(ui_SunsynkLogo, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_SunsynkLogo, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
-    lv_obj_clear_flag(ui_SunsynkLogo, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_outline_color(ui_Inverter, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_opa(ui_Inverter, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_width(ui_Inverter, 12, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_pad(ui_Inverter, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_time = lv_label_create(ui_home);
     lv_obj_set_width(ui_time, LV_SIZE_CONTENT);   /// 1
@@ -516,5 +513,7 @@ void ui_home_screen_init(void)
     lv_obj_clear_flag(ui_settingsIcon, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_img_recolor(ui_settingsIcon, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_img_recolor_opa(ui_settingsIcon, 128, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_add_event_cb(ui_Inverter, ui_event_Inverter, LV_EVENT_ALL, NULL);
 
 }
