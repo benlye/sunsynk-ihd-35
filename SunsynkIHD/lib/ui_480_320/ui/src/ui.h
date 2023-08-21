@@ -62,7 +62,6 @@ extern lv_obj_t * ui_loadTotal;
 extern lv_obj_t * ui_loadTotalUnits;
 void ui_event_Inverter(lv_event_t * e);
 extern lv_obj_t * ui_Inverter;
-extern lv_obj_t * ui_SunsynkLogo;
 extern lv_obj_t * ui_time;
 extern lv_obj_t * ui_syncing;
 extern lv_obj_t * ui_wifiHigh;
