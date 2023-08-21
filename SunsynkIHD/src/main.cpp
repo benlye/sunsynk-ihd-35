@@ -651,7 +651,7 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
 // LVGL touch callback
 void my_touchpad_read(lv_indev_drv_t * indev_driver, lv_indev_data_t * data)
 {
-    uint16_t touchX, touchY, rawTouchX, rawTouchY;
+    uint16_t touchX, touchY;
     int16_t touch_last_x = 0, touch_last_y = 0;
 
     data->state = LV_INDEV_STATE_REL;
@@ -669,8 +669,6 @@ void my_touchpad_read(lv_indev_drv_t * indev_driver, lv_indev_data_t * data)
         data->point.x = touch_last_x;
         data->point.y = touch_last_y;
 
-        gfx->getTouchRaw(&rawTouchX, &rawTouchY);
-        Serial.printf("Raw:   X:%d Y:%d\n", rawTouchX, rawTouchY);
         Serial.printf("Touch: X:%d Y:%d\n", data->point.x, data->point.y);
         lastTouchTime = getTime();
     }
