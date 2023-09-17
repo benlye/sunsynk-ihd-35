@@ -86,6 +86,12 @@ static lv_disp_drv_t disp_drv;
 // Connects to the Wi-Fi network.
 void connectWiFi(void);
 
+// Callback for Wi-Fi disconnection
+void WiFiDisconnected(WiFiEvent_t event, WiFiEventInfo_t info);
+
+// Callback for Wi-Fi connection
+void WiFiReconnected(WiFiEvent_t event, WiFiEventInfo_t info);
+
 // Configures NTP and syncs the time.
 void configureNtp(void);
 
@@ -96,7 +102,10 @@ void getVersion(char *buff);
 boolean IsNightMode(void);
 
 // Toggles night mode on or off. Night mode dims the screen and disables API polling.
-void SetNightMode(void);
+void ToggleNightMode(void);
+
+// Toggles API polling on or off.
+void TogglePolling(void);
 
 // Updates the widget values in the UI with the data pulled from the APIs.
 void UpdateDisplayFields(PlantFlowData_t &flow, PlantTotals_t &totals, bool &ready, bool &refreshed);
@@ -231,6 +240,9 @@ void TaskCallApi(void *pvParameters)
     uint32_t api_delay = *((uint32_t *)pvParameters);
     for (;;)
     {
+        // Show the syncing icon
+        lv_obj_clear_flag(ui_syncing, LV_OBJ_FLAG_HIDDEN);
+
         // Signal that data isn't ready
         ihdDataReady = false;
 
@@ -254,8 +266,11 @@ void TaskCallApi(void *pvParameters)
         // Signal that data is ready
         ihdDataReady = true;
 
-        // Signal tha the IHD has not been refreshed with this data
+        // Signal that the IHD has not been refreshed with this data
         ihdScreenRefreshed = false;
+
+        // Hide the syncing icon
+        lv_obj_add_flag(ui_syncing, LV_OBJ_FLAG_HIDDEN);
 
         // Wait until this task should run again
         delay(api_delay);
@@ -272,7 +287,7 @@ void TaskClock(void *pvParameters)
         ihdTime = getTimeString();
 
         // Check if we need to toggle night mode
-        SetNightMode();
+        ToggleNightMode();
 
         // Wait until this task should run again
         delay(time_delay);
@@ -285,6 +300,9 @@ void TaskUpdateIhd(void *pvParameters)
     uint32_t output_delay = *((uint32_t *)pvParameters);
     for (;;)
     {
+        // Check if we need to toggle API polling
+        TogglePolling();
+
         // Call the function to update the IHD UI widgets
         UpdateDisplayFields(flowData, dailyTotals, ihdDataReady, ihdScreenRefreshed);
 
@@ -305,6 +323,29 @@ void connectWiFi()
     while ((WiFi.status() != WL_CONNECTED))
     {}
     Serial.println(" connected");
+
+    // Register Wi-Fi disconnection callback
+    WiFi.onEvent(WiFiDisconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
+
+    // Register Wi-Fi reconnection callback
+    WiFi.onEvent(WiFiReconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_CONNECTED);
+}
+
+// Handle Wi-Fi disconnection
+void WiFiDisconnected(WiFiEvent_t event, WiFiEventInfo_t info)
+{
+    Serial.println("Disconnected from WiFi access point");
+    TogglePolling();
+
+    Serial.println("Trying to reconnect ...");
+    WiFi.reconnect();
+}
+
+// Handle Wi-Fi reconnection
+void WiFiReconnected(WiFiEvent_t event, WiFiEventInfo_t info)
+{
+    Serial.println("Reconnected to WiFi access point");
+    TogglePolling();
 }
 
 // Use NTP to set the clock
@@ -378,7 +419,7 @@ boolean IsNightMode()
 }
 
 // Enable or disable night mode.
-void SetNightMode()
+void ToggleNightMode()
 {   
     if (IsNightMode())
     {
@@ -389,35 +430,34 @@ void SetNightMode()
             gfx->setBrightness(LCD_BRIGHTNESS_NIGHT);
             backlightOn = false;
         }
-
-        if (LCD_BRIGHTNESS_NIGHT == 0 && TaskCallApi_h != NULL)
-        {
-            // Get the API task state, disable it if it's enabled
-            eTaskState state = eTaskGetState(TaskCallApi_h);
-            if (state != eSuspended)
-            {
-                Serial.println("Suspending API polling task.");
-                vTaskSuspend(TaskCallApi_h);
-            }
-        }
     } else {
-        // Get the API task state, enable it if it's disabled
-        if (TaskCallApi_h != NULL)
-        {
-            eTaskState state = eTaskGetState(TaskCallApi_h);
-            if (state == eSuspended)
-            {
-                Serial.println("Resuming API polling task.");
-                vTaskResume(TaskCallApi_h);
-            }
-        }
-
         // Get the backlight state, turn it on if it's off
         if (!backlightOn)
         {
             Serial.println("Turning LCD backlight on.");
             gfx->setBrightness(LCD_BRIGHTNESS_DAY);
             backlightOn = true;
+        }
+    }
+}
+
+// Enable or disable API polling
+void TogglePolling()
+{
+    if (TaskCallApi_h != NULL)
+    {
+        eTaskState state = eTaskGetState(TaskCallApi_h);
+
+        if (((IsNightMode() == true && LCD_BRIGHTNESS_NIGHT == 0) || WiFi.status() != WL_CONNECTED) && state != eSuspended)
+        {
+            Serial.println("Suspending API polling task.");
+            vTaskSuspend(TaskCallApi_h);
+        }
+
+        if ((IsNightMode() == false && WiFi.status() == WL_CONNECTED) && state == eSuspended)
+        {
+            Serial.println("Resuming API polling task.");
+            vTaskResume(TaskCallApi_h);
         }
     }
 }
@@ -461,6 +501,7 @@ void UpdateDisplayFields(PlantFlowData_t &flowData, PlantTotals_t &dailyTotals, 
         lv_obj_add_flag(ui_wifiLow, LV_OBJ_FLAG_HIDDEN);
         lv_obj_add_flag(ui_wifiMed, LV_OBJ_FLAG_HIDDEN);
         lv_obj_add_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(ui_syncing, LV_OBJ_FLAG_HIDDEN);
     }
 
     if (showInfoMessage)
@@ -474,9 +515,6 @@ void UpdateDisplayFields(PlantFlowData_t &flowData, PlantTotals_t &dailyTotals, 
 
     if (ready &! refreshed)
     {
-        // Hide the syncing icon
-        lv_obj_add_flag(ui_syncing, LV_OBJ_FLAG_HIDDEN);
-
         // Update the PV energy
         int pvWattsColor = UI_GREY;
         if (flowData.pvWatts > 0)
@@ -566,16 +604,6 @@ void UpdateDisplayFields(PlantFlowData_t &flowData, PlantTotals_t &dailyTotals, 
         lv_label_set_text(ui_pvTotal, eTodayStr);
 
         refreshed = true;
-    }
-    else if (!ready && refreshed)
-    {
-        // Show the syncing icon
-        lv_obj_clear_flag(ui_syncing, LV_OBJ_FLAG_HIDDEN);
-    }
-    else
-    {
-        // Hide the syncing icon
-        lv_obj_add_flag(ui_syncing, LV_OBJ_FLAG_HIDDEN);
     }
 
     // Update time
