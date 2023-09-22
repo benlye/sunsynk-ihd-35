@@ -60,6 +60,9 @@ boolean ihdDataReady = false;
 // Flag to indicate that the most recent API data has been displayed.
 boolean ihdScreenRefreshed = false;
 
+// Flag to indicate that API calls are in progress
+boolean apiSyncing = false;
+
 // Stores the last clock time that the screen was touched so we can time it out in night mode.
 unsigned long lastTouchTime = 0;
 
@@ -241,7 +244,7 @@ void TaskCallApi(void *pvParameters)
     for (;;)
     {
         // Show the syncing icon
-        lv_obj_clear_flag(ui_syncing, LV_OBJ_FLAG_HIDDEN);
+        apiSyncing = true;
 
         // Signal that data isn't ready
         ihdDataReady = false;
@@ -270,7 +273,7 @@ void TaskCallApi(void *pvParameters)
         ihdScreenRefreshed = false;
 
         // Hide the syncing icon
-        lv_obj_add_flag(ui_syncing, LV_OBJ_FLAG_HIDDEN);
+        apiSyncing = false;
 
         // Wait until this task should run again
         delay(api_delay);
@@ -501,6 +504,15 @@ void UpdateDisplayFields(PlantFlowData_t &flowData, PlantTotals_t &dailyTotals, 
         lv_obj_add_flag(ui_wifiLow, LV_OBJ_FLAG_HIDDEN);
         lv_obj_add_flag(ui_wifiMed, LV_OBJ_FLAG_HIDDEN);
         lv_obj_add_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN);
+        apiSyncing = false;
+    }
+
+    if (apiSyncing)
+    {
+        lv_obj_clear_flag(ui_syncing, LV_OBJ_FLAG_HIDDEN);
+    }
+    else
+    {
         lv_obj_add_flag(ui_syncing, LV_OBJ_FLAG_HIDDEN);
     }
 
