@@ -24,7 +24,7 @@
 /*
  * Timezone and NTP server settings
  */
-#define TZ_INFO             "GMTGMT-1,M3.4.0/01,M10.4.0/02"         // Timezone string to use for local time. Default is for the UK.
+#define TZ_INFO             "GMT0BST,M3.5.0/1,M10.5.0/2"            // Timezone string to use for local time. Default is for the UK.
 #define NTP_SERVER_1        "0.pool.ntp.org"                        // First NTP server
 #define NTP_SERVER_2        "1.pool.ntp.org"                        // Second NTP server
 #define NTP_SERVER_3        "time.nist.gov"                         // Third NTP server
