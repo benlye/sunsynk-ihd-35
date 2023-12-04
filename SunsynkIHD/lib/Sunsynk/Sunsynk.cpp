@@ -31,7 +31,7 @@ void Sunsynk::SetTimeout(uint16_t t)
 }
 
 // Authenticate with the API and store an access token
-bool Sunsynk::Authenticate(const char *username, const char *password)
+bool Sunsynk::Authenticate(const char *username, const char *password, const int region)
 {
     ClearAuth();
     Serial.println("Fetching API auth token ...");
@@ -40,6 +40,21 @@ bool Sunsynk::Authenticate(const char *username, const char *password)
 
     if (client)
     {
+        if (region == 1)
+        {
+            _region = 1;
+            _authEndpoint = "https://pv.inteless.com/oauth/token";
+            _apiEndoint = "https://pv.inteless.com/api/v1";
+            _rootCert = _rootCert1;
+        }
+        else
+        {
+            _region = 2;
+            _authEndpoint = "https://api.sunsynk.net/oauth/token";
+            _apiEndoint = "https://api.sunsynk.net/api/v1";
+            _rootCert = _rootCert2;
+        }
+
         Serial.println(_authEndpoint);
 
         if (_insecure)

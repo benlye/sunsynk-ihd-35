@@ -39,7 +39,7 @@ class Sunsynk
 public:
     Sunsynk();
 
-    bool Authenticate(const char *username, const char *password);
+    bool Authenticate(const char *username, const char *password, const int region);
     void ClearAuth(void);
     void SetCaCert(const char *cert);
     void SetCaCertBundle(const uint8_t *bundle);
@@ -54,9 +54,9 @@ public:
     void GetDailyPlotData(uint32_t plant, tm date, PlantDailyPlot_t &data);
 
 private:
-    const char *_authEndpoint = "https://pv.inteless.com/oauth/token";
-    const char *_apiEndoint = "https://pv.inteless.com/api/v1";
-
+    uint8_t _region = 1;
+    const char *_authEndpoint = "";
+    const char *_apiEndoint = "";
     uint16_t _apiTimeout = 10000;
     bool _insecure = false;
     String _accessToken = "";
@@ -65,6 +65,7 @@ private:
     unsigned long _acquiredAt = 0;
     unsigned long _expiresAt = 0;
 
+    const char *_rootCert;
     const uint8_t *_rootCertBundle;
 
     /*
@@ -73,7 +74,7 @@ private:
      * Expires: 04/06/2035
      * Serial Number: 00:82:10:CF:B0:D2:40:E3:59:44:63:E0:BB:63:82:8B:00
      */
-    const char *_rootCert =
+    const char *_rootCert1 =
         "-----BEGIN CERTIFICATE-----\n"
         "MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw\n"
         "TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh\n"
@@ -104,6 +105,36 @@ private:
         "4RgqsahDYVvTH9w7jXbyLeiNdd8XM2w9U/t7y0Ff/9yi0GE44Za4rF2LN9d11TPA\n"
         "mRGunUHBcnWEvgJBQl9nJEiU0Zsnvgc/ubhPgXRR4Xq37Z0j4r7g1SgEEzwxA57d\n"
         "emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=\n"
+        "-----END CERTIFICATE-----\n";
+
+    /*
+     * Root certificate for api.sunsynk.net
+     * Friendly Name: DigiCert Global Root G2
+     * Expires: 15/01/2038
+     * Serial Number: 03:3A:F1:E6:A7:11:A9:A0:BB:28:64:B1:1D:09:FA:E5
+     */
+    const char *_rootCert2 =
+        "-----BEGIN CERTIFICATE-----\n"
+        "MIIDjjCCAnagAwIBAgIQAzrx5qcRqaC7KGSxHQn65TANBgkqhkiG9w0BAQsFADBh\n"
+        "MQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3\n"
+        "d3cuZGlnaWNlcnQuY29tMSAwHgYDVQQDExdEaWdpQ2VydCBHbG9iYWwgUm9vdCBH\n"
+        "MjAeFw0xMzA4MDExMjAwMDBaFw0zODAxMTUxMjAwMDBaMGExCzAJBgNVBAYTAlVT\n"
+        "MRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5j\n"
+        "b20xIDAeBgNVBAMTF0RpZ2lDZXJ0IEdsb2JhbCBSb290IEcyMIIBIjANBgkqhkiG\n"
+        "9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuzfNNNx7a8myaJCtSnX/RrohCgiN9RlUyfuI\n"
+        "2/Ou8jqJkTx65qsGGmvPrC3oXgkkRLpimn7Wo6h+4FR1IAWsULecYxpsMNzaHxmx\n"
+        "1x7e/dfgy5SDN67sH0NO3Xss0r0upS/kqbitOtSZpLYl6ZtrAGCSYP9PIUkY92eQ\n"
+        "q2EGnI/yuum06ZIya7XzV+hdG82MHauVBJVJ8zUtluNJbd134/tJS7SsVQepj5Wz\n"
+        "tCO7TG1F8PapspUwtP1MVYwnSlcUfIKdzXOS0xZKBgyMUNGPHgm+F6HmIcr9g+UQ\n"
+        "vIOlCsRnKPZzFBQ9RnbDhxSJITRNrw9FDKZJobq7nMWxM4MphQIDAQABo0IwQDAP\n"
+        "BgNVHRMBAf8EBTADAQH/MA4GA1UdDwEB/wQEAwIBhjAdBgNVHQ4EFgQUTiJUIBiV\n"
+        "5uNu5g/6+rkS7QYXjzkwDQYJKoZIhvcNAQELBQADggEBAGBnKJRvDkhj6zHd6mcY\n"
+        "1Yl9PMWLSn/pvtsrF9+wX3N3KjITOYFnQoQj8kVnNeyIv/iPsGEMNKSuIEyExtv4\n"
+        "NeF22d+mQrvHRAiGfzZ0JFrabA0UWTW98kndth/Jsw1HKj2ZL7tcu7XUIOGZX1NG\n"
+        "Fdtom/DzMNU+MeKNhJ7jitralj41E6Vf8PlwUHBHQRFXGU7Aj64GxJUTFy8bJZ91\n"
+        "8rGOmaFvE7FBcf6IKshPECBV1/MUReXgRPTqh5Uykw7+U0b6LJ3/iyK5S9kJRaTe\n"
+        "pLiaWN0bfVKfjllDiIGknibVb63dDcY3fe0Dkhvld1927jyNxF1WW6LZZm6zNTfl\n"
+        "MrY=\n"
         "-----END CERTIFICATE-----\n";
 };
 

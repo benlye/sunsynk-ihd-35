@@ -206,7 +206,7 @@ void setup()
 
     // Authenticate
     infoMessage = "Authenticating ...";
-    sunsynk.Authenticate(SUNSYNK_USERNAME, SUNSYNK_PASSWORD);
+    sunsynk.Authenticate(SUNSYNK_USERNAME, SUNSYNK_PASSWORD, SUNSYNK_REGION);
 
     // Create the task to get API data
     infoMessage = "Fetching data ...";
@@ -252,7 +252,7 @@ void TaskCallApi(void *pvParameters)
         // Check if the access token is still valid, renew it if now
         if (!sunsynk.CheckAccessToken())
         {
-            sunsynk.Authenticate(SUNSYNK_USERNAME, SUNSYNK_PASSWORD);
+            sunsynk.Authenticate(SUNSYNK_USERNAME, SUNSYNK_PASSWORD, SUNSYNK_REGION);
         }
 
         // Get the plant flow data
