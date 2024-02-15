@@ -2,6 +2,7 @@
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
 #include <lvgl.h>
+#include <MQTT.h>
 #include <WiFi.h>
 #include <Time.h>
 #include <TimeLib.h>
@@ -45,11 +46,23 @@ LGFX *gfx = new LGFX;
 // Global instance for the Sunsynk API.
 Sunsynk sunsynk;
 
+// WiFi Client
+WiFiClient wifi;
+
+// MQTT Client
+MQTTClient mqtt;
+
 // Struct for storing the realtime flow data.
 PlantFlowData_t flowData;
 
 // Struct for storing the daily totals.
 PlantTotals_t dailyTotals;
+
+// Struct for storing the realtime flow data.
+PlantFlowData_t mqttFlowData;
+
+// Struct for storing the daily totals.
+PlantTotals_t mqttDailyTotals;
 
 // Struct for storing the daily plot data.
 PlantDailyPlot_t dailyPlotData;
@@ -94,6 +107,12 @@ void WiFiDisconnected(WiFiEvent_t event, WiFiEventInfo_t info);
 
 // Callback for Wi-Fi connection
 void WiFiReconnected(WiFiEvent_t event, WiFiEventInfo_t info);
+
+// Connects to the MQTT broker.
+void connectMQTT(void);
+
+// Callback for MQTT message received.
+void mqttReceived(String &topic, String &payload);
 
 // Configures NTP and syncs the time.
 void configureNtp(void);
@@ -204,13 +223,20 @@ void setup()
     infoMessage = "Setting the time ...";
     configureNtp();
 
+    // Connect to MQTT
+    infoMessage = "Connecting to Solar Assistant ...";
+    mqtt.begin(MQTT_BROKER, wifi);
+    mqtt.onMessage(mqttReceived);
+    connectMQTT();
+
     // Authenticate
-    infoMessage = "Authenticating ...";
-    sunsynk.Authenticate(SUNSYNK_USERNAME, SUNSYNK_PASSWORD, SUNSYNK_REGION);
+    //infoMessage = "Authenticating ...";
+    //sunsynk.Authenticate(SUNSYNK_USERNAME, SUNSYNK_PASSWORD, SUNSYNK_REGION);
 
     // Create the task to get API data
     infoMessage = "Fetching data ...";
-    uint32_t api_call_delay = 30000; // 30 seconds
+    //uint32_t api_call_delay = 30000; // 30 seconds
+    uint32_t api_call_delay = 1000; // 5 seconds
     xTaskCreate(TaskCallApi, "API Call Task", 20480, (void *)&api_call_delay, 2, &TaskCallApi_h);
 
     // Create the task to update the time on the IHD display
@@ -218,11 +244,13 @@ void setup()
     xTaskCreate(TaskClock, "Task Clock", 2048, (void *)&time_delay, 2, NULL);
 
     // Wait up to 10s for API data
+    /*
     int delayEnd = millis() + (10 * 1000);
     while (!ihdDataReady && millis() < delayEnd)
     {
         delay(100);
     }
+    */
 
     infoMessage = "Ready!";
     delay(500);
@@ -234,6 +262,12 @@ void setup()
 
 void loop()
 {
+    mqtt.loop();
+    delay(10);
+    if (!mqtt.connected()) {
+        Serial.println("MQTT not connected!");
+        connectMQTT();
+    }
     // Nothing to do here as all the work is done by the tasks
 }
 
@@ -249,6 +283,7 @@ void TaskCallApi(void *pvParameters)
         // Signal that data isn't ready
         ihdDataReady = false;
 
+/*
         // Check if the access token is still valid, renew it if now
         if (!sunsynk.CheckAccessToken())
         {
@@ -265,6 +300,9 @@ void TaskCallApi(void *pvParameters)
             // Get the daily totals
             sunsynk.GetDailyTotals(SUNSYNK_PLANT_ID, timeinfo, dailyTotals);
         }
+*/
+        flowData = mqttFlowData;
+        dailyTotals = mqttDailyTotals;
 
         // Signal that data is ready
         ihdDataReady = true;
@@ -349,6 +387,66 @@ void WiFiReconnected(WiFiEvent_t event, WiFiEventInfo_t info)
 {
     Serial.println("Reconnected to WiFi access point");
     TogglePolling();
+}
+
+void connectMQTT() {
+    Serial.print(" - Connecting to MQTT broker ...");
+    char espid[17];
+    snprintf(espid, 17, "ihd-%llX", ESP.getEfuseMac());
+
+    while (!mqtt.connect(espid)) {
+        Serial.print(".");
+        delay(1000);
+    }
+
+    Serial.println(" connected");
+    mqtt.subscribe("solar_assistant/inverter_1/grid_power/state");
+    mqtt.subscribe("solar_assistant/inverter_1/load_power/state");
+    mqtt.subscribe("solar_assistant/inverter_1/pv_power/state");
+    mqtt.subscribe("solar_assistant/total/battery_power/state");
+    mqtt.subscribe("solar_assistant/total/battery_state_of_charge/state");
+    mqtt.subscribe("solar_assistant/total/battery_energy_in/state");
+    mqtt.subscribe("solar_assistant/total/battery_energy_out/state");
+    mqtt.subscribe("solar_assistant/total/grid_energy_in/state");
+    mqtt.subscribe("solar_assistant/total/grid_energy_out/state");
+    mqtt.subscribe("solar_assistant/total/load_energy/state");
+    mqtt.subscribe("solar_assistant/total/pv_energy/state");
+}
+
+void mqttReceived(String &topic, String &payload) {
+    //Serial.println("Incoming: " + topic + ": " + payload);
+
+    if (topic == "solar_assistant/inverter_1/grid_power/state") {
+        mqttFlowData.gridWatts = payload.toInt();
+        mqttFlowData.toGrid = (mqttFlowData.gridWatts < 0);
+        mqttFlowData.gridWatts = abs(mqttFlowData.gridWatts);
+    } else if (topic == "solar_assistant/inverter_1/load_power/state") {
+        mqttFlowData.loadWatts = payload.toInt();
+    } else if (topic == "solar_assistant/inverter_1/pv_power/state") {
+        mqttFlowData.pvWatts = payload.toInt();
+    } else if (topic == "solar_assistant/total/battery_power/state") {
+        mqttFlowData.battWatts = payload.toInt();
+        mqttFlowData.toBatt = (mqttFlowData.battWatts > 0);
+    } else if (topic == "solar_assistant/total/battery_state_of_charge/state") {
+        mqttFlowData.battSoc = payload.toInt();
+    } else if (topic == "solar_assistant/total/battery_energy_in/state") {
+        mqttDailyTotals.battCharge = payload.toDouble();
+    } else if (topic == "solar_assistant/total/battery_energy_out/state") {
+        mqttDailyTotals.battDischarge = payload.toDouble();
+    } else if (topic == "solar_assistant/total/grid_energy_in/state") {
+        mqttDailyTotals.gridImport = payload.toDouble();
+    } else if (topic == "solar_assistant/total/grid_energy_out/state") {
+        mqttDailyTotals.gridExport = payload.toDouble();
+    } else if (topic == "solar_assistant/total/pv_energy/state") {
+        mqttDailyTotals.pv = payload.toDouble();
+    } else if (topic == "solar_assistant/total/load_energy/state") {
+        mqttDailyTotals.load = payload.toDouble();
+    }
+
+    // Note: Do not use the client in the callback to publish, subscribe or
+    // unsubscribe as it may cause deadlocks when other things arrive while
+    // sending and receiving acknowledgments. Instead, change a global variable,
+    // or push to a queue and handle it in the loop after calling `client.loop()`.
 }
 
 // Use NTP to set the clock

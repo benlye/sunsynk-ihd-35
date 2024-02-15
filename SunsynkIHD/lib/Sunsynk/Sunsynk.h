@@ -7,7 +7,7 @@ typedef struct
 {
     uint16_t pvWatts;
     int16_t battWatts;
-    uint16_t gridWatts;
+    int16_t gridWatts;
     uint16_t loadWatts;
     uint8_t battSoc;
     bool toBatt;
