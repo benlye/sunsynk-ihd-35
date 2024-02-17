@@ -1,8 +1,13 @@
-SET(SOURCES screens/ui_home.c
-    screens/ui_plot.c
+SET(SOURCES screens/ui_homeScreen.c
+    screens/ui_inverterScreen.c
+    screens/ui_pvScreen.c
+    screens/ui_gridScreen.c
+    screens/ui_battScreen.c
+    screens/ui_loadScreen.c
     ui.c
     components/ui_comp_hook.c
     ui_helpers.c
+    ui_events.c
     images/ui_img_1549501229.c
     images/ui_img_1933564998.c
     images/ui_img_670870020.c

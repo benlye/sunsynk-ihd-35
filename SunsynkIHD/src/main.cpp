@@ -58,6 +58,8 @@ PlantFlowData_t flowData;
 // Struct for storing the daily totals.
 PlantTotals_t dailyTotals;
 
+BattData_t mqttBattData;
+
 // Struct for storing the realtime flow data.
 PlantFlowData_t mqttFlowData;
 
@@ -143,6 +145,9 @@ int16_t getTimeMinutes(void);
 
 // Convert a clock time to minutes since midnight.
 int16_t timeToMinutes(String time);
+
+// Converts a double to string with single digit precision
+String doubleToString(double d);
 
 // LVGL touchpad read callback.
 void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data);
@@ -411,6 +416,10 @@ void connectMQTT() {
     mqtt.subscribe("solar_assistant/total/grid_energy_out/state");
     mqtt.subscribe("solar_assistant/total/load_energy/state");
     mqtt.subscribe("solar_assistant/total/pv_energy/state");
+
+    mqtt.subscribe("solar_assistant/inverter_1/battery_current/state");
+    mqtt.subscribe("solar_assistant/inverter_1/battery_voltage/state");
+    mqtt.subscribe("solar_assistant/total/battery_temperature/state");
 }
 
 void mqttReceived(String &topic, String &payload) {
@@ -419,7 +428,6 @@ void mqttReceived(String &topic, String &payload) {
     if (topic == "solar_assistant/inverter_1/grid_power/state") {
         mqttFlowData.gridWatts = payload.toInt();
         mqttFlowData.toGrid = (mqttFlowData.gridWatts < 0);
-        mqttFlowData.gridWatts = abs(mqttFlowData.gridWatts);
     } else if (topic == "solar_assistant/inverter_1/load_power/state") {
         mqttFlowData.loadWatts = payload.toInt();
     } else if (topic == "solar_assistant/inverter_1/pv_power/state") {
@@ -441,6 +449,12 @@ void mqttReceived(String &topic, String &payload) {
         mqttDailyTotals.pv = payload.toDouble();
     } else if (topic == "solar_assistant/total/load_energy/state") {
         mqttDailyTotals.load = payload.toDouble();
+    } else if (topic == "solar_assistant/inverter_1/battery_current/state") {
+        mqttBattData.current = payload.toDouble();
+    } else if (topic == "solar_assistant/inverter_1/battery_voltage/state") {
+        mqttBattData.voltage = payload.toDouble();
+    } else if (topic == "solar_assistant/total/battery_temperature/state") {
+        mqttBattData.temperature = payload.toDouble();
     }
 
     // Note: Do not use the client in the callback to publish, subscribe or
@@ -465,7 +479,6 @@ void configureNtp()
         nowSecs = time(nullptr);
     }
     Serial.println(" synced");
-    
 }
 
 // Build a version string
@@ -636,7 +649,7 @@ void UpdateDisplayFields(PlantFlowData_t &flowData, PlantTotals_t &dailyTotals, 
 
         // Update the grid energy
         int gridWattsColor = UI_GREY;
-        if (flowData.gridWatts > 0)
+        if (flowData.gridWatts != 0)
         {
             if (flowData.toGrid)
             { // Exporting
@@ -648,7 +661,7 @@ void UpdateDisplayFields(PlantFlowData_t &flowData, PlantTotals_t &dailyTotals, 
             }
         }
         lv_obj_set_style_text_color(ui_gridWatts, lv_color_hex(gridWattsColor), LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_label_set_text_fmt(ui_gridWatts, "%d", flowData.gridWatts);
+        lv_label_set_text_fmt(ui_gridWatts, "%d", abs(flowData.gridWatts));
 
         // Update the battery energy
         int battWattsColor = UI_GREY;
@@ -677,6 +690,26 @@ void UpdateDisplayFields(PlantFlowData_t &flowData, PlantTotals_t &dailyTotals, 
 
         // Update the battery SOC
         lv_label_set_text_fmt(ui_battSoc, "%d%%", flowData.battSoc);
+
+        // Update the battery rate
+        float battRate = (double)abs(flowData.battWatts) / (double)BATTERY_CAPACITY * (double)100;
+        char battRateStr[8];
+        dtostrf(battRate, 3, 1, battRateStr);
+        String battRateSign = "+";
+        if (flowData.battWatts < 0) {
+            battRateSign = "-";
+        }
+        //lv_obj_set_style_text_color(ui_battSocRate, lv_color_hex(battWattsColor), LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_label_set_text_fmt(ui_battSocRate, "%s%s %%/hr", battRateSign, battRateStr);
+
+        // Update the battery details
+        //lv_label_set_text_fmt(ui_battCapValue, "%d Ah", mqttBattData.current);
+        lv_label_set_text_fmt(ui_battCapValue, "%d Ah", 300);
+        lv_label_set_text_fmt(ui_battSocValue, "%d %%", flowData.battSoc);
+        lv_label_set_text_fmt(ui_battPwrValue, "%d W", flowData.battWatts);
+        lv_label_set_text_fmt(ui_battCurrValue, "%s A", doubleToString(mqttBattData.current));
+        lv_label_set_text_fmt(ui_battVoltValue, "%s V", doubleToString(mqttBattData.voltage));
+        lv_label_set_text_fmt(ui_battTempValue, "%s °C", doubleToString(mqttBattData.temperature));
 
         // Update total export
         double eTodayToDbl = dailyTotals.gridExport;
@@ -775,6 +808,13 @@ int16_t timeToMinutes(String s)
     return t;
 }
 
+String doubleToString(double d)
+{
+    char tempStr[8];
+    dtostrf(d, 3, 1, tempStr);
+    return tempStr;
+}
+
 // LVGL display flushing callback
 void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p) {
     int w = (area->x2 - area->x1 + 1);
@@ -804,8 +844,15 @@ void my_touchpad_read(lv_indev_drv_t * indev_driver, lv_indev_data_t * data)
     }
 }
 
+void detailScreenOnLoad(lv_event_t * e)
+{
+    // Start a timer to return to the main screen
+}
+
+
 void updatePlotData(lv_event_t * e)
 {
+    /*
     int16_t minPv = 0;
     int16_t maxPv = 0;
     int16_t minLoad = 0;
@@ -856,4 +903,5 @@ void updatePlotData(lv_event_t * e)
         }
         lv_chart_set_range(ui_dailyFlow, LV_CHART_AXIS_PRIMARY_Y, minY, maxY);
     }
+    */
 }

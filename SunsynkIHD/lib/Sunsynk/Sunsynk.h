@@ -16,6 +16,14 @@ typedef struct
 
 typedef struct
 {
+    uint8_t capacity;
+    double current;
+    double voltage;
+    double temperature;
+} BattData_t;
+
+typedef struct
+{
     double pv = 0;
     double load = 0;
     double battCharge = 0;
