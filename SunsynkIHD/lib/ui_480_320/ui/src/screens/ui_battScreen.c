@@ -28,12 +28,13 @@ void ui_battScreen_screen_init(void)
     lv_img_set_src(ui_battIcon2, &ui_img_670870020);
     lv_obj_set_width(ui_battIcon2, LV_SIZE_CONTENT);   /// 90
     lv_obj_set_height(ui_battIcon2, LV_SIZE_CONTENT);    /// 90
-    lv_obj_set_x(ui_battIcon2, 183);
-    lv_obj_set_y(ui_battIcon2, -104);
+    lv_obj_set_x(ui_battIcon2, 187);
+    lv_obj_set_y(ui_battIcon2, -107);
     lv_obj_set_align(ui_battIcon2, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_battIcon2, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
     lv_obj_clear_flag(ui_battIcon2, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_img_set_angle(ui_battIcon2, -900);
+    lv_img_set_zoom(ui_battIcon2, 200);
 
     ui_battCapLabel = lv_label_create(ui_battScreen);
     lv_obj_set_width(ui_battCapLabel, LV_SIZE_CONTENT);   /// 1
@@ -63,7 +64,7 @@ void ui_battScreen_screen_init(void)
     lv_obj_set_x(ui_battSocLabel, -300);
     lv_obj_set_y(ui_battSocLabel, -60);
     lv_obj_set_align(ui_battSocLabel, LV_ALIGN_RIGHT_MID);
-    lv_label_set_text(ui_battSocLabel, "State of charge:");
+    lv_label_set_text(ui_battSocLabel, "State of Charge:");
     lv_obj_set_style_text_color(ui_battSocLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_battSocLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_battSocLabel, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);

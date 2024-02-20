@@ -60,6 +60,14 @@ PlantTotals_t dailyTotals;
 
 BattData_t mqttBattData;
 
+PvData_t mqttPvData;
+
+InverterData_t mqttInverterData;
+
+LoadData_t mqttLoadData;
+
+GridData_t mqttGridData;
+
 // Struct for storing the realtime flow data.
 PlantFlowData_t mqttFlowData;
 
@@ -95,6 +103,9 @@ String ihdTime = "--:--";
 
 // Holds the previous Wi-Fi RSSI so we can smooth the Wi-Fi icon display.
 int8_t lastRssi = 0;
+
+bool homeScreenActive = true;
+unsigned long detailScreenTimeout = 0;
 
 // LVGL structs
 static lv_disp_draw_buf_t draw_buf;
@@ -335,6 +346,12 @@ void TaskClock(void *pvParameters)
         // Check if we need to toggle night mode
         ToggleNightMode();
 
+        // Check if we need to return to the home screen
+        if (homeScreenActive == false && detailScreenTimeout < getTime())
+        {
+            _ui_screen_change(&ui_homeScreen, LV_SCR_LOAD_ANIM_NONE, 100, 0, &ui_homeScreen_screen_init);
+        }
+
         // Wait until this task should run again
         delay(time_delay);
     }
@@ -417,9 +434,37 @@ void connectMQTT() {
     mqtt.subscribe("solar_assistant/total/load_energy/state");
     mqtt.subscribe("solar_assistant/total/pv_energy/state");
 
+    // Battery details
     mqtt.subscribe("solar_assistant/inverter_1/battery_current/state");
     mqtt.subscribe("solar_assistant/inverter_1/battery_voltage/state");
     mqtt.subscribe("solar_assistant/total/battery_temperature/state");
+
+    // PV details
+    mqtt.subscribe("solar_assistant/inverter_1/pv_current_1/state");
+    mqtt.subscribe("solar_assistant/inverter_1/pv_current_2/state");
+    mqtt.subscribe("solar_assistant/inverter_1/pv_voltage_1/state");
+    mqtt.subscribe("solar_assistant/inverter_1/pv_voltage_2/state");
+    mqtt.subscribe("solar_assistant/inverter_1/pv_power_1/state");
+    mqtt.subscribe("solar_assistant/inverter_1/pv_power_2/state");
+
+    // Inverter details
+    mqtt.subscribe("solar_assistant/inverter_1/ac_output_voltage/state");
+    mqtt.subscribe("solar_assistant/inverter_1/ac_output_frequency/state");
+    mqtt.subscribe("solar_assistant/inverter_1/temperature/state");
+    mqtt.subscribe("solar_assistant/inverter_1/device_mode/state");
+    mqtt.subscribe("solar_assistant/inverter_1/work_mode/state");
+    mqtt.subscribe("solar_assistant/inverter_1/energy_pattern/state");
+
+    // Load details
+    mqtt.subscribe("solar_assistant/inverter_1/load_percentage/state");
+    mqtt.subscribe("solar_assistant/inverter_1/load_power_non-essential/state");
+    mqtt.subscribe("solar_assistant/inverter_1/load_power_essential/state");
+    
+    //Grid details
+    mqtt.subscribe("solar_assistant/inverter_1/grid_power_ld/state");
+    mqtt.subscribe("solar_assistant/inverter_1/grid_power_ct/state");
+    mqtt.subscribe("solar_assistant/inverter_1/grid_voltage/state");
+    mqtt.subscribe("solar_assistant/inverter_1/grid_frequency/state");
 }
 
 void mqttReceived(String &topic, String &payload) {
@@ -455,6 +500,44 @@ void mqttReceived(String &topic, String &payload) {
         mqttBattData.voltage = payload.toDouble();
     } else if (topic == "solar_assistant/total/battery_temperature/state") {
         mqttBattData.temperature = payload.toDouble();
+    } else if (topic == "solar_assistant/inverter_1/pv_current_1/state") {
+        mqttPvData.mppt1Current = payload.toDouble();
+    } else if (topic == "solar_assistant/inverter_1/pv_current_2/state") {
+        mqttPvData.mppt2Current = payload.toDouble();
+    } else if (topic == "solar_assistant/inverter_1/pv_voltage_1/state") {
+        mqttPvData.mppt1Voltage = payload.toDouble();
+    } else if (topic == "solar_assistant/inverter_1/pv_voltage_2/state") {
+        mqttPvData.mppt2Voltage = payload.toDouble();
+    } else if (topic == "solar_assistant/inverter_1/pv_power_1/state") {
+        mqttPvData.mppt1Power = payload.toInt();
+    } else if (topic == "solar_assistant/inverter_1/pv_power_2/state") {
+        mqttPvData.mppt2Power = payload.toInt();
+    } else if (topic == "solar_assistant/inverter_1/ac_output_voltage/state") {
+        mqttInverterData.acOutputVoltage = payload.toDouble();
+    } else if (topic == "solar_assistant/inverter_1/ac_output_frequency/state") {
+        mqttInverterData.acOutputFrequency = payload.toDouble();
+    } else if (topic == "solar_assistant/inverter_1/temperature/state") {
+        mqttInverterData.temperature = payload.toDouble();
+    } else if (topic == "solar_assistant/inverter_1/device_mode/state") {
+        mqttInverterData.deviceMode = payload;
+    } else if (topic == "solar_assistant/inverter_1/work_mode/state") {
+        mqttInverterData.workMode = payload;
+    } else if (topic == "solar_assistant/inverter_1/energy_pattern/state") {
+        mqttInverterData.energyPattern = payload;
+    } else if (topic == "solar_assistant/inverter_1/load_percentage/state") {
+        mqttLoadData.loadPercentage = payload.toInt();
+    } else if (topic == "solar_assistant/inverter_1/load_power_non-essential/state") {
+        mqttLoadData.nonEssentialPower = payload.toInt();
+    } else if (topic == "solar_assistant/inverter_1/load_power_essential/state") {
+        mqttLoadData.essentialPower = payload.toInt();
+    } else if (topic == "solar_assistant/inverter_1/grid_power_ld/state") {
+        mqttGridData.ldPower = payload.toInt();
+    } else if (topic == "solar_assistant/inverter_1/grid_power_ct/state") {
+        mqttGridData.ctPower = payload.toInt();
+    } else if (topic == "solar_assistant/inverter_1/grid_voltage/state") {
+        mqttGridData.gridVoltage = payload.toDouble();
+    } else if (topic == "solar_assistant/inverter_1/grid_frequency/state") {
+        mqttGridData.gridFrequency = payload.toDouble();
     }
 
     // Note: Do not use the client in the callback to publish, subscribe or
@@ -692,7 +775,7 @@ void UpdateDisplayFields(PlantFlowData_t &flowData, PlantTotals_t &dailyTotals, 
         lv_label_set_text_fmt(ui_battSoc, "%d%%", flowData.battSoc);
 
         // Update the battery rate
-        float battRate = (double)abs(flowData.battWatts) / (double)BATTERY_CAPACITY * (double)100;
+        float battRate = (double)abs(mqttBattData.current) / (double)BATTERY_CAPACITY_AH * (double)100;
         char battRateStr[8];
         dtostrf(battRate, 3, 1, battRateStr);
         String battRateSign = "+";
@@ -703,13 +786,43 @@ void UpdateDisplayFields(PlantFlowData_t &flowData, PlantTotals_t &dailyTotals, 
         lv_label_set_text_fmt(ui_battSocRate, "%s%s %%/hr", battRateSign, battRateStr);
 
         // Update the battery details
-        //lv_label_set_text_fmt(ui_battCapValue, "%d Ah", mqttBattData.current);
-        lv_label_set_text_fmt(ui_battCapValue, "%d Ah", 300);
+        lv_label_set_text_fmt(ui_battCapValue, "%d Ah", BATTERY_CAPACITY_AH);
         lv_label_set_text_fmt(ui_battSocValue, "%d %%", flowData.battSoc);
         lv_label_set_text_fmt(ui_battPwrValue, "%d W", flowData.battWatts);
         lv_label_set_text_fmt(ui_battCurrValue, "%s A", doubleToString(mqttBattData.current));
         lv_label_set_text_fmt(ui_battVoltValue, "%s V", doubleToString(mqttBattData.voltage));
         lv_label_set_text_fmt(ui_battTempValue, "%s °C", doubleToString(mqttBattData.temperature));
+
+        // Update the PV details
+        lv_label_set_text_fmt(ui_mppt1Power, "%d W", mqttPvData.mppt1Power);
+        lv_label_set_text_fmt(ui_mppt1Current, "%s A", doubleToString(mqttPvData.mppt1Current));
+        lv_label_set_text_fmt(ui_mppt1Voltage, "%s V", doubleToString(mqttPvData.mppt1Voltage));
+        lv_label_set_text_fmt(ui_mppt2Power, "%d W", mqttPvData.mppt2Power);
+        lv_label_set_text_fmt(ui_mppt2Current, "%s A", doubleToString(mqttPvData.mppt2Current));
+        lv_label_set_text_fmt(ui_mppt2Voltage, "%s V", doubleToString(mqttPvData.mppt2Voltage));
+        lv_label_set_text_fmt(ui_mpptPowerTotal, "%d W", mqttPvData.mppt1Power + mqttPvData.mppt2Power);
+
+        // Update the inverter details
+        lv_label_set_text_fmt(ui_acOutputPowerValue, "%d W", mqttFlowData.loadWatts);
+        lv_label_set_text_fmt(ui_acOutputVoltageValue, "%s V", doubleToString(mqttInverterData.acOutputVoltage));
+        lv_label_set_text_fmt(ui_acOutputFreqValue, "%s Hz", doubleToString(mqttInverterData.acOutputFrequency));
+        lv_label_set_text_fmt(ui_invTempValue, "%s °C", doubleToString(mqttInverterData.temperature));
+        lv_label_set_text(ui_deviceModeValue, mqttInverterData.deviceMode.c_str());
+        lv_label_set_text(ui_workModeValue, mqttInverterData.workMode.c_str());
+        lv_label_set_text(ui_energyPatternValue, mqttInverterData.energyPattern.c_str());
+
+        // Update the grid details
+        lv_label_set_text_fmt(ui_gridPowerValue, "%d W", mqttFlowData.gridWatts);
+        lv_label_set_text_fmt(ui_gridPowerLdValue, "%d W", mqttGridData.ldPower);
+        lv_label_set_text_fmt(ui_gridPowerCtValue, "%d W", mqttGridData.ctPower);
+        lv_label_set_text_fmt(ui_gridVoltageValue, "%s V", doubleToString(mqttGridData.gridVoltage));
+        lv_label_set_text_fmt(ui_gridFreqValue, "%s Hz", doubleToString(mqttGridData.gridFrequency));
+
+        // Update the load details
+        lv_label_set_text_fmt(ui_loadPercentValue, "%d %%", mqttLoadData.loadPercentage);
+        lv_label_set_text_fmt(ui_loadPowerValue, "%d W", mqttFlowData.loadWatts);
+        lv_label_set_text_fmt(ui_loadPowerEssValue, "%d W", mqttLoadData.essentialPower);
+        lv_label_set_text_fmt(ui_loadPowerNonEssValue, "%d W", mqttLoadData.nonEssentialPower);
 
         // Update total export
         double eTodayToDbl = dailyTotals.gridExport;
@@ -844,11 +957,21 @@ void my_touchpad_read(lv_indev_drv_t * indev_driver, lv_indev_data_t * data)
     }
 }
 
+void homeScreenOnLoad(lv_event_t * e)
+{
+    // Start a timer to return to the main screen
+    Serial.println("Loaded the home screen.");
+    homeScreenActive = true;
+    detailScreenTimeout = 0;
+}
+
 void detailScreenOnLoad(lv_event_t * e)
 {
     // Start a timer to return to the main screen
+    Serial.println("Loaded a details screen.");
+    homeScreenActive = false;
+    detailScreenTimeout = getTime() + DETAIL_SCREEN_TIMEOUT;
 }
-
 
 void updatePlotData(lv_event_t * e)
 {

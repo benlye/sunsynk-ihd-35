@@ -21,7 +21,180 @@ void ui_inverterScreen_screen_init(void)
     lv_label_set_text(ui_invScreenHeading, "INVERTER");
     lv_obj_set_style_text_color(ui_invScreenHeading, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_invScreenHeading, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_invScreenHeading, &lv_font_montserrat_24, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_decor(ui_invScreenHeading, LV_TEXT_DECOR_UNDERLINE, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_invScreenHeading, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_Inverter2 = lv_obj_create(ui_inverterScreen);
+    lv_obj_set_width(ui_Inverter2, 64);
+    lv_obj_set_height(ui_Inverter2, 64);
+    lv_obj_set_x(ui_Inverter2, 187);
+    lv_obj_set_y(ui_Inverter2, -107);
+    lv_obj_set_align(ui_Inverter2, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(ui_Inverter2, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_Inverter2, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_Inverter2, 256, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_img_src(ui_Inverter2, &ui_img_1551709364, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_color(ui_Inverter2, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(ui_Inverter2, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui_Inverter2, 4, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_color(ui_Inverter2, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_opa(ui_Inverter2, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_width(ui_Inverter2, 12, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_pad(ui_Inverter2, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_acOutputPowerLabel = lv_label_create(ui_inverterScreen);
+    lv_obj_set_width(ui_acOutputPowerLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_acOutputPowerLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_acOutputPowerLabel, -270);
+    lv_obj_set_y(ui_acOutputPowerLabel, -90);
+    lv_obj_set_align(ui_acOutputPowerLabel, LV_ALIGN_RIGHT_MID);
+    lv_label_set_text(ui_acOutputPowerLabel, "AC Output Power:");
+    lv_obj_set_style_text_color(ui_acOutputPowerLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_acOutputPowerLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_acOutputPowerLabel, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_acOutputPowerValue = lv_label_create(ui_inverterScreen);
+    lv_obj_set_width(ui_acOutputPowerValue, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_acOutputPowerValue, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_acOutputPowerValue, 220);
+    lv_obj_set_y(ui_acOutputPowerValue, -90);
+    lv_obj_set_align(ui_acOutputPowerValue, LV_ALIGN_LEFT_MID);
+    lv_label_set_text(ui_acOutputPowerValue, "-- W");
+    lv_obj_set_style_text_color(ui_acOutputPowerValue, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_acOutputPowerValue, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_acOutputPowerValue, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_acOutputVoltageLabel = lv_label_create(ui_inverterScreen);
+    lv_obj_set_width(ui_acOutputVoltageLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_acOutputVoltageLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_acOutputVoltageLabel, -270);
+    lv_obj_set_y(ui_acOutputVoltageLabel, -60);
+    lv_obj_set_align(ui_acOutputVoltageLabel, LV_ALIGN_RIGHT_MID);
+    lv_label_set_text(ui_acOutputVoltageLabel, "AC Output Voltage:");
+    lv_obj_set_style_text_color(ui_acOutputVoltageLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_acOutputVoltageLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_acOutputVoltageLabel, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_acOutputVoltageValue = lv_label_create(ui_inverterScreen);
+    lv_obj_set_width(ui_acOutputVoltageValue, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_acOutputVoltageValue, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_acOutputVoltageValue, 220);
+    lv_obj_set_y(ui_acOutputVoltageValue, -60);
+    lv_obj_set_align(ui_acOutputVoltageValue, LV_ALIGN_LEFT_MID);
+    lv_label_set_text(ui_acOutputVoltageValue, "-- V");
+    lv_obj_set_style_text_color(ui_acOutputVoltageValue, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_acOutputVoltageValue, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_acOutputVoltageValue, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_acOutputFreqLabel = lv_label_create(ui_inverterScreen);
+    lv_obj_set_width(ui_acOutputFreqLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_acOutputFreqLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_acOutputFreqLabel, -270);
+    lv_obj_set_y(ui_acOutputFreqLabel, -30);
+    lv_obj_set_align(ui_acOutputFreqLabel, LV_ALIGN_RIGHT_MID);
+    lv_label_set_text(ui_acOutputFreqLabel, "AC Output Freq:");
+    lv_obj_set_style_text_color(ui_acOutputFreqLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_acOutputFreqLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_acOutputFreqLabel, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_acOutputFreqValue = lv_label_create(ui_inverterScreen);
+    lv_obj_set_width(ui_acOutputFreqValue, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_acOutputFreqValue, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_acOutputFreqValue, 220);
+    lv_obj_set_y(ui_acOutputFreqValue, -30);
+    lv_obj_set_align(ui_acOutputFreqValue, LV_ALIGN_LEFT_MID);
+    lv_label_set_text(ui_acOutputFreqValue, "-- Hz");
+    lv_obj_set_style_text_color(ui_acOutputFreqValue, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_acOutputFreqValue, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_acOutputFreqValue, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_invTempLabel = lv_label_create(ui_inverterScreen);
+    lv_obj_set_width(ui_invTempLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_invTempLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_invTempLabel, -270);
+    lv_obj_set_y(ui_invTempLabel, 0);
+    lv_obj_set_align(ui_invTempLabel, LV_ALIGN_RIGHT_MID);
+    lv_label_set_text(ui_invTempLabel, "Temperature:");
+    lv_obj_set_style_text_color(ui_invTempLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_invTempLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_invTempLabel, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_invTempValue = lv_label_create(ui_inverterScreen);
+    lv_obj_set_width(ui_invTempValue, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_invTempValue, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_invTempValue, 220);
+    lv_obj_set_y(ui_invTempValue, 0);
+    lv_obj_set_align(ui_invTempValue, LV_ALIGN_LEFT_MID);
+    lv_label_set_text(ui_invTempValue, "-- °C");
+    lv_obj_set_style_text_color(ui_invTempValue, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_invTempValue, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_invTempValue, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_deviceModeLabel = lv_label_create(ui_inverterScreen);
+    lv_obj_set_width(ui_deviceModeLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_deviceModeLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_deviceModeLabel, -270);
+    lv_obj_set_y(ui_deviceModeLabel, 30);
+    lv_obj_set_align(ui_deviceModeLabel, LV_ALIGN_RIGHT_MID);
+    lv_label_set_text(ui_deviceModeLabel, "Device Mode:");
+    lv_obj_set_style_text_color(ui_deviceModeLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_deviceModeLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_deviceModeLabel, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_deviceModeValue = lv_label_create(ui_inverterScreen);
+    lv_obj_set_width(ui_deviceModeValue, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_deviceModeValue, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_deviceModeValue, 220);
+    lv_obj_set_y(ui_deviceModeValue, 30);
+    lv_obj_set_align(ui_deviceModeValue, LV_ALIGN_LEFT_MID);
+    lv_label_set_text(ui_deviceModeValue, "--");
+    lv_obj_set_style_text_color(ui_deviceModeValue, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_deviceModeValue, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_deviceModeValue, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_workModeLabel = lv_label_create(ui_inverterScreen);
+    lv_obj_set_width(ui_workModeLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_workModeLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_workModeLabel, -270);
+    lv_obj_set_y(ui_workModeLabel, 60);
+    lv_obj_set_align(ui_workModeLabel, LV_ALIGN_RIGHT_MID);
+    lv_label_set_text(ui_workModeLabel, "Work Mode:");
+    lv_obj_set_style_text_color(ui_workModeLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_workModeLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_workModeLabel, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_workModeValue = lv_label_create(ui_inverterScreen);
+    lv_obj_set_width(ui_workModeValue, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_workModeValue, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_workModeValue, 220);
+    lv_obj_set_y(ui_workModeValue, 60);
+    lv_obj_set_align(ui_workModeValue, LV_ALIGN_LEFT_MID);
+    lv_label_set_text(ui_workModeValue, "--");
+    lv_obj_set_style_text_color(ui_workModeValue, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_workModeValue, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_workModeValue, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_energyPatternLabel = lv_label_create(ui_inverterScreen);
+    lv_obj_set_width(ui_energyPatternLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_energyPatternLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_energyPatternLabel, -270);
+    lv_obj_set_y(ui_energyPatternLabel, 90);
+    lv_obj_set_align(ui_energyPatternLabel, LV_ALIGN_RIGHT_MID);
+    lv_label_set_text(ui_energyPatternLabel, "Energy Pattern:");
+    lv_obj_set_style_text_color(ui_energyPatternLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_energyPatternLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_energyPatternLabel, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_energyPatternValue = lv_label_create(ui_inverterScreen);
+    lv_obj_set_width(ui_energyPatternValue, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_energyPatternValue, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_energyPatternValue, 220);
+    lv_obj_set_y(ui_energyPatternValue, 90);
+    lv_obj_set_align(ui_energyPatternValue, LV_ALIGN_LEFT_MID);
+    lv_label_set_text(ui_energyPatternValue, "--");
+    lv_obj_set_style_text_color(ui_energyPatternValue, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_energyPatternValue, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_energyPatternValue, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_add_event_cb(ui_inverterScreen, ui_event_inverterScreen, LV_EVENT_ALL, NULL);
 

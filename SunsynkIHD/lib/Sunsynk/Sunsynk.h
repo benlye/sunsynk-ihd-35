@@ -24,6 +24,42 @@ typedef struct
 
 typedef struct
 {
+    uint16_t mppt1Power;
+    uint16_t mppt2Power;
+    double mppt1Current;
+    double mppt2Current;
+    double mppt1Voltage;
+    double mppt2Voltage;
+} PvData_t;
+
+typedef struct 
+{
+    uint16_t acOutputPower;
+    double acOutputVoltage;
+    double acOutputFrequency;
+    double temperature;
+    String deviceMode;
+    String workMode;
+    String energyPattern;
+} InverterData_t;
+
+typedef struct
+{
+    uint8_t loadPercentage;
+    int16_t nonEssentialPower;
+    int16_t essentialPower;
+} LoadData_t;
+typedef struct
+{
+    int16_t ldPower;
+    int16_t ctPower;
+    double gridVoltage;
+    double gridFrequency;
+
+} GridData_t;
+
+typedef struct
+{
     double pv = 0;
     double load = 0;
     double battCharge = 0;

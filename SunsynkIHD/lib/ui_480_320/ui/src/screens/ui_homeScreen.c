@@ -574,5 +574,6 @@ void ui_homeScreen_screen_init(void)
     lv_obj_add_event_cb(ui_gridTouch, ui_event_gridTouch, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_battTouch, ui_event_battTouch, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_loadTouch, ui_event_loadTouch, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_homeScreen, ui_event_homeScreen, LV_EVENT_ALL, NULL);
 
 }

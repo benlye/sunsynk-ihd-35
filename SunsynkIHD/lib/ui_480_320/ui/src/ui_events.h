@@ -10,6 +10,7 @@
 extern "C" {
 #endif
 
+void homeScreenOnLoad(lv_event_t * e);
 void detailScreenOnLoad(lv_event_t * e);
 
 #ifdef __cplusplus

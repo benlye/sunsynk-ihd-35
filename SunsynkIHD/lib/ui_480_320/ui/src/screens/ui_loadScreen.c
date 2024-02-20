@@ -21,7 +21,107 @@ void ui_loadScreen_screen_init(void)
     lv_label_set_text(ui_loadScreenHeading, "LOAD");
     lv_obj_set_style_text_color(ui_loadScreenHeading, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_loadScreenHeading, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_loadScreenHeading, &lv_font_montserrat_24, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_decor(ui_loadScreenHeading, LV_TEXT_DECOR_UNDERLINE, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_loadScreenHeading, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_battDetailsIcon = lv_img_create(ui_loadScreen);
+    lv_img_set_src(ui_battDetailsIcon, &ui_img_1076282785);
+    lv_obj_set_width(ui_battDetailsIcon, LV_SIZE_CONTENT);   /// 100
+    lv_obj_set_height(ui_battDetailsIcon, LV_SIZE_CONTENT);    /// 100
+    lv_obj_set_x(ui_battDetailsIcon, 187);
+    lv_obj_set_y(ui_battDetailsIcon, -107);
+    lv_obj_set_align(ui_battDetailsIcon, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_battDetailsIcon, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_battDetailsIcon, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_img_set_zoom(ui_battDetailsIcon, 200);
+
+    ui_loadPercentLabel = lv_label_create(ui_loadScreen);
+    lv_obj_set_width(ui_loadPercentLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_loadPercentLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_loadPercentLabel, -250);
+    lv_obj_set_y(ui_loadPercentLabel, -90);
+    lv_obj_set_align(ui_loadPercentLabel, LV_ALIGN_RIGHT_MID);
+    lv_label_set_text(ui_loadPercentLabel, "Load Percentage:");
+    lv_obj_set_style_text_color(ui_loadPercentLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_loadPercentLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_loadPercentLabel, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_loadPercentValue = lv_label_create(ui_loadScreen);
+    lv_obj_set_width(ui_loadPercentValue, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_loadPercentValue, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_loadPercentValue, 240);
+    lv_obj_set_y(ui_loadPercentValue, -90);
+    lv_obj_set_align(ui_loadPercentValue, LV_ALIGN_LEFT_MID);
+    lv_label_set_text(ui_loadPercentValue, "-- %");
+    lv_obj_set_style_text_color(ui_loadPercentValue, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_loadPercentValue, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_loadPercentValue, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_loadPowerLabel = lv_label_create(ui_loadScreen);
+    lv_obj_set_width(ui_loadPowerLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_loadPowerLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_loadPowerLabel, -250);
+    lv_obj_set_y(ui_loadPowerLabel, -60);
+    lv_obj_set_align(ui_loadPowerLabel, LV_ALIGN_RIGHT_MID);
+    lv_label_set_text(ui_loadPowerLabel, "Load Power:");
+    lv_obj_set_style_text_color(ui_loadPowerLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_loadPowerLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_loadPowerLabel, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_loadPowerValue = lv_label_create(ui_loadScreen);
+    lv_obj_set_width(ui_loadPowerValue, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_loadPowerValue, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_loadPowerValue, 240);
+    lv_obj_set_y(ui_loadPowerValue, -60);
+    lv_obj_set_align(ui_loadPowerValue, LV_ALIGN_LEFT_MID);
+    lv_label_set_text(ui_loadPowerValue, "-- W");
+    lv_obj_set_style_text_color(ui_loadPowerValue, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_loadPowerValue, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_loadPowerValue, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_loadPowerNonEssLabel = lv_label_create(ui_loadScreen);
+    lv_obj_set_width(ui_loadPowerNonEssLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_loadPowerNonEssLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_loadPowerNonEssLabel, -250);
+    lv_obj_set_y(ui_loadPowerNonEssLabel, 0);
+    lv_obj_set_align(ui_loadPowerNonEssLabel, LV_ALIGN_RIGHT_MID);
+    lv_label_set_text(ui_loadPowerNonEssLabel, "Non Essential Power:");
+    lv_obj_set_style_text_color(ui_loadPowerNonEssLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_loadPowerNonEssLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_loadPowerNonEssLabel, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_loadPowerNonEssValue = lv_label_create(ui_loadScreen);
+    lv_obj_set_width(ui_loadPowerNonEssValue, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_loadPowerNonEssValue, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_loadPowerNonEssValue, 240);
+    lv_obj_set_y(ui_loadPowerNonEssValue, 0);
+    lv_obj_set_align(ui_loadPowerNonEssValue, LV_ALIGN_LEFT_MID);
+    lv_label_set_text(ui_loadPowerNonEssValue, "-- W");
+    lv_obj_set_style_text_color(ui_loadPowerNonEssValue, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_loadPowerNonEssValue, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_loadPowerNonEssValue, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_loadPowerEssLabel = lv_label_create(ui_loadScreen);
+    lv_obj_set_width(ui_loadPowerEssLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_loadPowerEssLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_loadPowerEssLabel, -250);
+    lv_obj_set_y(ui_loadPowerEssLabel, -30);
+    lv_obj_set_align(ui_loadPowerEssLabel, LV_ALIGN_RIGHT_MID);
+    lv_label_set_text(ui_loadPowerEssLabel, "Essential Power:");
+    lv_obj_set_style_text_color(ui_loadPowerEssLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_loadPowerEssLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_loadPowerEssLabel, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_loadPowerEssValue = lv_label_create(ui_loadScreen);
+    lv_obj_set_width(ui_loadPowerEssValue, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_loadPowerEssValue, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_loadPowerEssValue, 240);
+    lv_obj_set_y(ui_loadPowerEssValue, -30);
+    lv_obj_set_align(ui_loadPowerEssValue, LV_ALIGN_LEFT_MID);
+    lv_label_set_text(ui_loadPowerEssValue, "-- W");
+    lv_obj_set_style_text_color(ui_loadPowerEssValue, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_loadPowerEssValue, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_loadPowerEssValue, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_add_event_cb(ui_loadScreen, ui_event_loadScreen, LV_EVENT_ALL, NULL);
 

@@ -11,6 +11,7 @@
 
 // SCREEN: ui_homeScreen
 void ui_homeScreen_screen_init(void);
+void ui_event_homeScreen(lv_event_t * e);
 lv_obj_t * ui_homeScreen;
 lv_obj_t * ui_pvIcon;
 lv_obj_t * ui_pvLine;
@@ -73,6 +74,21 @@ void ui_inverterScreen_screen_init(void);
 void ui_event_inverterScreen(lv_event_t * e);
 lv_obj_t * ui_inverterScreen;
 lv_obj_t * ui_invScreenHeading;
+lv_obj_t * ui_Inverter2;
+lv_obj_t * ui_acOutputPowerLabel;
+lv_obj_t * ui_acOutputPowerValue;
+lv_obj_t * ui_acOutputVoltageLabel;
+lv_obj_t * ui_acOutputVoltageValue;
+lv_obj_t * ui_acOutputFreqLabel;
+lv_obj_t * ui_acOutputFreqValue;
+lv_obj_t * ui_invTempLabel;
+lv_obj_t * ui_invTempValue;
+lv_obj_t * ui_deviceModeLabel;
+lv_obj_t * ui_deviceModeValue;
+lv_obj_t * ui_workModeLabel;
+lv_obj_t * ui_workModeValue;
+lv_obj_t * ui_energyPatternLabel;
+lv_obj_t * ui_energyPatternValue;
 
 
 // SCREEN: ui_pvScreen
@@ -80,6 +96,24 @@ void ui_pvScreen_screen_init(void);
 void ui_event_pvScreen(lv_event_t * e);
 lv_obj_t * ui_pvScreen;
 lv_obj_t * ui_pvScreenHeading;
+lv_obj_t * ui_solarIcon;
+lv_obj_t * ui_solarLabels;
+lv_obj_t * ui_pvPowerLabel;
+lv_obj_t * ui_pvCurrentLabel;
+lv_obj_t * ui_pvVoltageLabel;
+lv_obj_t * ui_mppt1Container;
+lv_obj_t * ui_mppt1Header;
+lv_obj_t * ui_mppt1Power;
+lv_obj_t * ui_mppt1Current;
+lv_obj_t * ui_mppt1Voltage;
+lv_obj_t * ui_mppt2Container;
+lv_obj_t * ui_mppt2Header;
+lv_obj_t * ui_mppt2Power;
+lv_obj_t * ui_mppt2Current;
+lv_obj_t * ui_mppt2Voltage;
+lv_obj_t * ui_totalContainer;
+lv_obj_t * ui_mpptPowerTotalLabel;
+lv_obj_t * ui_mpptPowerTotal;
 
 
 // SCREEN: ui_gridScreen
@@ -87,6 +121,17 @@ void ui_gridScreen_screen_init(void);
 void ui_event_gridScreen(lv_event_t * e);
 lv_obj_t * ui_gridScreen;
 lv_obj_t * ui_gridScreenHeading;
+lv_obj_t * ui_gridDetailsIcon;
+lv_obj_t * ui_gridPowerLabel;
+lv_obj_t * ui_gridPowerValue;
+lv_obj_t * ui_gridPowerLdLabel;
+lv_obj_t * ui_gridPowerCtLabel;
+lv_obj_t * ui_gridVoltageLabel;
+lv_obj_t * ui_gridFreqLabel;
+lv_obj_t * ui_gridPowerLdValue;
+lv_obj_t * ui_gridPowerCtValue;
+lv_obj_t * ui_gridVoltageValue;
+lv_obj_t * ui_gridFreqValue;
 
 
 // SCREEN: ui_battScreen
@@ -114,6 +159,15 @@ void ui_loadScreen_screen_init(void);
 void ui_event_loadScreen(lv_event_t * e);
 lv_obj_t * ui_loadScreen;
 lv_obj_t * ui_loadScreenHeading;
+lv_obj_t * ui_battDetailsIcon;
+lv_obj_t * ui_loadPercentLabel;
+lv_obj_t * ui_loadPercentValue;
+lv_obj_t * ui_loadPowerLabel;
+lv_obj_t * ui_loadPowerValue;
+lv_obj_t * ui_loadPowerNonEssLabel;
+lv_obj_t * ui_loadPowerNonEssValue;
+lv_obj_t * ui_loadPowerEssLabel;
+lv_obj_t * ui_loadPowerEssValue;
 lv_obj_t * ui____initial_actions0;
 const lv_img_dsc_t * ui_imgset_867608463[1] = {&ui_img_705529016};
 const lv_img_dsc_t * ui_imgset_1070557679[1] = {&ui_img_670870020};
@@ -135,6 +189,14 @@ const lv_img_dsc_t * ui_imgset_1178831554[1] = {&ui_img_1933564998};
 ///////////////////// ANIMATIONS ////////////////////
 
 ///////////////////// FUNCTIONS ////////////////////
+void ui_event_homeScreen(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_SCREEN_LOADED) {
+        homeScreenOnLoad(e);
+    }
+}
 void ui_event_inverterTouch(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
@@ -180,15 +242,21 @@ void ui_event_inverterScreen(lv_event_t * e)
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_CLICKED) {
-        _ui_screen_change(&ui_homeScreen, LV_SCR_LOAD_ANIM_FADE_ON, 100, 0, &ui_homeScreen_screen_init);
+        _ui_screen_change(&ui_homeScreen, LV_SCR_LOAD_ANIM_NONE, 100, 0, &ui_homeScreen_screen_init);
+    }
+    if(event_code == LV_EVENT_SCREEN_LOADED) {
+        detailScreenOnLoad(e);
     }
 }
 void ui_event_pvScreen(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
-    if(event_code == LV_EVENT_CLICKED) {
-        _ui_screen_change(&ui_homeScreen, LV_SCR_LOAD_ANIM_FADE_ON, 100, 0, &ui_homeScreen_screen_init);
+    if(event_code == LV_EVENT_PRESSED) {
+        _ui_screen_change(&ui_homeScreen, LV_SCR_LOAD_ANIM_NONE, 100, 0, &ui_homeScreen_screen_init);
+    }
+    if(event_code == LV_EVENT_SCREEN_LOADED) {
+        detailScreenOnLoad(e);
     }
 }
 void ui_event_gridScreen(lv_event_t * e)
@@ -196,7 +264,10 @@ void ui_event_gridScreen(lv_event_t * e)
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_CLICKED) {
-        _ui_screen_change(&ui_homeScreen, LV_SCR_LOAD_ANIM_FADE_ON, 100, 0, &ui_homeScreen_screen_init);
+        _ui_screen_change(&ui_homeScreen, LV_SCR_LOAD_ANIM_NONE, 100, 0, &ui_homeScreen_screen_init);
+    }
+    if(event_code == LV_EVENT_SCREEN_LOADED) {
+        detailScreenOnLoad(e);
     }
 }
 void ui_event_battScreen(lv_event_t * e)
@@ -215,7 +286,10 @@ void ui_event_loadScreen(lv_event_t * e)
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_CLICKED) {
-        _ui_screen_change(&ui_homeScreen, LV_SCR_LOAD_ANIM_FADE_ON, 100, 0, &ui_homeScreen_screen_init);
+        _ui_screen_change(&ui_homeScreen, LV_SCR_LOAD_ANIM_NONE, 100, 0, &ui_homeScreen_screen_init);
+    }
+    if(event_code == LV_EVENT_SCREEN_LOADED) {
+        detailScreenOnLoad(e);
     }
 }
 

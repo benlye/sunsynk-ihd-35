@@ -21,7 +21,129 @@ void ui_gridScreen_screen_init(void)
     lv_label_set_text(ui_gridScreenHeading, "GRID");
     lv_obj_set_style_text_color(ui_gridScreenHeading, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_gridScreenHeading, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_gridScreenHeading, &lv_font_montserrat_24, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_decor(ui_gridScreenHeading, LV_TEXT_DECOR_UNDERLINE, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_gridScreenHeading, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_gridDetailsIcon = lv_img_create(ui_gridScreen);
+    lv_img_set_src(ui_gridDetailsIcon, &ui_img_264836261);
+    lv_obj_set_width(ui_gridDetailsIcon, LV_SIZE_CONTENT);   /// 100
+    lv_obj_set_height(ui_gridDetailsIcon, LV_SIZE_CONTENT);    /// 100
+    lv_obj_set_x(ui_gridDetailsIcon, 187);
+    lv_obj_set_y(ui_gridDetailsIcon, -107);
+    lv_obj_set_align(ui_gridDetailsIcon, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_gridDetailsIcon, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_gridDetailsIcon, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_img_set_zoom(ui_gridDetailsIcon, 200);
+
+    ui_gridPowerLabel = lv_label_create(ui_gridScreen);
+    lv_obj_set_width(ui_gridPowerLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_gridPowerLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_gridPowerLabel, -300);
+    lv_obj_set_y(ui_gridPowerLabel, -90);
+    lv_obj_set_align(ui_gridPowerLabel, LV_ALIGN_RIGHT_MID);
+    lv_label_set_text(ui_gridPowerLabel, "Grid Power:");
+    lv_obj_set_style_text_color(ui_gridPowerLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_gridPowerLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_gridPowerLabel, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_gridPowerValue = lv_label_create(ui_gridScreen);
+    lv_obj_set_width(ui_gridPowerValue, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_gridPowerValue, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_gridPowerValue, 190);
+    lv_obj_set_y(ui_gridPowerValue, -90);
+    lv_obj_set_align(ui_gridPowerValue, LV_ALIGN_LEFT_MID);
+    lv_label_set_text(ui_gridPowerValue, "-- W");
+    lv_obj_set_style_text_color(ui_gridPowerValue, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_gridPowerValue, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_gridPowerValue, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_gridPowerLdLabel = lv_label_create(ui_gridScreen);
+    lv_obj_set_width(ui_gridPowerLdLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_gridPowerLdLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_gridPowerLdLabel, -300);
+    lv_obj_set_y(ui_gridPowerLdLabel, -60);
+    lv_obj_set_align(ui_gridPowerLdLabel, LV_ALIGN_RIGHT_MID);
+    lv_label_set_text(ui_gridPowerLdLabel, "Grid Power LD:");
+    lv_obj_set_style_text_color(ui_gridPowerLdLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_gridPowerLdLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_gridPowerLdLabel, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_gridPowerCtLabel = lv_label_create(ui_gridScreen);
+    lv_obj_set_width(ui_gridPowerCtLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_gridPowerCtLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_gridPowerCtLabel, -300);
+    lv_obj_set_y(ui_gridPowerCtLabel, -30);
+    lv_obj_set_align(ui_gridPowerCtLabel, LV_ALIGN_RIGHT_MID);
+    lv_label_set_text(ui_gridPowerCtLabel, "Grid Power CT:");
+    lv_obj_set_style_text_color(ui_gridPowerCtLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_gridPowerCtLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_gridPowerCtLabel, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_gridVoltageLabel = lv_label_create(ui_gridScreen);
+    lv_obj_set_width(ui_gridVoltageLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_gridVoltageLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_gridVoltageLabel, -300);
+    lv_obj_set_y(ui_gridVoltageLabel, 0);
+    lv_obj_set_align(ui_gridVoltageLabel, LV_ALIGN_RIGHT_MID);
+    lv_label_set_text(ui_gridVoltageLabel, "Grid Voltage:");
+    lv_obj_set_style_text_color(ui_gridVoltageLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_gridVoltageLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_gridVoltageLabel, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_gridFreqLabel = lv_label_create(ui_gridScreen);
+    lv_obj_set_width(ui_gridFreqLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_gridFreqLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_gridFreqLabel, -300);
+    lv_obj_set_y(ui_gridFreqLabel, 30);
+    lv_obj_set_align(ui_gridFreqLabel, LV_ALIGN_RIGHT_MID);
+    lv_label_set_text(ui_gridFreqLabel, "Grid Frequency:");
+    lv_obj_set_style_text_color(ui_gridFreqLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_gridFreqLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_gridFreqLabel, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_gridPowerLdValue = lv_label_create(ui_gridScreen);
+    lv_obj_set_width(ui_gridPowerLdValue, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_gridPowerLdValue, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_gridPowerLdValue, 190);
+    lv_obj_set_y(ui_gridPowerLdValue, -60);
+    lv_obj_set_align(ui_gridPowerLdValue, LV_ALIGN_LEFT_MID);
+    lv_label_set_text(ui_gridPowerLdValue, "-- W");
+    lv_obj_set_style_text_color(ui_gridPowerLdValue, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_gridPowerLdValue, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_gridPowerLdValue, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_gridPowerCtValue = lv_label_create(ui_gridScreen);
+    lv_obj_set_width(ui_gridPowerCtValue, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_gridPowerCtValue, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_gridPowerCtValue, 190);
+    lv_obj_set_y(ui_gridPowerCtValue, -30);
+    lv_obj_set_align(ui_gridPowerCtValue, LV_ALIGN_LEFT_MID);
+    lv_label_set_text(ui_gridPowerCtValue, "-- W");
+    lv_obj_set_style_text_color(ui_gridPowerCtValue, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_gridPowerCtValue, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_gridPowerCtValue, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_gridVoltageValue = lv_label_create(ui_gridScreen);
+    lv_obj_set_width(ui_gridVoltageValue, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_gridVoltageValue, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_gridVoltageValue, 190);
+    lv_obj_set_y(ui_gridVoltageValue, 0);
+    lv_obj_set_align(ui_gridVoltageValue, LV_ALIGN_LEFT_MID);
+    lv_label_set_text(ui_gridVoltageValue, "-- V");
+    lv_obj_set_style_text_color(ui_gridVoltageValue, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_gridVoltageValue, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_gridVoltageValue, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_gridFreqValue = lv_label_create(ui_gridScreen);
+    lv_obj_set_width(ui_gridFreqValue, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_gridFreqValue, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_gridFreqValue, 190);
+    lv_obj_set_y(ui_gridFreqValue, 30);
+    lv_obj_set_align(ui_gridFreqValue, LV_ALIGN_LEFT_MID);
+    lv_label_set_text(ui_gridFreqValue, "-- Hz");
+    lv_obj_set_style_text_color(ui_gridFreqValue, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_gridFreqValue, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_gridFreqValue, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_add_event_cb(ui_gridScreen, ui_event_gridScreen, LV_EVENT_ALL, NULL);
 

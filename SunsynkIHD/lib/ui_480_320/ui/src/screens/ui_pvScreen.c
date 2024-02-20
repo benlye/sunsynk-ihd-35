@@ -21,8 +21,194 @@ void ui_pvScreen_screen_init(void)
     lv_label_set_text(ui_pvScreenHeading, "SOLAR");
     lv_obj_set_style_text_color(ui_pvScreenHeading, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_pvScreenHeading, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_decor(ui_pvScreenHeading, LV_TEXT_DECOR_NONE, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_pvScreenHeading, &lv_font_montserrat_24, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_decor(ui_pvScreenHeading, LV_TEXT_DECOR_UNDERLINE, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_pvScreenHeading, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_solarIcon = lv_img_create(ui_pvScreen);
+    lv_img_set_src(ui_solarIcon, &ui_img_1549501229);
+    lv_obj_set_width(ui_solarIcon, LV_SIZE_CONTENT);   /// 100
+    lv_obj_set_height(ui_solarIcon, LV_SIZE_CONTENT);    /// 100
+    lv_obj_set_x(ui_solarIcon, 187);
+    lv_obj_set_y(ui_solarIcon, -107);
+    lv_obj_set_align(ui_solarIcon, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_solarIcon, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_solarIcon, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_img_set_zoom(ui_solarIcon, 200);
+
+    ui_solarLabels = lv_obj_create(ui_pvScreen);
+    lv_obj_remove_style_all(ui_solarLabels);
+    lv_obj_set_width(ui_solarLabels, 85);
+    lv_obj_set_height(ui_solarLabels, 90);
+    lv_obj_set_x(ui_solarLabels, -175);
+    lv_obj_set_y(ui_solarLabels, -10);
+    lv_obj_set_align(ui_solarLabels, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(ui_solarLabels, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_pvPowerLabel = lv_label_create(ui_solarLabels);
+    lv_obj_set_width(ui_pvPowerLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_pvPowerLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_pvPowerLabel, LV_ALIGN_TOP_RIGHT);
+    lv_label_set_text(ui_pvPowerLabel, "Power:");
+    lv_obj_set_style_text_color(ui_pvPowerLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_pvPowerLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_pvPowerLabel, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_pvCurrentLabel = lv_label_create(ui_solarLabels);
+    lv_obj_set_width(ui_pvCurrentLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_pvCurrentLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_pvCurrentLabel, 0);
+    lv_obj_set_y(ui_pvCurrentLabel, 30);
+    lv_obj_set_align(ui_pvCurrentLabel, LV_ALIGN_TOP_RIGHT);
+    lv_label_set_text(ui_pvCurrentLabel, "Current:");
+    lv_obj_set_style_text_color(ui_pvCurrentLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_pvCurrentLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_pvCurrentLabel, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_pvVoltageLabel = lv_label_create(ui_solarLabels);
+    lv_obj_set_width(ui_pvVoltageLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_pvVoltageLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_pvVoltageLabel, 0);
+    lv_obj_set_y(ui_pvVoltageLabel, 60);
+    lv_obj_set_align(ui_pvVoltageLabel, LV_ALIGN_TOP_RIGHT);
+    lv_label_set_text(ui_pvVoltageLabel, "Voltage:");
+    lv_obj_set_style_text_color(ui_pvVoltageLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_pvVoltageLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_pvVoltageLabel, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_mppt1Container = lv_obj_create(ui_pvScreen);
+    lv_obj_remove_style_all(ui_mppt1Container);
+    lv_obj_set_width(ui_mppt1Container, 90);
+    lv_obj_set_height(ui_mppt1Container, 120);
+    lv_obj_set_x(ui_mppt1Container, -80);
+    lv_obj_set_y(ui_mppt1Container, -30);
+    lv_obj_set_align(ui_mppt1Container, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(ui_mppt1Container, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_mppt1Header = lv_label_create(ui_mppt1Container);
+    lv_obj_set_width(ui_mppt1Header, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_mppt1Header, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_mppt1Header, LV_ALIGN_TOP_MID);
+    lv_label_set_text(ui_mppt1Header, "MPPT 1");
+    lv_obj_set_style_text_color(ui_mppt1Header, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_mppt1Header, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_decor(ui_mppt1Header, LV_TEXT_DECOR_UNDERLINE, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_mppt1Header, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_mppt1Power = lv_label_create(ui_mppt1Container);
+    lv_obj_set_width(ui_mppt1Power, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_mppt1Power, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_mppt1Power, 0);
+    lv_obj_set_y(ui_mppt1Power, 35);
+    lv_obj_set_align(ui_mppt1Power, LV_ALIGN_TOP_RIGHT);
+    lv_label_set_text(ui_mppt1Power, "-- W");
+    lv_obj_set_style_text_color(ui_mppt1Power, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_mppt1Power, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_mppt1Power, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_mppt1Current = lv_label_create(ui_mppt1Container);
+    lv_obj_set_width(ui_mppt1Current, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_mppt1Current, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_mppt1Current, 0);
+    lv_obj_set_y(ui_mppt1Current, 65);
+    lv_obj_set_align(ui_mppt1Current, LV_ALIGN_TOP_RIGHT);
+    lv_label_set_text(ui_mppt1Current, "-- A");
+    lv_obj_set_style_text_color(ui_mppt1Current, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_mppt1Current, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_mppt1Current, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_mppt1Voltage = lv_label_create(ui_mppt1Container);
+    lv_obj_set_width(ui_mppt1Voltage, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_mppt1Voltage, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_mppt1Voltage, 0);
+    lv_obj_set_y(ui_mppt1Voltage, 95);
+    lv_obj_set_align(ui_mppt1Voltage, LV_ALIGN_TOP_RIGHT);
+    lv_label_set_text(ui_mppt1Voltage, "-- V");
+    lv_obj_set_style_text_color(ui_mppt1Voltage, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_mppt1Voltage, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_mppt1Voltage, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_mppt2Container = lv_obj_create(ui_pvScreen);
+    lv_obj_remove_style_all(ui_mppt2Container);
+    lv_obj_set_width(ui_mppt2Container, 90);
+    lv_obj_set_height(ui_mppt2Container, 120);
+    lv_obj_set_x(ui_mppt2Container, 30);
+    lv_obj_set_y(ui_mppt2Container, -30);
+    lv_obj_set_align(ui_mppt2Container, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(ui_mppt2Container, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_mppt2Header = lv_label_create(ui_mppt2Container);
+    lv_obj_set_width(ui_mppt2Header, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_mppt2Header, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_mppt2Header, LV_ALIGN_TOP_MID);
+    lv_label_set_text(ui_mppt2Header, "MPPT 2");
+    lv_obj_set_style_text_color(ui_mppt2Header, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_mppt2Header, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_decor(ui_mppt2Header, LV_TEXT_DECOR_UNDERLINE, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_mppt2Header, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_mppt2Power = lv_label_create(ui_mppt2Container);
+    lv_obj_set_width(ui_mppt2Power, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_mppt2Power, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_mppt2Power, 0);
+    lv_obj_set_y(ui_mppt2Power, 35);
+    lv_obj_set_align(ui_mppt2Power, LV_ALIGN_TOP_RIGHT);
+    lv_label_set_text(ui_mppt2Power, "-- W");
+    lv_obj_set_style_text_color(ui_mppt2Power, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_mppt2Power, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_mppt2Power, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_mppt2Current = lv_label_create(ui_mppt2Container);
+    lv_obj_set_width(ui_mppt2Current, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_mppt2Current, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_mppt2Current, 0);
+    lv_obj_set_y(ui_mppt2Current, 65);
+    lv_obj_set_align(ui_mppt2Current, LV_ALIGN_TOP_RIGHT);
+    lv_label_set_text(ui_mppt2Current, "-- A");
+    lv_obj_set_style_text_color(ui_mppt2Current, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_mppt2Current, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_mppt2Current, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_mppt2Voltage = lv_label_create(ui_mppt2Container);
+    lv_obj_set_width(ui_mppt2Voltage, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_mppt2Voltage, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_mppt2Voltage, 0);
+    lv_obj_set_y(ui_mppt2Voltage, 95);
+    lv_obj_set_align(ui_mppt2Voltage, LV_ALIGN_TOP_RIGHT);
+    lv_label_set_text(ui_mppt2Voltage, "-- V");
+    lv_obj_set_style_text_color(ui_mppt2Voltage, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_mppt2Voltage, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_mppt2Voltage, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_totalContainer = lv_obj_create(ui_pvScreen);
+    lv_obj_remove_style_all(ui_totalContainer);
+    lv_obj_set_width(ui_totalContainer, 300);
+    lv_obj_set_height(ui_totalContainer, 50);
+    lv_obj_set_x(ui_totalContainer, 0);
+    lv_obj_set_y(ui_totalContainer, 80);
+    lv_obj_set_align(ui_totalContainer, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(ui_totalContainer, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_mpptPowerTotalLabel = lv_label_create(ui_totalContainer);
+    lv_obj_set_width(ui_mpptPowerTotalLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_mpptPowerTotalLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_mpptPowerTotalLabel, -190);
+    lv_obj_set_y(ui_mpptPowerTotalLabel, 0);
+    lv_obj_set_align(ui_mpptPowerTotalLabel, LV_ALIGN_RIGHT_MID);
+    lv_label_set_text(ui_mpptPowerTotalLabel, "Total:");
+    lv_obj_set_style_text_color(ui_mpptPowerTotalLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_mpptPowerTotalLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_mpptPowerTotalLabel, &lv_font_montserrat_24, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_mpptPowerTotal = lv_label_create(ui_totalContainer);
+    lv_obj_set_width(ui_mpptPowerTotal, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_mpptPowerTotal, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_mpptPowerTotal, 120);
+    lv_obj_set_y(ui_mpptPowerTotal, 0);
+    lv_obj_set_align(ui_mpptPowerTotal, LV_ALIGN_LEFT_MID);
+    lv_label_set_text(ui_mpptPowerTotal, "-- W");
+    lv_obj_set_style_text_color(ui_mpptPowerTotal, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_mpptPowerTotal, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_mpptPowerTotal, &lv_font_montserrat_24, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_add_event_cb(ui_pvScreen, ui_event_pvScreen, LV_EVENT_ALL, NULL);
 

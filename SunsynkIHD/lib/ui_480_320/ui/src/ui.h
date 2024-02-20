@@ -26,6 +26,7 @@ extern "C" {
 #include "ui_events.h"
 // SCREEN: ui_homeScreen
 void ui_homeScreen_screen_init(void);
+void ui_event_homeScreen(lv_event_t * e);
 extern lv_obj_t * ui_homeScreen;
 extern lv_obj_t * ui_pvIcon;
 extern lv_obj_t * ui_pvLine;
@@ -86,16 +87,60 @@ void ui_inverterScreen_screen_init(void);
 void ui_event_inverterScreen(lv_event_t * e);
 extern lv_obj_t * ui_inverterScreen;
 extern lv_obj_t * ui_invScreenHeading;
+extern lv_obj_t * ui_Inverter2;
+extern lv_obj_t * ui_acOutputPowerLabel;
+extern lv_obj_t * ui_acOutputPowerValue;
+extern lv_obj_t * ui_acOutputVoltageLabel;
+extern lv_obj_t * ui_acOutputVoltageValue;
+extern lv_obj_t * ui_acOutputFreqLabel;
+extern lv_obj_t * ui_acOutputFreqValue;
+extern lv_obj_t * ui_invTempLabel;
+extern lv_obj_t * ui_invTempValue;
+extern lv_obj_t * ui_deviceModeLabel;
+extern lv_obj_t * ui_deviceModeValue;
+extern lv_obj_t * ui_workModeLabel;
+extern lv_obj_t * ui_workModeValue;
+extern lv_obj_t * ui_energyPatternLabel;
+extern lv_obj_t * ui_energyPatternValue;
 // SCREEN: ui_pvScreen
 void ui_pvScreen_screen_init(void);
 void ui_event_pvScreen(lv_event_t * e);
 extern lv_obj_t * ui_pvScreen;
 extern lv_obj_t * ui_pvScreenHeading;
+extern lv_obj_t * ui_solarIcon;
+extern lv_obj_t * ui_solarLabels;
+extern lv_obj_t * ui_pvPowerLabel;
+extern lv_obj_t * ui_pvCurrentLabel;
+extern lv_obj_t * ui_pvVoltageLabel;
+extern lv_obj_t * ui_mppt1Container;
+extern lv_obj_t * ui_mppt1Header;
+extern lv_obj_t * ui_mppt1Power;
+extern lv_obj_t * ui_mppt1Current;
+extern lv_obj_t * ui_mppt1Voltage;
+extern lv_obj_t * ui_mppt2Container;
+extern lv_obj_t * ui_mppt2Header;
+extern lv_obj_t * ui_mppt2Power;
+extern lv_obj_t * ui_mppt2Current;
+extern lv_obj_t * ui_mppt2Voltage;
+extern lv_obj_t * ui_totalContainer;
+extern lv_obj_t * ui_mpptPowerTotalLabel;
+extern lv_obj_t * ui_mpptPowerTotal;
 // SCREEN: ui_gridScreen
 void ui_gridScreen_screen_init(void);
 void ui_event_gridScreen(lv_event_t * e);
 extern lv_obj_t * ui_gridScreen;
 extern lv_obj_t * ui_gridScreenHeading;
+extern lv_obj_t * ui_gridDetailsIcon;
+extern lv_obj_t * ui_gridPowerLabel;
+extern lv_obj_t * ui_gridPowerValue;
+extern lv_obj_t * ui_gridPowerLdLabel;
+extern lv_obj_t * ui_gridPowerCtLabel;
+extern lv_obj_t * ui_gridVoltageLabel;
+extern lv_obj_t * ui_gridFreqLabel;
+extern lv_obj_t * ui_gridPowerLdValue;
+extern lv_obj_t * ui_gridPowerCtValue;
+extern lv_obj_t * ui_gridVoltageValue;
+extern lv_obj_t * ui_gridFreqValue;
 // SCREEN: ui_battScreen
 void ui_battScreen_screen_init(void);
 void ui_event_battScreen(lv_event_t * e);
@@ -119,6 +164,15 @@ void ui_loadScreen_screen_init(void);
 void ui_event_loadScreen(lv_event_t * e);
 extern lv_obj_t * ui_loadScreen;
 extern lv_obj_t * ui_loadScreenHeading;
+extern lv_obj_t * ui_battDetailsIcon;
+extern lv_obj_t * ui_loadPercentLabel;
+extern lv_obj_t * ui_loadPercentValue;
+extern lv_obj_t * ui_loadPowerLabel;
+extern lv_obj_t * ui_loadPowerValue;
+extern lv_obj_t * ui_loadPowerNonEssLabel;
+extern lv_obj_t * ui_loadPowerNonEssValue;
+extern lv_obj_t * ui_loadPowerEssLabel;
+extern lv_obj_t * ui_loadPowerEssValue;
 extern lv_obj_t * ui____initial_actions0;
 
 LV_IMG_DECLARE(ui_img_1549501229);    // assets\icons8-solar-panel-100.png
