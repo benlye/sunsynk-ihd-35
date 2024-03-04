@@ -102,7 +102,8 @@ const char* infoMessage = "";
 String ihdTime = "--:--";
 
 // Holds the previous Wi-Fi RSSI so we can smooth the Wi-Fi icon display.
-int8_t lastRssi = 0;
+//int8_t lastRssi = 0;
+int8_t lastRssi[6];
 
 bool homeScreenActive = true;
 unsigned long detailScreenTimeout = 0;
@@ -282,7 +283,11 @@ void loop()
     delay(10);
     if (!mqtt.connected()) {
         Serial.println("MQTT not connected!");
+        infoMessage = "Connecting to Solar Assistant ...";
+        showInfoMessage = true;
         connectMQTT();
+        infoMessage = "";
+        showInfoMessage = false;
     }
     // Nothing to do here as all the work is done by the tasks
 }
@@ -665,22 +670,27 @@ void UpdateDisplayFields(PlantFlowData_t &flowData, PlantTotals_t &dailyTotals, 
     if (WiFi.status() == WL_CONNECTED)
     {
         // Prevent Wi-Fi symbol hysteresis
-        int8_t rssi = WiFi.RSSI();
-        int8_t rssiTemp = rssi;
-        if (rssi < lastRssi + 2 && rssi > lastRssi - 2)
+        int8_t rssiTemp = WiFi.RSSI();
+        int8_t rssiAvg = rssiTemp;
+
+        // Shift the RSSI values and add the most recent
+        for (uint8_t i = 5; i > 0; i--)
         {
-            rssi = lastRssi;
+            lastRssi[i] = lastRssi[i-1];
         }
-        lastRssi = rssiTemp;
+        lastRssi[0] = rssiTemp;
+
+        // Calculate the average RSSI
+        rssiAvg = (lastRssi[0] + lastRssi[1] + lastRssi[2] + lastRssi[3] + lastRssi[4] + lastRssi[5]) / 6;
 
         // Show the appropriate WiFi symbol
-        if (rssi < -80) // Poor signal
+        if (rssiAvg < -80) // Poor signal
         {
             lv_obj_clear_flag(ui_wifiLow, LV_OBJ_FLAG_HIDDEN);
             lv_obj_add_flag(ui_wifiMed, LV_OBJ_FLAG_HIDDEN);
             lv_obj_add_flag(ui_wifiHigh, LV_OBJ_FLAG_HIDDEN);
         }
-        else if (rssi < -67) // Moderate signal
+        else if (rssiAvg < -67) // Moderate signal
         {
             lv_obj_add_flag(ui_wifiLow, LV_OBJ_FLAG_HIDDEN);
             lv_obj_clear_flag(ui_wifiMed, LV_OBJ_FLAG_HIDDEN);
