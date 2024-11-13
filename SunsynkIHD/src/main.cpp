@@ -108,6 +108,8 @@ int8_t lastRssi[6];
 bool homeScreenActive = true;
 unsigned long detailScreenTimeout = 0;
 
+uint8_t mqttDiscCount;
+
 // LVGL structs
 static lv_disp_draw_buf_t draw_buf;
 static lv_color_t *disp_draw_buf;
@@ -246,14 +248,9 @@ void setup()
     mqtt.onMessage(mqttReceived);
     connectMQTT();
 
-    // Authenticate
-    //infoMessage = "Authenticating ...";
-    //sunsynk.Authenticate(SUNSYNK_USERNAME, SUNSYNK_PASSWORD, SUNSYNK_REGION);
-
-    // Create the task to get API data
+    // Create the task to get MQTT data
     infoMessage = "Fetching data ...";
-    //uint32_t api_call_delay = 30000; // 30 seconds
-    uint32_t api_call_delay = 1000; // 5 seconds
+    uint32_t api_call_delay = 1000; // 1 second
     xTaskCreate(TaskCallApi, "API Call Task", 20480, (void *)&api_call_delay, 2, &TaskCallApi_h);
 
     // Create the task to update the time on the IHD display
@@ -279,49 +276,40 @@ void setup()
 
 void loop()
 {
+    // Poll MQTT
     mqtt.loop();
-    delay(10);
     if (!mqtt.connected()) {
         Serial.println("MQTT not connected!");
-        infoMessage = "Connecting to Solar Assistant ...";
-        showInfoMessage = true;
         connectMQTT();
-        infoMessage = "";
-        showInfoMessage = false;
     }
-    // Nothing to do here as all the work is done by the tasks
+    delay(10);
+    // Nothing else to do here as all the work is done by the tasks
 }
 
-// Task to make API calls. Should run every 30s as the API will have new data at most every 60s (but could be 300s).
+// Task to make refresh data from MQTT. Should run every 1s as Solar Assistant pushes every 2s.
 void TaskCallApi(void *pvParameters)
 {
     uint32_t api_delay = *((uint32_t *)pvParameters);
     for (;;)
     {
+        if (!mqtt.connected()) {
+            Serial.println("MQTT not connected!");
+            mqttDiscCount++;
+            if (mqttDiscCount > 5) {
+                infoMessage = "Connecting to Solar Assistant ...";
+                showInfoMessage = true;
+            } else {
+                infoMessage = "";
+                showInfoMessage = false;
+            }
+        }
         // Show the syncing icon
-        apiSyncing = true;
+        //apiSyncing = true;
 
         // Signal that data isn't ready
         ihdDataReady = false;
 
-/*
-        // Check if the access token is still valid, renew it if now
-        if (!sunsynk.CheckAccessToken())
-        {
-            sunsynk.Authenticate(SUNSYNK_USERNAME, SUNSYNK_PASSWORD, SUNSYNK_REGION);
-        }
-
-        // Get the plant flow data
-        sunsynk.GetPlantFlow(SUNSYNK_PLANT_ID, flowData);
-
-        // Get the date/time so we can pull today's totals
-        struct tm timeinfo;
-        if (getLocalTime(&timeinfo))
-        {
-            // Get the daily totals
-            sunsynk.GetDailyTotals(SUNSYNK_PLANT_ID, timeinfo, dailyTotals);
-        }
-*/
+        // Populate the data structs with whatever we have from MQTT
         flowData = mqttFlowData;
         dailyTotals = mqttDailyTotals;
 
@@ -332,7 +320,7 @@ void TaskCallApi(void *pvParameters)
         ihdScreenRefreshed = false;
 
         // Hide the syncing icon
-        apiSyncing = false;
+        //apiSyncing = false;
 
         // Wait until this task should run again
         delay(api_delay);
@@ -427,6 +415,8 @@ void connectMQTT() {
     }
 
     Serial.println(" connected");
+    mqttDiscCount = 0;
+
     mqtt.subscribe("solar_assistant/inverter_1/grid_power/state");
     mqtt.subscribe("solar_assistant/inverter_1/load_power/state");
     mqtt.subscribe("solar_assistant/inverter_1/pv_power/state");
@@ -473,8 +463,6 @@ void connectMQTT() {
 }
 
 void mqttReceived(String &topic, String &payload) {
-    //Serial.println("Incoming: " + topic + ": " + payload);
-
     if (topic == "solar_assistant/inverter_1/grid_power/state") {
         mqttFlowData.gridWatts = payload.toInt();
         mqttFlowData.toGrid = (mqttFlowData.gridWatts < 0);
